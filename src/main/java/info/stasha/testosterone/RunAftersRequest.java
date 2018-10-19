@@ -1,0 +1,60 @@
+package info.stasha.testosterone;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.MultipleFailureException;
+import org.junit.runners.model.Statement;
+
+/**
+ *
+ * @author stasha
+ */
+public class RunAftersRequest extends Statement {
+
+	private final FrameworkMethod method;
+	private final Statement next;
+	private final JerseyRequestTest target;
+	private final List<FrameworkMethod> afters;
+
+	public RunAftersRequest(FrameworkMethod method, Statement next, List<FrameworkMethod> afters, Object target) {
+		this.method = method;
+		this.next = next;
+		this.afters = afters;
+		this.target = (JerseyRequestTest) target;
+	}
+
+	@Override
+	public void evaluate() throws Throwable {
+		List<Throwable> errors = new ArrayList<>();
+		try {
+			next.evaluate();
+
+			Method m = target.getClass().getMethod("setRequestTest", Boolean.class);
+			m.invoke(target, false);
+
+			errors.addAll(target.getMessages());
+
+			if (target.getThrownException() != null) {
+				throw target.getThrownException();
+			}
+
+		} catch (Throwable e) {
+			errors.add(e);
+		} finally {
+			for (FrameworkMethod each : afters) {
+				try {
+					each.invokeExplosively(target);
+				} catch (Throwable e) {
+					errors.add(e);
+				}
+			}
+
+			// cleaning up test
+			target.getMessages().clear();
+			target.setThrownException(null);
+		}
+		MultipleFailureException.assertEmpty(errors);
+	}
+}
