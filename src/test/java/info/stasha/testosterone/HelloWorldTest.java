@@ -1,7 +1,5 @@
 package info.stasha.testosterone;
 
-
-
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -10,13 +8,16 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.AdditionalAnswers.delegatesTo;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.times;
 
+/**
+ *
+ * @author stasha
+ */
 @RunWith(JerseyRequestTestRunner.class)
 public class HelloWorldTest extends MyAppSuperTest {
 
@@ -42,7 +43,12 @@ public class HelloWorldTest extends MyAppSuperTest {
 	@Produces("text/plain")
 	public String test1(@Context UriInfo uriInfo) {
 		assertTrue(uriInfo.getRequestUri().toString().endsWith(INTERNAL_RESOURCE_PATH));
-		return myService.getText();
+//		assertTrue("should be true", false);
+
+		String text = myService.getText();
+		Mockito.verify(myService, times(1)).getText();
+
+		return text;
 	}
 
 	@POST
@@ -55,7 +61,7 @@ public class HelloWorldTest extends MyAppSuperTest {
 		Response resp = target().path(INTERNAL_RESOURCE_PATH).request().get();
 		String data = resp.readEntity(String.class);
 		assertEquals("Messages should equal", MyService.RESPONSE_TEXT, data);
-		
+
 		Mockito.verify(myService, times(1)).getText();
 	}
 
@@ -71,13 +77,15 @@ public class HelloWorldTest extends MyAppSuperTest {
 		System.out.println(myService.getText());
 	}
 
-	@Test(expected = RuntimeException.class)
+	@Test
 	public void test3() {
-		assertTrue(true);
+//		assertTrue(true);
+		testAssert();
 
-		if (1 == 1) {
-			throw new IllegalStateException("exception");
-		}
+	}
+
+	private void testAssert() {
+		assertTrue("Should be true", true);
 	}
 
 }

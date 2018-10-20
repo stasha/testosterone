@@ -33,37 +33,74 @@ import org.junit.runners.model.Statement;
  */
 public class JerseyRequestTestRunner extends BlockJUnit4ClassRunner {
 
+	// cache for instrumented classes
 	private static final Map<Class<?>, Class<?>> CLASSES = new HashMap<>();
 
+	/**
+	 * Interceptor for all methods annotated with @RequestTest or @Path
+	 * annotations.
+	 */
 	public static class MyServiceInterceptor {
 
 		@RuntimeType
-		public static void intercept(@SuperCall Callable<?> zuper, @This JerseyRequestTest orig) throws Exception {
+		public static Object intercept(@SuperCall Callable<?> zuper, @This JerseyRequestTest orig) throws Exception {
 			try {
 				Object obj = zuper.call();
+				return obj;
 			} catch (Throwable ex) {
-				if (ex instanceof AssertionError || ex instanceof AssertionError) {
+				if (ex instanceof AssertionError) {
 					orig.getMessages().add(ex);
 				} else {
 					orig.setThrownException(ex);
 				}
 			}
+			return null;
 		}
 	}
 
+	/**
+	 * Returns instrumented proxy class
+	 *
+	 * @param clazz
+	 * @return
+	 */
 	public static Class<?> getClazz(Class<?> clazz) {
+
 		if (!CLASSES.containsKey(clazz)) {
+
 			Class<?> cls = new ByteBuddy()
 					.subclass(clazz)
 					.name(clazz.getSimpleName())
-					.method(isAnnotatedWith(RequestTest.class))
-					.intercept(MethodDelegation.to(MyServiceInterceptor.class))
-					.attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
+					//
+					// adding @Path annotation to all methods annotated with
+					// @RequestTest excluding methods that already have @Path annotation
 					.method(isAnnotatedWith(RequestTest.class).and(not(isAnnotatedWith(Path.class))))
 					.intercept(MethodDelegation.to(MyServiceInterceptor.class))
 					.attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
 					.annotateMethod(new PathAnnotation())
+					//
+					// adding @GET annotation to all methods annotated with
+					// @RequestTest excluding methods that are already annotated
+					// with one of GET, POST, PUT, DELETE, PATCH, HEAD and OPTIONS
+					//					.method(isAnnotatedWith(RequestTest.class)
+					//							.and(not(isAnnotatedWith(GET.class)))
+					//							.and(not(isAnnotatedWith(POST.class)))
+					//							.and(not(isAnnotatedWith(PUT.class)))
+					//							.and(not(isAnnotatedWith(DELETE.class)))
+					//							.and(not(isAnnotatedWith(PATCH.class)))
+					//							.and(not(isAnnotatedWith(HEAD.class)))
+					//							.and(not(isAnnotatedWith(OPTIONS.class)))
+					//					)
+					//					.intercept(MethodDelegation.to(MyServiceInterceptor.class))
+					//					.attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
 					.annotateMethod(new GetAnnotation())
+					//
+					// intercepting all methods that have @Path annotation
+					.method(isAnnotatedWith(Path.class))
+					.intercept(MethodDelegation.to(MyServiceInterceptor.class))
+					.attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
+					//
+					// building and loading class
 					.make()
 					.load(clazz.getClassLoader())
 					.getLoaded();

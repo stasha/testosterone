@@ -1,7 +1,7 @@
 package info.stasha.testosterone;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import javax.ws.rs.Path;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -23,12 +23,12 @@ import org.junit.internal.InexactComparisonCriteria;
 @Path("")
 public abstract class JerseyRequestTest extends JerseyTest {
 
-	private final List<Throwable> messages = new ArrayList<>();
+	private final Set<Throwable> messages = new LinkedHashSet<>();
 	private Throwable thrownException;
 
 	private Boolean requestTest = false;
 
-	public List<Throwable> getMessages() {
+	public Set<Throwable> getMessages() {
 		return messages;
 	}
 
