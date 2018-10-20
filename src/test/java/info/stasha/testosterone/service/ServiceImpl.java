@@ -1,11 +1,11 @@
-package info.stasha.testosterone;
-
+package info.stasha.testosterone.service;
 
 /**
+ * Service implementation
  *
  * @author stasha
  */
-public class MyServiceImpl implements MyService {
+public class ServiceImpl implements Service {
 
 	private User user;
 

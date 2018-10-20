@@ -28,6 +28,8 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
 /**
+ * Test runner for running JerseyRequestTests and handling methods annotated
+ * with @RequestTest and @Test annotations.
  *
  * @author stasha
  */
@@ -74,7 +76,10 @@ public class JerseyRequestTestRunner extends BlockJUnit4ClassRunner {
 					//
 					// adding @Path annotation to all methods annotated with
 					// @RequestTest excluding methods that already have @Path annotation
-					.method(isAnnotatedWith(RequestTest.class).and(not(isAnnotatedWith(Path.class))))
+					.method(isAnnotatedWith(RequestTest.class)
+							.and(not(isAnnotatedWith(Path.class)))
+							.and(not(isAnnotatedWith(DontIntercept.class)))
+					)
 					.intercept(MethodDelegation.to(MyServiceInterceptor.class))
 					.attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
 					.annotateMethod(new PathAnnotation())
@@ -96,7 +101,9 @@ public class JerseyRequestTestRunner extends BlockJUnit4ClassRunner {
 					.annotateMethod(new GetAnnotation())
 					//
 					// intercepting all methods that have @Path annotation
-					.method(isAnnotatedWith(Path.class))
+					.method(isAnnotatedWith(Path.class)
+							.and(not(isAnnotatedWith(DontIntercept.class)))
+					)
 					.intercept(MethodDelegation.to(MyServiceInterceptor.class))
 					.attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
 					//

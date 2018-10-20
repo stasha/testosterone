@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import javax.ws.rs.Path;
 
 /**
+ * Implementation of Path annotation.
  *
  * @author stasha
  */

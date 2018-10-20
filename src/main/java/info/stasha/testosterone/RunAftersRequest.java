@@ -8,6 +8,7 @@ import org.junit.runners.model.MultipleFailureException;
 import org.junit.runners.model.Statement;
 
 /**
+ * Class responsible for running @After methods and other after stuff.
  *
  * @author stasha
  */

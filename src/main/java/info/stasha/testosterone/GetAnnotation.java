@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import javax.ws.rs.GET;
 
 /**
+ * Implementation of GET annotation
  *
  * @author stasha
  */

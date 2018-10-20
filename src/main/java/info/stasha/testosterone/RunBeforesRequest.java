@@ -6,6 +6,7 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
 /**
+ * Class responsible for running @Before methods and other before stuff.
  *
  * @author stasha
  */

@@ -5,6 +5,7 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
 /**
+ * Expected exception that should be thrown by test.
  *
  * @author stasha
  */

@@ -23,6 +23,9 @@ import org.junit.internal.InexactComparisonCriteria;
 @Path("")
 public abstract class JerseyRequestTest extends JerseyTest {
 
+	protected ResourceConfig configuration;
+	protected AbstractBinder abstractBinder;
+
 	private final Set<Throwable> messages = new LinkedHashSet<>();
 	private Throwable thrownException;
 
@@ -70,16 +73,15 @@ public abstract class JerseyRequestTest extends JerseyTest {
 	protected ResourceConfig configure() {
 		enable(TestProperties.LOG_TRAFFIC);
 //		enable(TestProperties.DUMP_ENTITY);
-		return new ResourceConfig().register(configureAbstractBinder());
-	}
-
-	protected AbstractBinder configureAbstractBinder() {
-		return new AbstractBinder() {
-			@Override
-			protected void configure() {
-
-			}
-		};
+		if (this.configuration == null) {
+			this.configuration = new ResourceConfig();
+			this.abstractBinder = new AbstractBinder() {
+				@Override
+				protected void configure() {
+				}
+			};
+		}
+		return this.configuration.register(this.abstractBinder);
 	}
 
 	/**

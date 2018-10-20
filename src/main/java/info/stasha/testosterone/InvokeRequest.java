@@ -17,6 +17,7 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
 /**
+ * Class responsible for invoking test method.
  *
  * @author stasha
  */
@@ -48,16 +49,14 @@ public class InvokeRequest extends Statement {
 		PATCH patch = method.getAnnotation(PATCH.class);
 		HEAD head = method.getAnnotation(HEAD.class);
 		OPTIONS options = method.getAnnotation(OPTIONS.class);
-		
-		String entity = method.getAnnotation(RequestTest.class).entity();
 
 		WebTarget webTarget = target.target(path);
 		Response resp;
 
 		if (post != null) {
-			resp = webTarget.request().post(Entity.json(entity));
+			resp = webTarget.request().post(Entity.json(null));
 		} else if (put != null) {
-			resp = webTarget.request().put(Entity.json(entity));
+			resp = webTarget.request().put(Entity.json(null));
 		} else if (delete != null) {
 			resp = webTarget.request().delete();
 		} else if (patch != null) {
