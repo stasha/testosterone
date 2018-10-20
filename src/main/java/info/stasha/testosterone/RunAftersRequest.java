@@ -1,6 +1,5 @@
 package info.stasha.testosterone;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.runners.model.FrameworkMethod;
@@ -31,9 +30,6 @@ public class RunAftersRequest extends Statement {
 		List<Throwable> errors = new ArrayList<>();
 		try {
 			next.evaluate();
-
-			Method m = target.getClass().getMethod("setRequestTest", Boolean.class);
-			m.invoke(target, false);
 
 			errors.addAll(target.getMessages());
 

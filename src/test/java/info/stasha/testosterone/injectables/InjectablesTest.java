@@ -2,7 +2,7 @@ package info.stasha.testosterone.injectables;
 
 import info.stasha.testosterone.JerseyRequestTest;
 import info.stasha.testosterone.JerseyRequestTestRunner;
-import info.stasha.testosterone.RequestTest;
+import org.junit.Test;
 import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Configuration;
@@ -46,7 +46,7 @@ public class InjectablesTest extends JerseyRequestTest {
 	@Context
 	private Providers providers;
 
-	@RequestTest
+	@Test
 	public void injectablesTest() {
 		assertNotNull("Application should not be null", application);
 		assertNotNull("HttpHeaders should not be null", httpHeaders);
@@ -58,7 +58,7 @@ public class InjectablesTest extends JerseyRequestTest {
 		assertNotNull("Providers should not be null", providers);
 	}
 
-	@RequestTest
+	@Test
 	public void methodInjectablesTest(
 			@Context Application application,
 			@Context HttpHeaders httpHeaders,

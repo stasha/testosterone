@@ -3,7 +3,7 @@ package info.stasha.testosterone.exceptionmapper;
 import info.stasha.testosterone.DontIntercept;
 import info.stasha.testosterone.JerseyRequestTest;
 import info.stasha.testosterone.JerseyRequestTestRunner;
-import info.stasha.testosterone.RequestTest;
+import org.junit.Test;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import org.junit.runner.RunWith;
@@ -29,7 +29,7 @@ public class ExceptionMappingProviderTest extends JerseyRequestTest {
 		throw new IllegalStateException();
 	}
 
-	@RequestTest
+	@Test
 	public void testmethod() {
 		String resp = target().path(PATH).request().get().readEntity(String.class);
 		assertEquals("ExceptionMappingProvider should return message", ExceptionMapperProvider.MESSAGE, resp);

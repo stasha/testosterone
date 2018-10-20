@@ -1,22 +1,28 @@
 package info.stasha.testosterone;
 
 import java.lang.annotation.Annotation;
+import org.junit.Test;
 
 /**
- * Implementation of RequestTest annotation.
+ * Implementation of Test annotation.
  *
  * @author stasha
  */
-public class RequestTestAnnotation implements RequestTest {
+public class TestAnnotation implements Test {
 
 	@Override
 	public Class<? extends Annotation> annotationType() {
-		return RequestTest.class;
+		return Test.class;
 	}
 
 	@Override
 	public Class<? extends Throwable> expected() {
 		return null;
+	}
+
+	@Override
+	public long timeout() {
+		return 0L;
 	}
 
 }

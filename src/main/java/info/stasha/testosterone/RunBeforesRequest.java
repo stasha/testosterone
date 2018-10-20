@@ -1,6 +1,5 @@
 package info.stasha.testosterone;
 
-import java.lang.reflect.Method;
 import java.util.List;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
@@ -26,8 +25,6 @@ public class RunBeforesRequest extends Statement {
 
 	@Override
 	public void evaluate() throws Throwable {
-		Method m = target.getClass().getMethod("setRequestTest", Boolean.class);
-		m.invoke(target, true);
 
 		for (FrameworkMethod before : befores) {
 			before.invokeExplosively(target);

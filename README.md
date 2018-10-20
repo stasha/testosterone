@@ -21,7 +21,7 @@ public class ApplicationListenerTest extends JerseyRequestTest {
 		Mockito.verify(APPLICATION_LISTENER, times(4)).onEvent(Mockito.any(ApplicationEvent.class));
 	}
 
-	@RequestTest
+	@Test
 	public void applicationListenerTest() {
 		Mockito.verify(APPLICATION_LISTENER, times(3)).onEvent(Mockito.any(ApplicationEvent.class));
 		Mockito.verify(APPLICATION_LISTENER, times(1)).onRequest(Mockito.any(RequestEvent.class));
@@ -46,7 +46,7 @@ public class BeanParamTest extends JerseyRequestTest {
 		assertEquals("State should equal", STATE, user.getState());
 	}
 
-	@RequestTest
+	@Test
 	public void testParams() {
 		Response resp = target().path("beanParam").path(STATE)
 				.queryParam("firstName", FIRST_NAME)
@@ -77,7 +77,7 @@ public class ExceptionMappingProviderTest extends JerseyRequestTest {
 		throw new IllegalStateException();
 	}
 
-	@RequestTest
+	@Test
 	public void testmethod() {
 		String resp = target().path(PATH).request().get().readEntity(String.class);
 		assertEquals("ExceptionMappingProvider should return message", ExceptionMapperProvider.MESSAGE, resp);
@@ -114,7 +114,7 @@ public class InjectablesTest extends JerseyRequestTest {
 	@Context
 	private Providers providers;
 
-	@RequestTest
+	@Test
 	public void injectablesTest() {
 		assertNotNull("Application should not be null", application);
 		assertNotNull("HttpHeaders should not be null", httpHeaders);
@@ -126,7 +126,7 @@ public class InjectablesTest extends JerseyRequestTest {
 		assertNotNull("Providers should not be null", providers);
 	}
 
-	@RequestTest
+	@Test
 	public void methodInjectablesTest(
 			@Context Application application,
 			@Context HttpHeaders httpHeaders,
@@ -167,7 +167,7 @@ public class ReadWriteInterceptorTest extends JerseyRequestTest {
 		return "success";
 	}
 
-	@RequestTest
+	@Test
 	public void testmethod(String data) {
 		// Interceptor should pass string data
 		assertEquals("Interceptor should pass string data", ReadWriteInterceptor.READ_FROM_TEXT, data);
@@ -199,7 +199,7 @@ public class RequestFilterTest extends JerseyRequestTest {
 		return "success";
 	}
 
-	@RequestTest
+	@Test
 	public void testmethod() {
 		// executing GET request that should be changed to POST by filter
 		String resp = target().path(PATH).request().get().readEntity(String.class);
@@ -230,7 +230,7 @@ public class RequestParamsTest extends JerseyRequestTest {
 		assertEquals("State should equal", STATE, state);
 	}
 
-	@RequestTest
+	@Test
 	public void testParams() {
 		Response resp = target().path("beanParam").path(STATE)
 				.queryParam("firstName", FIRST_NAME)
@@ -253,13 +253,13 @@ public class ResourceTest extends JerseyRequestTest {
 		this.abstractBinder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
 	}
 
-	@RequestTest
+	@Test
 	public void testResource() {
 		String resp = target().path(Resource.PATH).request().get().readEntity(String.class);
 		assertEquals("Message returned by request should equal", Resource.MESSAGE, resp);
 	}
 
-	@RequestTest
+	@Test
 	public void testResourceService() {
 		String resp = target().path(Resource.PATH).path("service").request().get().readEntity(String.class);
 		assertEquals("Message returned by request should equal", Service.RESPONSE_TEXT, resp);
@@ -283,19 +283,19 @@ public class ServiceTest extends JerseyRequestTest {
 		this.service = Mockito.mock(Service.class, delegatesTo(service));
 	}
 
-	@RequestTest
+	@Test
 	public void messageTest() {
 		Mockito.verify(service, times(0)).getText();
 		assertEquals("Returned message should equal", Service.RESPONSE_TEXT, service.getText());
 		Mockito.verify(service, times(1)).getText();
 	}
 
-	@RequestTest
+	@Test
 	public void zeroInteractionsTest() {
 		Mockito.verifyZeroInteractions(service);
 	}
 
-	@RequestTest
+	@Test
 	public void customReturnTest() {
 		assertNull("User should be null", service.getUser());
 		Mockito.doReturn(new User()).when(service).getUser();

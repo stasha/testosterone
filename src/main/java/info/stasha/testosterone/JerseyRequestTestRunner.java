@@ -2,7 +2,10 @@ package info.stasha.testosterone;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -18,29 +21,30 @@ import static net.bytebuddy.matcher.ElementMatchers.not;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.internal.runners.statements.ExpectException;
-import org.junit.internal.runners.statements.InvokeMethod;
-import org.junit.internal.runners.statements.RunAfters;
-import org.junit.internal.runners.statements.RunBefores;
+import org.junit.runner.Description;
+import org.junit.runner.Request;
+import org.junit.runner.manipulation.Filter;
+import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
+import org.junit.runners.model.RunnerScheduler;
 import org.junit.runners.model.Statement;
 
 /**
- * Test runner for running JerseyRequestTests and handling methods annotated
- * with @RequestTest and @Test annotations.
+ * Test runner for running JerseyRequestTests.
  *
  * @author stasha
  */
 public class JerseyRequestTestRunner extends BlockJUnit4ClassRunner {
 
 	// cache for instrumented classes
-	private static final Map<Class<?>, Class<?>> CLASSES = new HashMap<>();
+	protected static final Map<Class<?>, Class<?>> CLASSES = new HashMap<>();
+	protected final Object childrenLock = new Object();
+	protected volatile Collection<FrameworkMethod> filteredChildren = null;
 
 	/**
-	 * Interceptor for all methods annotated with @RequestTest or @Path
-	 * annotations.
+	 * Interceptor for all methods annotated with @Test or @Path annotations.
 	 */
 	public static class MyServiceInterceptor {
 
@@ -72,11 +76,11 @@ public class JerseyRequestTestRunner extends BlockJUnit4ClassRunner {
 
 			Class<?> cls = new ByteBuddy()
 					.subclass(clazz)
-					.name(clazz.getSimpleName())
+					.name(clazz.getName() + "_")
 					//
 					// adding @Path annotation to all methods annotated with
-					// @RequestTest excluding methods that already have @Path annotation
-					.method(isAnnotatedWith(RequestTest.class)
+					// @Test excluding methods that already have @Path annotation
+					.method(isAnnotatedWith(Test.class)
 							.and(not(isAnnotatedWith(Path.class)))
 							.and(not(isAnnotatedWith(DontIntercept.class)))
 					)
@@ -85,9 +89,9 @@ public class JerseyRequestTestRunner extends BlockJUnit4ClassRunner {
 					.annotateMethod(new PathAnnotation())
 					//
 					// adding @GET annotation to all methods annotated with
-					// @RequestTest excluding methods that are already annotated
+					// @Test excluding methods that are already annotated
 					// with one of GET, POST, PUT, DELETE, PATCH, HEAD and OPTIONS
-					//					.method(isAnnotatedWith(RequestTest.class)
+					//					.method(isAnnotatedWith(Test.class)
 					//							.and(not(isAnnotatedWith(GET.class)))
 					//							.and(not(isAnnotatedWith(POST.class)))
 					//							.and(not(isAnnotatedWith(PUT.class)))
@@ -123,87 +127,141 @@ public class JerseyRequestTestRunner extends BlockJUnit4ClassRunner {
 	}
 
 	@Override
-	protected List<FrameworkMethod> computeTestMethods() {
-		List<FrameworkMethod> methods = new ArrayList<>();
-		methods.addAll(getTestClass().getAnnotatedMethods(Test.class));
-		methods.addAll(getTestClass().getAnnotatedMethods(RequestTest.class));
-		return methods;
+	protected void validatePublicVoidNoArgMethods(Class<? extends Annotation> annotation,
+			boolean isStatic, List<Throwable> errors) {
+		List<FrameworkMethod> methods = getTestClass().getAnnotatedMethods(annotation);
+
+		for (FrameworkMethod eachTestMethod : methods) {
+			if (annotation == Test.class) {
+				eachTestMethod.validatePublicVoid(isStatic, errors);
+			} else {
+				eachTestMethod.validatePublicVoidNoArg(isStatic, errors);
+			}
+		}
 	}
 
-	protected Class<? extends Throwable> getExpectedException(Annotation annotation) {
-		if (annotation == null) {
+	private Class<? extends Throwable> getExpectedException(Test annotation) {
+		if (annotation == null || annotation.expected() == Test.None.class) {
 			return null;
-		}
-
-		Class<? extends Throwable> expectedException;
-
-		if (annotation instanceof RequestTest) {
-			expectedException = ((RequestTest) annotation).expected();
 		} else {
-			expectedException = ((Test) annotation).expected();
+			return annotation.expected();
 		}
-
-		if (expectedException == Test.None.class) {
-			return null;
-		}
-
-		return expectedException;
-
 	}
 
-	protected boolean expectsException(Annotation annotation) {
+	protected boolean expectsException(Test annotation) {
 		return getExpectedException(annotation) != null;
 	}
 
 	@Override
 	protected Statement methodInvoker(FrameworkMethod method, Object target) {
-		if (method.getAnnotation(RequestTest.class) != null) {
-			return new InvokeRequest(method, target);
-		}
-
-		return new InvokeMethod(method, target);
+		return new InvokeRequest(method, target);
 	}
 
 	@Override
 	protected Statement possiblyExpectingExceptions(FrameworkMethod method, Object target, Statement next) {
-		Annotation annotation;
-		if (method.getAnnotation(RequestTest.class) != null) {
-			annotation = method.getAnnotation(RequestTest.class);
-			return expectsException(annotation) ? new ExpectRequestException(method, next, target, getExpectedException(annotation)) : next;
-		}
-
-		annotation = method.getAnnotation(Test.class);
-		return expectsException(annotation) ? new ExpectException(next, getExpectedException(annotation)) : next;
-
+		Test annotation = method.getAnnotation(Test.class);
+		return expectsException(annotation) ? new ExpectRequestException(method, next, target, getExpectedException(annotation)) : next;
 	}
 
 	@Override
 	protected Statement withBefores(FrameworkMethod method, Object target, Statement statement) {
 		List<FrameworkMethod> befores = getTestClass().getAnnotatedMethods(Before.class);
-		if (method.getAnnotation(RequestTest.class) != null) {
-			return befores.isEmpty() ? statement : new RunBeforesRequest(method, statement, befores, target);
-		}
-		return befores.isEmpty() ? statement : new RunBefores(statement, befores, target);
+		return befores.isEmpty() ? statement : new RunBeforesRequest(method, statement, befores, target);
 	}
 
 	@Override
 	protected Statement withAfters(FrameworkMethod method, Object target, Statement statement) {
 		List<FrameworkMethod> afters = getTestClass().getAnnotatedMethods(After.class);
-		if (method.getAnnotation(RequestTest.class) != null) {
-			return afters.isEmpty() ? statement : new RunAftersRequest(method, statement, afters, target);
-		}
-		return afters.isEmpty() ? statement : new RunAfters(statement, afters, target);
-
+		return afters.isEmpty() ? statement : new RunAftersRequest(method, statement, afters, target);
 	}
 
 	@Override
 	protected void runChild(FrameworkMethod method, RunNotifier notifier) {
-
 		System.out.println("");
 		System.out.println("Running test: " + method.toString());
 
 		super.runChild(method, notifier);
+	}
 
+	@Override
+	public void filter(Filter filter) throws NoTestsRemainException {
+		synchronized (childrenLock) {
+			List<FrameworkMethod> children = new ArrayList<>(getFilteredChildren());
+			for (Iterator<FrameworkMethod> iter = children.iterator(); iter.hasNext();) {
+
+				FrameworkMethod each = iter.next();
+
+//				Description method = Description.createTestDescription(each.getClass(), each.getName());
+//				Request req = Request.aClass(each.getClass()).filterWith(method);
+//				Filter f = Filter.matchMethodDescription(method);
+
+				String filteredClass = filter.describe();
+				String currentClass = "Method " + describeChild(each).toString().replace("_)", ")");
+
+				// hack to enable running single test from IDE
+//				if (shouldRun(filter, each)) {
+				if (filteredClass.equals(currentClass)) {
+					try {
+						filter.apply(each);
+					} catch (NoTestsRemainException e) {
+						iter.remove();
+					}
+				} else {
+					iter.remove();
+				}
+			}
+			filteredChildren = Collections.unmodifiableCollection(children);
+			if (filteredChildren.isEmpty()) {
+				throw new NoTestsRemainException();
+			}
+		}
+	}
+
+	protected Collection<FrameworkMethod> getFilteredChildren() {
+		if (filteredChildren == null) {
+			synchronized (childrenLock) {
+				if (filteredChildren == null) {
+					filteredChildren = Collections.unmodifiableCollection(getChildren());
+				}
+			}
+		}
+		return filteredChildren;
+	}
+
+	private volatile RunnerScheduler scheduler = new RunnerScheduler() {
+		@Override
+		public void schedule(Runnable childStatement) {
+			childStatement.run();
+		}
+
+		@Override
+		public void finished() {
+			// do nothing
+		}
+	};
+
+	protected void runChildren(final RunNotifier notifier) {
+		final RunnerScheduler currentScheduler = scheduler;
+		try {
+			for (final FrameworkMethod each : getFilteredChildren()) {
+				currentScheduler.schedule(new Runnable() {
+					public void run() {
+						JerseyRequestTestRunner.this.runChild(each, notifier);
+					}
+				});
+			}
+		} finally {
+			currentScheduler.finished();
+		}
+	}
+
+	protected Statement childrenInvoker(final RunNotifier notifier) {
+		return new Statement() {
+			@Override
+			public void evaluate() {
+				runChildren(notifier);
+			}
+		};
 	}
 
 }

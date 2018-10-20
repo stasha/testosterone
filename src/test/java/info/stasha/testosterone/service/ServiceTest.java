@@ -2,7 +2,7 @@ package info.stasha.testosterone.service;
 
 import info.stasha.testosterone.JerseyRequestTest;
 import info.stasha.testosterone.JerseyRequestTestRunner;
-import info.stasha.testosterone.RequestTest;
+import org.junit.Test;
 import javax.ws.rs.core.Context;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.junit.runner.RunWith;
@@ -29,19 +29,19 @@ public class ServiceTest extends JerseyRequestTest {
 		this.service = Mockito.mock(Service.class, delegatesTo(service));
 	}
 
-	@RequestTest
+	@Test
 	public void messageTest() {
 		Mockito.verify(service, times(0)).getText();
 		assertEquals("Returned message should equal", Service.RESPONSE_TEXT, service.getText());
 		Mockito.verify(service, times(1)).getText();
 	}
 
-	@RequestTest
+	@Test
 	public void zeroInteractionsTest() {
 		Mockito.verifyZeroInteractions(service);
 	}
 
-	@RequestTest
+	@Test
 	public void customReturnTest() {
 		assertNull("User should be null", service.getUser());
 		Mockito.doReturn(new User()).when(service).getUser();

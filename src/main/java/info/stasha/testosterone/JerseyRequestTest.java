@@ -29,7 +29,6 @@ public abstract class JerseyRequestTest extends JerseyTest {
 	private final Set<Throwable> messages = new LinkedHashSet<>();
 	private Throwable thrownException;
 
-	private Boolean requestTest = false;
 
 	public Set<Throwable> getMessages() {
 		return messages;
@@ -43,20 +42,10 @@ public abstract class JerseyRequestTest extends JerseyTest {
 		this.thrownException = thrownException;
 	}
 
-	public Boolean isRequestTest() {
-		return requestTest;
-	}
-
-	public void setRequestTest(Boolean requestTest) {
-		this.requestTest = requestTest;
-	}
-
 	@Before
 	@Override
 	public void setUp() throws Exception {
-		if (isRequestTest()) {
-			super.setUp();
-		}
+		super.setUp();
 	}
 
 	@Override

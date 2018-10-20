@@ -2,7 +2,7 @@ package info.stasha.testosterone.readwriteinterceptor;
 
 import info.stasha.testosterone.JerseyRequestTest;
 import info.stasha.testosterone.JerseyRequestTestRunner;
-import info.stasha.testosterone.RequestTest;
+import org.junit.Test;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import org.junit.runner.RunWith;
@@ -27,7 +27,7 @@ public class ReadWriteInterceptorTest extends JerseyRequestTest {
 		return "success";
 	}
 
-	@RequestTest
+	@Test
 	public void testmethod(String data) {
 		// Interceptor should pass string data
 		assertEquals("Interceptor should pass string data", ReadWriteInterceptor.READ_FROM_TEXT, data);

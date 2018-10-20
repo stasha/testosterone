@@ -2,7 +2,7 @@ package info.stasha.testosterone.applicationlistener;
 
 import info.stasha.testosterone.JerseyRequestTest;
 import info.stasha.testosterone.JerseyRequestTestRunner;
-import info.stasha.testosterone.RequestTest;
+import org.junit.Test;
 import org.glassfish.jersey.server.monitoring.ApplicationEvent;
 import org.glassfish.jersey.server.monitoring.RequestEvent;
 import org.junit.AfterClass;
@@ -29,7 +29,7 @@ public class ApplicationListenerTest extends JerseyRequestTest {
 		Mockito.verify(APPLICATION_LISTENER, times(4)).onEvent(Mockito.any(ApplicationEvent.class));
 	}
 
-	@RequestTest
+	@Test
 	public void applicationListenerTest() {
 		Mockito.verify(APPLICATION_LISTENER, times(3)).onEvent(Mockito.any(ApplicationEvent.class));
 		Mockito.verify(APPLICATION_LISTENER, times(1)).onRequest(Mockito.any(RequestEvent.class));

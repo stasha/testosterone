@@ -2,7 +2,7 @@ package info.stasha.testosterone.beanparam;
 
 import info.stasha.testosterone.JerseyRequestTest;
 import info.stasha.testosterone.JerseyRequestTestRunner;
-import info.stasha.testosterone.RequestTest;
+import org.junit.Test;
 import info.stasha.testosterone.service.User;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.GET;
@@ -30,7 +30,7 @@ public class BeanParamTest extends JerseyRequestTest {
 		assertEquals("State should equal", STATE, user.getState());
 	}
 
-	@RequestTest
+	@Test
 	public void testParams() {
 		Response resp = target().path("beanParam").path(STATE)
 				.queryParam("firstName", FIRST_NAME)

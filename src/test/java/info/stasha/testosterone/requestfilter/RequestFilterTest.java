@@ -2,7 +2,7 @@ package info.stasha.testosterone.requestfilter;
 
 import info.stasha.testosterone.JerseyRequestTest;
 import info.stasha.testosterone.JerseyRequestTestRunner;
-import info.stasha.testosterone.RequestTest;
+import org.junit.Test;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import org.junit.runner.RunWith;
@@ -27,7 +27,7 @@ public class RequestFilterTest extends JerseyRequestTest {
 		return "success";
 	}
 
-	@RequestTest
+	@Test
 	public void testmethod() {
 		// executing GET request that should be changed to POST by filter
 		String resp = target().path(PATH).request().get().readEntity(String.class);
