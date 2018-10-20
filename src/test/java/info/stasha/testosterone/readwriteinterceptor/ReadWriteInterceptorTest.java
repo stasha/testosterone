@@ -29,7 +29,7 @@ public class ReadWriteInterceptorTest extends JerseyRequestTest {
 
 	@RequestTest
 	public void testmethod(String data) {
-		// Text should pass string data
+		// Interceptor should pass string data
 		assertEquals("Interceptor should pass string data", ReadWriteInterceptor.READ_FROM_TEXT, data);
 
 		// without interceptor, returned text should be "success"
