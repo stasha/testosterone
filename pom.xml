@@ -5,7 +5,7 @@
 	<groupId>info.stasha</groupId>
 	<artifactId>testosterone</artifactId>
 	<!-- version corresponds to used jersey version -->
-	<version>2.27-SNAPSHOT</version>
+	<version>2.27</version>
 	
 	<description>
 		Testosterone enables Jersey usage directly in JUnit test classes. 
