@@ -5,9 +5,13 @@
 	<groupId>info.stasha</groupId>
 	<artifactId>testosterone</artifactId>
 	<!-- version corresponds to used jersey version -->
-	<version>2.27.1-SNAPSHOT</version>
+	<version>2.27-SNAPSHOT</version>
 	
-	<description>Testosterone enables Jersey usage directly in JUnit test classes. In other words, test classes become Jersey resource classes with full JUnit functionality support.</description>
+	<description>
+		Testosterone enables Jersey usage directly in JUnit test classes. 
+		In other words, test classes become Jersey resource classes with full 
+		JUnit functionality support.
+	</description>
 
 	<contributors>
 		<contributor>
@@ -21,8 +25,19 @@
 	<scm>
 		<connection>scm:git:https://github.com/stasha/testosterone.git</connection>
 		<url>https://github.com/stasha/testosterone.git</url>
-	  <tag>HEAD</tag>
-  </scm>
+		<tag>HEAD</tag>
+	</scm>
+	
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
 	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -88,7 +103,7 @@
 			<properties>
 				<checkstyle.skip>true</checkstyle.skip>
 			</properties>
-		
+			
 			<build>
 				<plugins>
 					<plugin>
@@ -98,7 +113,7 @@
 						<configuration>
 							<autoVersionSubmodules>true</autoVersionSubmodules>
 							<useReleaseProfile>false</useReleaseProfile>
-							<goals>deploy</goals>
+							<goals>deploy nexus-staging:release</goals>
 						</configuration>
 					</plugin>
 					<plugin>
@@ -148,6 +163,17 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-deploy-plugin</artifactId>
 						<version>3.0.0-M1</version>
+					</plugin>
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
+						<version>1.6.8</version>
+						<extensions>true</extensions>
+						<configuration>
+							<serverId>ossrh</serverId>
+							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+							<autoReleaseAfterClose>true</autoReleaseAfterClose>
+						</configuration>
 					</plugin>
 				</plugins>
 
