@@ -12,4 +12,6 @@ public interface Service {
 	String getText();
 
 	User getUser();
+
+	void throwIllegalStateException();
 }

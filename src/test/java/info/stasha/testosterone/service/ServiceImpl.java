@@ -23,4 +23,9 @@ public class ServiceImpl implements Service {
 		this.user = user;
 	}
 
+	@Override
+	public void throwIllegalStateException() {
+		throw new IllegalStateException();
+	}
+
 }

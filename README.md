@@ -98,10 +98,39 @@ public class ExceptionMappingProviderTest extends JerseyRequestTest {
 
 }
 ```
+### Expected exception test
+```
+@RunWith(JerseyRequestTestRunner.class)
+public class ExpectedExceptionTest extends JerseyRequestTest {
+
+	public ExpectedExceptionTest() {
+		this.abstractBinder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void illegalStateExceptionTest(@Context Service service) {
+		service.throwIllegalStateException();
+	}
+
+	@GET
+	@Path("exceptionTest")
+	public String throwIllegalStateException(@Context Service service) {
+		service.throwIllegalStateException();
+		return "not reachable";
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void illegalStateExceptionByRequestTest() {
+		target().path("exceptionTest").request().get();
+	}
+
+}
+```
+
 ### Injectables test
 ```
 @RunWith(JerseyRequestTestRunner.class)
-public class InjectablesTest extends JerseyRequestTest {
+public class InjectablesTest extends JerseyWebRequestTest {
 
 	@Context
 	private Application application;
@@ -127,6 +156,18 @@ public class InjectablesTest extends JerseyRequestTest {
 	@Context
 	private Providers providers;
 
+	@Context
+	private HttpServletRequest httpServletRequest;
+
+	@Context
+	private HttpServletResponse httpServletResponse;
+
+	@Context
+	private ServletConfig servletConfig;
+
+	@Context
+	private ServletContext servletContext;
+
 	@Test
 	public void injectablesTest() {
 		assertNotNull("Application should not be null", application);
@@ -137,6 +178,10 @@ public class InjectablesTest extends JerseyRequestTest {
 		assertNotNull("Configuration should not be null", conf);
 		assertNotNull("ResourceContext should not be null", resourceContext);
 		assertNotNull("Providers should not be null", providers);
+		assertNotNull("HttpServletRequest should not be null", httpServletRequest);
+		assertNotNull("HttpServletResponse should not be null", httpServletResponse);
+		assertNotNull("ServletConfig should not be null", servletConfig);
+		assertNotNull("ServletContext should not be null", servletContext);
 	}
 
 	@Test
@@ -148,7 +193,11 @@ public class InjectablesTest extends JerseyRequestTest {
 			@Context UriInfo uriInfo,
 			@Context Configuration conf,
 			@Context ResourceContext resourceContext,
-			@Context Providers providers
+			@Context Providers providers,
+			@Context HttpServletRequest httpServletRequest,
+			@Context HttpServletResponse httpServletResponse,
+			@Context ServletConfig servletConfig,
+			@Context ServletContext servletContext
 	) {
 		assertNotNull("Application should not be null", application);
 		assertNotNull("HttpHeaders should not be null", httpHeaders);
@@ -158,8 +207,11 @@ public class InjectablesTest extends JerseyRequestTest {
 		assertNotNull("Configuration should not be null", conf);
 		assertNotNull("ResourceContext should not be null", resourceContext);
 		assertNotNull("Providers should not be null", providers);
+		assertNotNull("HttpServletRequest should not be null", httpServletRequest);
+		assertNotNull("HttpServletResponse should not be null", httpServletResponse);
+		assertNotNull("ServletConfig should not be null", servletConfig);
+		assertNotNull("ServletContext should not be null", servletContext);
 	}
-
 }
 ```
 
