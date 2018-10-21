@@ -5,7 +5,7 @@
 	<groupId>info.stasha</groupId>
 	<artifactId>testosterone</artifactId>
 	<!-- version corresponds to used jersey version -->
-	<version>2.27.1-SNAPSHOT</version>
+	<version>2.27-SNAPSHOT</version>
 	
 	<name>testosterone</name>
 	<description>
@@ -124,7 +124,7 @@
 				<configuration>
 					<serverId>ossrh</serverId>
 					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+					<autoReleaseAfterClose>false</autoReleaseAfterClose>
 				</configuration>
 			</plugin>
 			<plugin>
