@@ -21,8 +21,6 @@ import static net.bytebuddy.matcher.ElementMatchers.not;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.Description;
-import org.junit.runner.Request;
 import org.junit.runner.manipulation.Filter;
 import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runner.notification.RunNotifier;
