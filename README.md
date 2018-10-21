@@ -3,6 +3,19 @@ Testosterone enables Jersey usage directly in JUnit test classes.
 In other words, test classes become Jersey resource classes with full JUnit functionality support. 
 Components can be injected using @Context or @Inject which is ideal for testing single component functionality. 
 
+### Install using maven:
+```
+<dependency>
+  <groupId>info.stasha</groupId>
+  <artifactId>testosterone</artifactId>
+  <version>${testosterone.version}</version>
+</dependency>
+```
+### Downlod from: 
+```
+https://repo.maven.apache.org/maven2/info/stasha/testosterone/
+```
+
 # Examples
 
 ### Application event listener test
