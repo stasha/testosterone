@@ -4,6 +4,7 @@ In other words, test classes become Jersey resource classes with full JUnit func
 Components can be injected using @Context or @Inject which is ideal for testing single component functionality. 
 
 [![Build Status](https://travis-ci.org/stasha/testosterone.svg?branch=master)](https://travis-ci.org/stasha/testosterone)
+[![CircleCI](https://circleci.com/gh/stasha/testosterone/tree/master.svg?style=svg)](https://circleci.com/gh/stasha/testosterone/tree/master)
 
 ### Install using maven:
 ```
