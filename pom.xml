@@ -5,7 +5,7 @@
 	<groupId>info.stasha</groupId>
 	<artifactId>testosterone</artifactId>
 	<!-- version corresponds to used jersey version -->
-	<version>2.27.2-SNAPSHOT</version>
+	<version>2.27.2</version>
 	
 	<name>testosterone</name>
 	<description>
@@ -35,7 +35,7 @@
 	<scm>
 		<connection>scm:git:https://github.com/stasha/testosterone.git</connection>
 		<url>https://github.com/stasha/testosterone.git</url>
-		<tag>testosterone-2.27</tag>
+		<tag>testosterone-2.27.2</tag>
 	</scm>
 	
 	<distributionManagement>
