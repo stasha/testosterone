@@ -57,6 +57,7 @@
 		<byte-buddy.version>1.9.2</byte-buddy.version>
 		<mockito.version>2.23.0</mockito.version>
 		<junit.version>4.12</junit.version>
+		<generex.version>1.0.2</generex.version>
 	</properties>
 	
 	<dependencies>
@@ -78,6 +79,12 @@
 			<artifactId>jersey-test-framework-provider-bundle</artifactId>
 			<version>${jersey.version}</version>
 			<type>pom</type>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.github.mifmif</groupId>
+			<artifactId>generex</artifactId>
+			<version>${generex.version}</version>
 		</dependency>
 		
 		<dependency>

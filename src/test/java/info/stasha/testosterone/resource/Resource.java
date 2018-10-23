@@ -11,10 +11,11 @@ import javax.ws.rs.core.Context;
  *
  * @author stasha
  */
-@Path(Resource.PATH)
+@Path(Resource.HELLO_WORLD_PATH)
 public class Resource {
 
-	public static final String PATH = "helloworld";
+	public static final String HELLO_WORLD_PATH = "helloworld";
+	public static final String SERVICE_PATH = HELLO_WORLD_PATH + "/service";
 	public static final String MESSAGE = "Hello World!";
 
 	@Context
@@ -23,12 +24,14 @@ public class Resource {
 	@GET
 	@Produces("text/plain")
 	public String getMessage() {
+		System.out.println(MESSAGE);
 		return MESSAGE;
 	}
 
 	@GET
 	@Path("service")
 	public String serviceMessage() {
+		System.out.println(Service.RESPONSE_TEXT);
 		return service.getText();
 	}
 

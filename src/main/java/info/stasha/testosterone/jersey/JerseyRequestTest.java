@@ -1,4 +1,4 @@
-package info.stasha.testosterone;
+package info.stasha.testosterone.jersey;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -8,13 +8,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.DeploymentContext;
 import org.glassfish.jersey.test.JerseyTest;
 import org.glassfish.jersey.test.TestProperties;
-import org.hamcrest.Matcher;
-import org.hamcrest.MatcherAssert;
 import org.junit.Before;
-import org.junit.ComparisonFailure;
-import org.junit.internal.ArrayComparisonFailure;
-import org.junit.internal.ExactComparisonCriteria;
-import org.junit.internal.InexactComparisonCriteria;
 
 /**
  *
@@ -72,6 +66,5 @@ public abstract class JerseyRequestTest extends JerseyTest {
 		}
 		return this.configuration.register(this.abstractBinder);
 	}
-
 
 }

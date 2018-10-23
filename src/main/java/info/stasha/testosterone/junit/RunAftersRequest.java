@@ -1,5 +1,6 @@
-package info.stasha.testosterone;
+package info.stasha.testosterone.junit;
 
+import info.stasha.testosterone.jersey.JerseyRequestTest;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.runners.model.FrameworkMethod;

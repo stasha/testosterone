@@ -247,6 +247,122 @@ public class ReadWriteInterceptorTest extends JerseyRequestTest {
 }
 ```
 
+
+### Request test
+```
+@RunWith(JerseyRequestTestRunner.class)
+public class RequestTest extends JerseyRequestTest {
+
+	public RequestTest() {
+		this.configuration.register(Resource.class);
+		this.abstractBinder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
+	}
+
+	/**
+	 * Multi request test.
+	 *
+	 * @param service
+	 * @param id
+	 * @param firstName
+	 * @param lastName
+	 */
+	@Test
+	@GET
+	@Path("test/{service}/{id}")
+	@Requests(
+			repeat = 2,
+			requests = {
+				@Request(url = "test/[a-z]{10,20}/[0-9]{1,10}?firstName=Jon&lastName=Doe"),
+				@Request(url = "test2/car/[a-z]{10,20}", method = HttpMethod.POST, excludeFromRepeat = {2}),
+				@Request(url = "test2/truck/[a-z]{10,20}", method = HttpMethod.POST)
+			})
+	public void multiRequestTest(
+			@PathParam("service") String service,
+			@PathParam("id") String id,
+			@QueryParam("firstName") String firstName,
+			@QueryParam("lastName") String lastName) {
+
+		assertData(service, id, firstName, lastName);
+	}
+
+	/**
+	 * This will be invoked by "annotations" placed on "multiRequestTest" method
+	 *
+	 * @param service
+	 * @param id
+	 */
+	@POST
+	@Path("test2/{service}/{id}")
+	public void multiRequestTestExternalMethod(
+			@PathParam("service") String service,
+			@PathParam("id") String id) {
+
+		assertTrue("Service should be car or truck", (service.equals("car") || service.equals("truck")));
+		assertTrue("Id should be number", id != null && !id.isEmpty());
+	}
+
+	/**
+	 * Single request test
+	 *
+	 * @param service
+	 * @param id
+	 * @param firstName
+	 * @param lastName
+	 */
+	@Test
+	@POST
+	@Path("test/{service}/{id}")
+	@Request(url = "test/[a-z]{10,20}/[0-9]{1,10}?firstName=Jon&lastName=Doe", method = HttpMethod.POST)
+	public void singleRequestTest(
+			@PathParam("service") String service,
+			@PathParam("id") String id,
+			@QueryParam("firstName") String firstName,
+			@QueryParam("lastName") String lastName) {
+
+		assertData(service, id, firstName, lastName);
+	}
+
+	/**
+	 * Single request to external resource test
+	 *
+	 * @param response
+	 */
+	@Test
+	@Request(url = Resource.HELLO_WORLD_PATH)
+	public void singleRequestExternalResourceTest(Response response) {
+		assertEquals("Status should equal", 200, response.getStatus());
+		assertEquals("Response text should equal", Resource.MESSAGE, response.readEntity(String.class));
+	}
+
+	/**
+	 * Single request to external resource test
+	 *
+	 * @param response
+	 */
+	@Test
+	@Requests(requests = {
+		@Request(url = Resource.HELLO_WORLD_PATH),
+		@Request(url = Resource.SERVICE_PATH)
+	})
+	public void multiRequestExternalResourceTest(Response response) {
+		assertEquals("Status should equal", 200, response.getStatus());
+
+		String resp = response.readEntity(String.class);
+		assertTrue("Message should be: ", Resource.MESSAGE.equals(resp) || Service.RESPONSE_TEXT.equals(resp));
+	}
+
+
+	private void assertData(String service, String id, String firstName, String lastName) {
+		assertTrue("Service should be string", service != null && !service.isEmpty());
+		assertTrue("Id should be number", (Integer) Integer.parseInt(id) instanceof Integer);
+		assertEquals("FirstName should equal", "Jon", firstName);
+		assertEquals("LastName should equal", "Doe", lastName);
+	}
+
+}
+
+```
+
 ### Request filter test
 ```
 @RunWith(JerseyRequestTestRunner.class)

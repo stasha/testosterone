@@ -1,4 +1,4 @@
-package info.stasha.testosterone;
+package info.stasha.testosterone.annotation;
 
 import java.lang.annotation.Annotation;
 import org.junit.Test;

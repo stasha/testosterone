@@ -1,20 +1,12 @@
-package info.stasha.testosterone;
+package info.stasha.testosterone.jersey;
 
+import info.stasha.testosterone.junit.RunAftersRequest;
+import info.stasha.testosterone.junit.RunBeforesRequest;
+import info.stasha.testosterone.junit.ExpectRequestException;
+import info.stasha.testosterone.junit.InvokeRequest;
+import info.stasha.testosterone.instrumentation.Instrument;
 import java.lang.annotation.Annotation;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import javax.ws.rs.Path;
-import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.implementation.MethodDelegation;
-import net.bytebuddy.implementation.attribute.MethodAttributeAppender;
-import net.bytebuddy.implementation.bind.annotation.RuntimeType;
-import net.bytebuddy.implementation.bind.annotation.SuperCall;
-import net.bytebuddy.implementation.bind.annotation.This;
-import static net.bytebuddy.matcher.ElementMatchers.isAnnotatedWith;
-import static net.bytebuddy.matcher.ElementMatchers.not;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,60 +23,8 @@ import org.junit.runners.model.Statement;
  */
 public class JerseyRequestTestRunner extends BlockJUnit4ClassRunner {
 
-	/**
-	 * Interceptor for all methods annotated with @Test or @Path annotations.
-	 */
-	public static class MyServiceInterceptor {
-
-		@RuntimeType
-		public static Object intercept(@SuperCall Callable<?> zuper, @This JerseyRequestTest orig) throws Exception {
-			try {
-				Object obj = zuper.call();
-				return obj;
-			} catch (Throwable ex) {
-				if (ex instanceof AssertionError) {
-					orig.getMessages().add(ex);
-				} else {
-					orig.setThrownException(ex);
-				}
-			}
-			return null;
-		}
-	}
-
-	/**
-	 * Returns instrumented proxy class
-	 *
-	 * @param clazz
-	 * @return
-	 */
-	public static Class<?> getClazz(Class<?> clazz) {
-
-		Class<?> cls = new ByteBuddy()
-				.subclass(clazz)
-				.name(clazz.getName() + "_")
-				.method(isAnnotatedWith(Test.class)
-						.and(not(isAnnotatedWith(Path.class)))
-						.and(not(isAnnotatedWith(DontIntercept.class)))
-				)
-				.intercept(MethodDelegation.to(MyServiceInterceptor.class))
-				.attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
-				.annotateMethod(new PathAnnotation())
-				.annotateMethod(new GetAnnotation())
-				.method(isAnnotatedWith(Path.class)
-						.and(not(isAnnotatedWith(DontIntercept.class)))
-				)
-				.intercept(MethodDelegation.to(MyServiceInterceptor.class))
-				.attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
-				.make()
-				.load(clazz.getClassLoader())
-				.getLoaded();
-
-		return cls;
-	}
-
 	public JerseyRequestTestRunner(Class<?> clazz) throws Throwable {
-		super(getClazz(clazz));
+		super(Instrument.testClass(clazz));
 	}
 
 	@Override
@@ -92,13 +32,13 @@ public class JerseyRequestTestRunner extends BlockJUnit4ClassRunner {
 			boolean isStatic, List<Throwable> errors) {
 		List<FrameworkMethod> methods = getTestClass().getAnnotatedMethods(annotation);
 
-		methods.forEach((eachTestMethod) -> {
+		for (FrameworkMethod eachTestMethod : methods) {
 			if (annotation == Test.class) {
 				eachTestMethod.validatePublicVoid(isStatic, errors);
 			} else {
 				eachTestMethod.validatePublicVoidNoArg(isStatic, errors);
 			}
-		});
+		}
 	}
 
 	@Override

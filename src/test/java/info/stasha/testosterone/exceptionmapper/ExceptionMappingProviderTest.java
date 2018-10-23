@@ -1,8 +1,8 @@
 package info.stasha.testosterone.exceptionmapper;
 
-import info.stasha.testosterone.DontIntercept;
-import info.stasha.testosterone.JerseyRequestTest;
-import info.stasha.testosterone.JerseyRequestTestRunner;
+import info.stasha.testosterone.annotation.DontIntercept;
+import info.stasha.testosterone.jersey.JerseyRequestTest;
+import info.stasha.testosterone.jersey.JerseyRequestTestRunner;
 import org.junit.Test;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

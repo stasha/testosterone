@@ -1,7 +1,7 @@
 package info.stasha.testosterone.resource;
 
-import info.stasha.testosterone.JerseyRequestTest;
-import info.stasha.testosterone.JerseyRequestTestRunner;
+import info.stasha.testosterone.jersey.JerseyRequestTest;
+import info.stasha.testosterone.jersey.JerseyRequestTestRunner;
 import org.junit.Test;
 import info.stasha.testosterone.service.Service;
 import info.stasha.testosterone.service.ServiceFactory;
@@ -24,13 +24,13 @@ public class ResourceTest extends JerseyRequestTest {
 
 	@Test
 	public void testResource() {
-		String resp = target().path(Resource.PATH).request().get().readEntity(String.class);
+		String resp = target().path(Resource.HELLO_WORLD_PATH).request().get().readEntity(String.class);
 		assertEquals("Message returned by request should equal", Resource.MESSAGE, resp);
 	}
 
 	@Test
 	public void testResourceService() {
-		String resp = target().path(Resource.PATH).path("service").request().get().readEntity(String.class);
+		String resp = target().path(Resource.HELLO_WORLD_PATH).path("service").request().get().readEntity(String.class);
 		assertEquals("Message returned by request should equal", Service.RESPONSE_TEXT, resp);
 	}
 
