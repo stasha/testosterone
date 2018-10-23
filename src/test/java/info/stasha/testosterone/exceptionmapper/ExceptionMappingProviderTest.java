@@ -6,6 +6,7 @@ import info.stasha.testosterone.JerseyRequestTestRunner;
 import org.junit.Test;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import static org.junit.Assert.assertEquals;
 import org.junit.runner.RunWith;
 
 /**

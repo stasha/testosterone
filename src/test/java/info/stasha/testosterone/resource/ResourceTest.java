@@ -6,6 +6,7 @@ import org.junit.Test;
 import info.stasha.testosterone.service.Service;
 import info.stasha.testosterone.service.ServiceFactory;
 import org.glassfish.jersey.process.internal.RequestScoped;
+import static org.junit.Assert.assertEquals;
 import org.junit.runner.RunWith;
 
 /**

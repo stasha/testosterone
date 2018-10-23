@@ -16,6 +16,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Providers;
+import static org.junit.Assert.assertNotNull;
 import org.junit.runner.RunWith;
 
 /**
