@@ -335,7 +335,7 @@ public class RequestTest extends JerseyRequestTest {
 	}
 
 	/**
-	 * Single request to external resource test
+	 * Multi request to external resource test
 	 *
 	 * @param response
 	 */
