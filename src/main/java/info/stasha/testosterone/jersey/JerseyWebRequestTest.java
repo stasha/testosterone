@@ -22,8 +22,8 @@ public class JerseyWebRequestTest extends JerseyRequestTest {
 	}
 
 	/**
-	 * Invoked before servletContainer is build. This is the time when to
-	 * setup servlet container and register @WebListeners or @WebFilter...
+	 * Invoked before servletContainer is build. This is the time when to setup
+	 * servlet container and register @WebListeners or @WebFilter...
 	 */
 	protected void prepareWebContainer() {
 

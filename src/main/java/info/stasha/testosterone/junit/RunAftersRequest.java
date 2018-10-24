@@ -3,8 +3,8 @@ package info.stasha.testosterone.junit;
 import info.stasha.testosterone.jersey.JerseyRequestTest;
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.internal.runners.model.MultipleFailureException;
 import org.junit.runners.model.FrameworkMethod;
-import org.junit.runners.model.MultipleFailureException;
 import org.junit.runners.model.Statement;
 
 /**
@@ -53,6 +53,13 @@ public class RunAftersRequest extends Statement {
 			target.getMessages().clear();
 			target.setThrownException(null);
 		}
-		MultipleFailureException.assertEmpty(errors);
+		if (errors.isEmpty()) {
+			return;
+		}
+		if (errors.size() == 1) {
+			throw errors.get(0);
+		}
+
+		throw new MultipleFailureException(errors);
 	}
 }

@@ -5,10 +5,8 @@ import java.util.Set;
 import javax.ws.rs.Path;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.test.DeploymentContext;
 import org.glassfish.jersey.test.JerseyTest;
 import org.glassfish.jersey.test.TestProperties;
-import org.junit.Before;
 
 /**
  *
@@ -36,21 +34,6 @@ public abstract class JerseyRequestTest extends JerseyTest {
 		this.thrownException = thrownException;
 	}
 
-	@Before
-	@Override
-	public void setUp() throws Exception {
-		super.setUp();
-	}
-
-	@Override
-	protected DeploymentContext configureDeployment() {
-		ResourceConfig config = configure();
-
-		// registering test class as resource
-		config.registerInstances(this);
-
-		return DeploymentContext.builder(config).build();
-	}
 
 	@Override
 	protected ResourceConfig configure() {
@@ -64,6 +47,8 @@ public abstract class JerseyRequestTest extends JerseyTest {
 				}
 			};
 		}
+		// registering test class as resource
+		this.configuration.registerInstances(this);
 		return this.configuration.register(this.abstractBinder);
 	}
 

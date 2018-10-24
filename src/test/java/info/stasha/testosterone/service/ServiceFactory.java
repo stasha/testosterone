@@ -1,17 +1,28 @@
 package info.stasha.testosterone.service;
 
-import java.util.function.Supplier;
+import info.stasha.testosterone.jersey.FactorySupplier;
 
 /**
  * Service factory
  *
  * @author stasha
  */
-public class ServiceFactory implements Supplier<Service> {
+public class ServiceFactory implements FactorySupplier<Service> {
+
 
 	@Override
 	public Service get() {
 		return new ServiceImpl();
+	}
+
+	@Override
+	public Service provide() {
+		return new ServiceImpl();
+	}
+
+	@Override
+	public void dispose(Service t) {
+		//do nothing
 	}
 
 }

@@ -23,8 +23,11 @@ import org.junit.runners.model.Statement;
  */
 public class JerseyRequestTestRunner extends BlockJUnit4ClassRunner {
 
+	protected Class<?> testClass;
+
 	public JerseyRequestTestRunner(Class<?> clazz) throws Throwable {
 		super(Instrument.testClass(clazz));
+		this.testClass = clazz;
 	}
 
 	@Override
@@ -68,8 +71,7 @@ public class JerseyRequestTestRunner extends BlockJUnit4ClassRunner {
 
 	@Override
 	protected Description describeChild(FrameworkMethod method) {
-		return Description.createTestDescription(getTestClass().getJavaClass().getName().replaceFirst("_$", ""),
-				testName(method), method.getAnnotations());
+		return Description.createTestDescription(this.testClass, testName(method), method.getAnnotations());
 	}
 
 	@Override
