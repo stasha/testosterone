@@ -11,7 +11,9 @@ import org.mockito.Mockito;
 import static org.mockito.Mockito.times;
 
 /**
- * Application event listener test
+ * Application event listener test<br>
+ *
+ * NOTE ApplicationEventListener is supported from Jersey version 2.1
  *
  * @author stasha
  */
@@ -20,17 +22,20 @@ public class ApplicationListenerTest extends JerseyRequestTest {
 
 	private static final ApplicationListener APPLICATION_LISTENER = Mockito.spy(new ApplicationListener());
 
-	public ApplicationListenerTest() {
+	@Override
+	protected void init() {
 		this.configuration.registerInstances(APPLICATION_LISTENER);
 	}
 
 	@AfterClass
 	public static void afterClass() {
+		// jersey version 2.1, 2.2, 2.3, 2.4 will invoke only 3 times
 		Mockito.verify(APPLICATION_LISTENER, times(4)).onEvent(Mockito.any(ApplicationEvent.class));
 	}
 
 	@Test
 	public void applicationListenerTest() {
+		// jersey version 2.1, 2.2, 2.3, 2.4 will invoke only 2 times
 		Mockito.verify(APPLICATION_LISTENER, times(3)).onEvent(Mockito.any(ApplicationEvent.class));
 		Mockito.verify(APPLICATION_LISTENER, times(1)).onRequest(Mockito.any(RequestEvent.class));
 	}

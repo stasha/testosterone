@@ -1,6 +1,6 @@
 package info.stasha.testosterone.junit;
 
-import info.stasha.testosterone.jersey.JerseyRequestTest;
+import info.stasha.testosterone.Testosterone;
 import java.util.List;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
@@ -15,13 +15,13 @@ public class RunBeforesRequest extends Statement {
 	private final FrameworkMethod method;
 	private final Statement next;
 	private final List<FrameworkMethod> befores;
-	private final JerseyRequestTest target;
+	private final Testosterone target;
 
 	public RunBeforesRequest(FrameworkMethod method, Statement next, List<FrameworkMethod> befores, Object target) {
 		this.method = method;
 		this.next = next;
 		this.befores = befores;
-		this.target = (JerseyRequestTest) target;
+		this.target = (Testosterone) target;
 	}
 
 	@Override

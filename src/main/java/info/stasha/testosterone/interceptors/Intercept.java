@@ -1,6 +1,6 @@
 package info.stasha.testosterone.interceptors;
 
-import info.stasha.testosterone.jersey.JerseyRequestTest;
+import info.stasha.testosterone.Testosterone;
 import java.util.concurrent.Callable;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.implementation.bind.annotation.SuperCall;
@@ -19,7 +19,7 @@ public class Intercept {
 	public static class TestClass {
 
 		@RuntimeType
-		public static Object intercept(@SuperCall Callable<?> zuper, @This JerseyRequestTest orig) throws Exception {
+		public static Object intercept(@SuperCall Callable<?> zuper, @This Testosterone orig) throws Exception {
 			try {
 				Object obj = zuper.call();
 				return obj;

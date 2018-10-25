@@ -18,7 +18,8 @@ public class RequestFilterTest extends JerseyRequestTest {
 
 	public static final String PATH = "filterChangedMethod";
 
-	public RequestFilterTest() {
+	@Override
+	protected void init() {
 		this.configuration.registerInstances(new RequestFilter());
 	}
 

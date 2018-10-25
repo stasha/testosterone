@@ -1,7 +1,7 @@
 package info.stasha.testosterone.annotation;
 
 import java.lang.annotation.Annotation;
-import org.eclipse.jetty.http.HttpMethod;
+import javax.ws.rs.HttpMethod;
 
 /**
  * Implementation of Request annotation
@@ -14,7 +14,7 @@ public class RequestAnnotation implements Request {
 	private int[] excludeFromRepeat = new int[]{};
 	private String url;
 	private String[] headerParams = new String[]{};
-	private HttpMethod method = HttpMethod.GET;
+	private String method = HttpMethod.GET;
 
 	public RequestAnnotation() {
 	}
@@ -39,7 +39,7 @@ public class RequestAnnotation implements Request {
 		this.headerParams = headerParams;
 	}
 
-	public void setMethod(HttpMethod method) {
+	public void setMethod(String method) {
 		this.method = method;
 	}
 
@@ -69,7 +69,7 @@ public class RequestAnnotation implements Request {
 	}
 
 	@Override
-	public HttpMethod method() {
+	public String method() {
 		return this.method;
 	}
 

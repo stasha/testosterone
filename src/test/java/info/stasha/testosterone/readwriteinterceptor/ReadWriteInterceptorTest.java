@@ -18,7 +18,8 @@ public class ReadWriteInterceptorTest extends JerseyRequestTest {
 
 	public static final String PATH = "changeTextInterceptor";
 
-	public ReadWriteInterceptorTest() {
+	@Override
+	protected void init() {
 		this.configuration.registerInstances(new ReadWriteInterceptor());
 	}
 

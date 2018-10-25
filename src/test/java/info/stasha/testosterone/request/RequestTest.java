@@ -8,12 +8,12 @@ import info.stasha.testosterone.resource.Resource;
 import info.stasha.testosterone.service.Service;
 import info.stasha.testosterone.service.ServiceFactory;
 import javax.ws.rs.GET;
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-import org.eclipse.jetty.http.HttpMethod;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -28,8 +28,10 @@ import org.junit.runner.RunWith;
 @RunWith(JerseyRequestTestRunner.class)
 public class RequestTest extends JerseyRequestTest {
 
-	public RequestTest() {
+	@Override
+	protected void init() {
 		this.configuration.register(Resource.class);
+		// Jersey 2.0 doesn't support "proxyForSameScope" method.
 		this.abstractBinder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
 	}
 
@@ -47,8 +49,10 @@ public class RequestTest extends JerseyRequestTest {
 	@Requests(
 			repeat = 2,
 			requests = {
-				@Request(url = "test/[a-z]{10,20}/[0-9]{1,10}?firstName=Jon&lastName=Doe"),
-				@Request(url = "test2/car/[a-z]{10,20}", method = HttpMethod.POST, excludeFromRepeat = {2}),
+				@Request(url = "test/[a-z]{10,20}/[0-9]{1,10}?firstName=Jon&lastName=Doe")
+				,
+				@Request(url = "test2/car/[a-z]{10,20}", method = HttpMethod.POST, excludeFromRepeat = {2})
+				,
 				@Request(url = "test2/truck/[a-z]{10,20}", method = HttpMethod.POST)
 			})
 	public void multiRequestTest(
@@ -116,7 +120,8 @@ public class RequestTest extends JerseyRequestTest {
 	 */
 	@Test
 	@Requests(requests = {
-		@Request(url = Resource.HELLO_WORLD_PATH),
+		@Request(url = Resource.HELLO_WORLD_PATH)
+		,
 		@Request(url = Resource.SERVICE_PATH)
 	})
 	public void multiRequestExternalResourceTest(Response response) {

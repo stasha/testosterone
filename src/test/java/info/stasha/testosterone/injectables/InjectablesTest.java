@@ -1,5 +1,6 @@
 package info.stasha.testosterone.injectables;
 
+import info.stasha.testosterone.Testosterone;
 import info.stasha.testosterone.jersey.JerseyRequestTestRunner;
 import info.stasha.testosterone.jersey.JerseyWebRequestTest;
 import javax.servlet.ServletConfig;
@@ -20,7 +21,7 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.runner.RunWith;
 
 /**
- * Test injectables
+ * Test injectables 
  *
  * @author stasha
  */
@@ -63,6 +64,10 @@ public class InjectablesTest extends JerseyWebRequestTest {
 	@Context
 	private ServletContext servletContext;
 
+	/**
+	 * Jersey version 2.0, 2.1, 2.2, 2.3 will fail with message "Not inside a
+	 * request scope."
+	 */
 	@Test
 	public void injectablesTest() {
 		assertNotNull("Application should not be null", application);
@@ -79,6 +84,22 @@ public class InjectablesTest extends JerseyWebRequestTest {
 		assertNotNull("ServletContext should not be null", servletContext);
 	}
 
+	/**
+	 * Jersey version 2.0 will fail with message "Not inside a request scope."
+	 *
+	 * @param application
+	 * @param httpHeaders
+	 * @param request
+	 * @param securityContext
+	 * @param uriInfo
+	 * @param conf
+	 * @param resourceContext
+	 * @param providers
+	 * @param httpServletRequest
+	 * @param httpServletResponse
+	 * @param servletConfig
+	 * @param servletContext
+	 */
 	@Test
 	public void methodInjectablesTest(
 			@Context Application application,

@@ -7,7 +7,9 @@ import info.stasha.testosterone.interceptors.Intercept;
 import javax.ws.rs.Path;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.implementation.MethodDelegation;
+import net.bytebuddy.implementation.SuperMethodCall;
 import net.bytebuddy.implementation.attribute.MethodAttributeAppender;
+import net.bytebuddy.matcher.ElementMatchers;
 import static net.bytebuddy.matcher.ElementMatchers.anyOf;
 import static net.bytebuddy.matcher.ElementMatchers.isAnnotatedWith;
 import static net.bytebuddy.matcher.ElementMatchers.not;
@@ -31,6 +33,9 @@ public class Instrument {
 		return new ByteBuddy()
 				.subclass(clazz)
 				.name(clazz.getName() + "_")
+				.constructor(ElementMatchers.isDefaultConstructor())
+				.intercept(SuperMethodCall.INSTANCE)
+				.annotateType(new PathAnnotation(""))
 				.method(isAnnotatedWith(anyOf(Test.class))
 						.and(not(isAnnotatedWith(Path.class)))
 						.and(not(isAnnotatedWith(DontIntercept.class)))

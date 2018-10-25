@@ -4,7 +4,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import org.eclipse.jetty.http.HttpMethod;
+import javax.ws.rs.HttpMethod;
 
 /**
  * Request annotation.
@@ -41,7 +41,7 @@ public @interface Request {
 	 *
 	 * @return
 	 */
-	HttpMethod method() default HttpMethod.GET;
+	String method() default HttpMethod.GET;
 
 	/**
 	 * Header parameters that will be used when invoking test method

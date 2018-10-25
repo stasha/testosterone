@@ -17,8 +17,10 @@ import org.junit.runner.RunWith;
 @RunWith(JerseyRequestTestRunner.class)
 public class ResourceTest extends JerseyRequestTest {
 
-	public ResourceTest() {
+	@Override
+	protected void init() {
 		this.configuration.register(Resource.class);
+		// Jersey 2.0 doesn't support "proxyForSameScope" method.
 		this.abstractBinder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
 	}
 

@@ -19,7 +19,9 @@ import org.junit.runner.RunWith;
 @RunWith(JerseyRequestTestRunner.class)
 public class ExpectedExceptionTest extends JerseyRequestTest {
 
-	public ExpectedExceptionTest() {
+	@Override
+	protected void init() {
+		// Jersey 2.0 doesn't support "proxyForSameScope" method.
 		this.abstractBinder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
 	}
 

@@ -23,7 +23,9 @@ public class ServiceTest extends JerseyRequestTest {
 
 	private Service service;
 
-	public ServiceTest() {
+	@Override
+	protected void init() {
+		// Jersey 2.0 doesn't support "proxyForSameScope" method.
 		this.abstractBinder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
 	}
 

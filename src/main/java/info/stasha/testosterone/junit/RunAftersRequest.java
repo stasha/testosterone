@@ -1,6 +1,6 @@
 package info.stasha.testosterone.junit;
 
-import info.stasha.testosterone.jersey.JerseyRequestTest;
+import info.stasha.testosterone.Testosterone;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.internal.runners.model.MultipleFailureException;
@@ -16,14 +16,14 @@ public class RunAftersRequest extends Statement {
 
 	private final FrameworkMethod method;
 	private final Statement next;
-	private final JerseyRequestTest target;
+	private final Testosterone target;
 	private final List<FrameworkMethod> afters;
 
 	public RunAftersRequest(FrameworkMethod method, Statement next, List<FrameworkMethod> afters, Object target) {
 		this.method = method;
 		this.next = next;
 		this.afters = afters;
-		this.target = (JerseyRequestTest) target;
+		this.target = (Testosterone) target;
 	}
 
 	@Override

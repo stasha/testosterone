@@ -10,9 +10,18 @@ import javax.ws.rs.Path;
  */
 public class PathAnnotation implements Path {
 
+	private String path;
+
+	public PathAnnotation() {
+	}
+
+	public PathAnnotation(String path) {
+		this.path = path;
+	}
+
 	@Override
 	public String value() {
-		return String.valueOf(Math.random()).replace(".", "");
+		return path == null ? String.valueOf(Math.random()).replace(".", "") : path;
 	}
 
 	@Override

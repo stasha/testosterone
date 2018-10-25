@@ -2,23 +2,21 @@ package info.stasha.testosterone.junit;
 
 import info.stasha.testosterone.annotation.Request;
 import com.mifmif.common.regex.Generex;
-import info.stasha.testosterone.jersey.JerseyRequestTest;
+import info.stasha.testosterone.Testosterone;
 import info.stasha.testosterone.annotation.RequestAnnotation;
 import info.stasha.testosterone.annotation.Requests;
 import java.util.Arrays;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
-import javax.ws.rs.NotSupportedException;
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.OPTIONS;
-import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
-import org.eclipse.jetty.http.HttpMethod;
 import org.glassfish.jersey.message.internal.MessageBodyProviderNotFoundException;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
@@ -33,11 +31,11 @@ public class InvokeRequest extends Statement {
 	private static final String EXECUTION_ERROR_MESSAGE = "Test failed with message: ";
 
 	private final FrameworkMethod method;
-	private final JerseyRequestTest target;
+	private final Testosterone target;
 
 	public InvokeRequest(FrameworkMethod method, Object target) {
 		this.method = method;
-		this.target = (JerseyRequestTest) target;
+		this.target = (Testosterone) target;
 	}
 
 	@Override
@@ -53,11 +51,10 @@ public class InvokeRequest extends Statement {
 		POST post = method.getAnnotation(POST.class);
 		PUT put = method.getAnnotation(PUT.class);
 		DELETE delete = method.getAnnotation(DELETE.class);
-		PATCH patch = method.getAnnotation(PATCH.class);
 		HEAD head = method.getAnnotation(HEAD.class);
 		OPTIONS options = method.getAnnotation(OPTIONS.class);
 
-		HttpMethod requestMethod = HttpMethod.GET;
+		String requestMethod = HttpMethod.GET;
 
 		Request requestAnnotatoin = method.getAnnotation(Request.class);
 		Requests requestsAnnotation = method.getAnnotation(Requests.class);
@@ -101,8 +98,6 @@ public class InvokeRequest extends Statement {
 						requestMethod = HttpMethod.PUT;
 					} else if (delete != null) {
 						requestMethod = HttpMethod.DELETE;
-					} else if (patch != null) {
-						throw new NotSupportedException("patch is not supported");
 					} else if (head != null) {
 						requestMethod = HttpMethod.HEAD;
 					} else if (options != null) {
@@ -150,19 +145,19 @@ public class InvokeRequest extends Statement {
 					Response resp;
 
 					switch (requestMethod) {
-						case POST:
+						case HttpMethod.POST:
 							resp = webTarget.request().post(Entity.json(null));
 							break;
-						case PUT:
+						case HttpMethod.PUT:
 							resp = webTarget.request().put(Entity.json(null));
 							break;
-						case DELETE:
+						case HttpMethod.DELETE:
 							resp = webTarget.request().delete();
 							break;
-						case HEAD:
+						case HttpMethod.HEAD:
 							resp = webTarget.request().head();
 							break;
-						case OPTIONS:
+						case HttpMethod.OPTIONS:
 							resp = webTarget.request().options();
 							break;
 						default:

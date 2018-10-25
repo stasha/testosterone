@@ -6,7 +6,9 @@ import info.stasha.testosterone.junit.ExpectRequestException;
 import info.stasha.testosterone.junit.InvokeRequest;
 import info.stasha.testosterone.instrumentation.Instrument;
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.ClassUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +17,7 @@ import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
+import org.junit.runners.model.TestClass;
 
 /**
  * Test runner for running JerseyRequestTests.
@@ -59,14 +62,24 @@ public class JerseyRequestTestRunner extends BlockJUnit4ClassRunner {
 
 	@Override
 	protected Statement withBefores(FrameworkMethod method, Object target, Statement statement) {
-		List<FrameworkMethod> befores = getTestClass().getAnnotatedMethods(Before.class);
-		return befores.isEmpty() ? statement : new RunBeforesRequest(method, statement, befores, target);
+		List<FrameworkMethod> list = getAnnotatedMethods(Before.class);
+		return list.isEmpty() ? statement : new RunBeforesRequest(method, statement, list, target);
 	}
 
 	@Override
 	protected Statement withAfters(FrameworkMethod method, Object target, Statement statement) {
-		List<FrameworkMethod> afters = getTestClass().getAnnotatedMethods(After.class);
-		return afters.isEmpty() ? statement : new RunAftersRequest(method, statement, afters, target);
+		List<FrameworkMethod> list = getAnnotatedMethods(After.class);
+		return list.isEmpty() ? statement : new RunAftersRequest(method, statement, list, target);
+	}
+
+	protected List<FrameworkMethod> getAnnotatedMethods(Class<? extends Annotation> cls) {
+		List<FrameworkMethod> methods = new ArrayList<>();
+		methods.addAll(getTestClass().getAnnotatedMethods(cls));
+		for (Class<?> i : ClassUtils.getAllInterfaces(testClass)) {
+			TestClass tc = new TestClass(i);
+			methods.addAll(tc.getAnnotatedMethods(cls));
+		}
+		return methods;
 	}
 
 	@Override

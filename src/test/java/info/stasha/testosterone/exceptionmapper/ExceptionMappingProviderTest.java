@@ -19,7 +19,8 @@ public class ExceptionMappingProviderTest extends JerseyRequestTest {
 
 	public static final String PATH = "exceptionMapping";
 
-	public ExceptionMappingProviderTest() {
+	@Override
+	protected void init(){
 		this.configuration.register(ExceptionMapperProvider.class);
 	}
 
@@ -27,7 +28,7 @@ public class ExceptionMappingProviderTest extends JerseyRequestTest {
 	@Path(PATH)
 	@DontIntercept
 	public String post() {
-		throw new IllegalStateException();
+		throw new IllegalStateException("!!! EXPECTED EXCEPTION - DON'T PANIC !!!");
 	}
 
 	@Test
