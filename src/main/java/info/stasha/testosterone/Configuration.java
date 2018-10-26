@@ -1,6 +1,10 @@
 package info.stasha.testosterone;
 
+import java.util.List;
+import java.util.Set;
 import javax.ws.rs.client.Client;
+import javax.ws.rs.client.WebTarget;
+import org.glassfish.jersey.server.ResourceConfig;
 
 /**
  *
@@ -15,9 +19,32 @@ public interface Configuration {
 	String getBaseUri();
 
 	Configuration get();
-	
-	void init();
-	
+
+	ResourceConfig getResourceConfig();
+
+	public static Configuration newInstance() {
+		return newInstance("jetty-servlet");
+	}
+
+	public static Configuration newInstance(String type) {
+		switch (type) {
+			case "jetty-servlet":
+				return new JettyConfiguration();
+			default:
+				return new JettyConfiguration();
+		}
+	}
+
+	void set(Configuration configuration);
+
+	void init(Object obj);
+
 	Client client();
-	
+
+	WebTarget target();
+
+	Set<Throwable> getMessages();
+
+	List<Throwable> getExpectedExceptions();
+
 }

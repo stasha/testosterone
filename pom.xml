@@ -116,14 +116,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>org.glassfish.jersey.test-framework.providers</groupId>
-			<artifactId>jersey-test-framework-provider-bundle</artifactId>
-			<type>pom</type>
-			<version>${jersey.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
 		<!-- jersey 2.26 version specific -->
 		<!--		
 		<dependency>

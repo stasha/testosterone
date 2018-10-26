@@ -17,12 +17,12 @@ public class ApplicationListener implements ApplicationEventListener {
 	@Override
 	public void onEvent(ApplicationEvent ae) {
 		// do nothing
-		System.out.println(ae);
+		System.out.println("ApplicationEvent: " + ae.getType());
 	}
 
 	@Override
 	public RequestEventListener onRequest(RequestEvent re) {
-		System.out.println(re);
+		System.out.println("Request event: " + re.getType());
 		return null;
 	}
 

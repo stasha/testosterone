@@ -2,7 +2,6 @@ package info.stasha.testosterone.injectables;
 
 import info.stasha.testosterone.Testosterone;
 import info.stasha.testosterone.jersey.JerseyRequestTestRunner;
-import info.stasha.testosterone.jersey.JerseyWebRequestTest;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +25,7 @@ import org.junit.runner.RunWith;
  * @author stasha
  */
 @RunWith(JerseyRequestTestRunner.class)
-public class InjectablesTest extends JerseyWebRequestTest {
+public class InjectablesTest implements Testosterone {
 
 	@Context
 	private Application application;

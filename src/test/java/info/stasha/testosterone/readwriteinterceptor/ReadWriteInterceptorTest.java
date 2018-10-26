@@ -1,10 +1,11 @@
 package info.stasha.testosterone.readwriteinterceptor;
 
-import info.stasha.testosterone.jersey.JerseyRequestTest;
+import info.stasha.testosterone.Testosterone;
 import info.stasha.testosterone.jersey.JerseyRequestTestRunner;
 import org.junit.Test;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import org.glassfish.jersey.server.ResourceConfig;
 import static org.junit.Assert.assertEquals;
 import org.junit.runner.RunWith;
 
@@ -14,13 +15,13 @@ import org.junit.runner.RunWith;
  * @author stasha
  */
 @RunWith(JerseyRequestTestRunner.class)
-public class ReadWriteInterceptorTest extends JerseyRequestTest {
+public class ReadWriteInterceptorTest implements Testosterone {
 
 	public static final String PATH = "changeTextInterceptor";
 
 	@Override
-	protected void init() {
-		this.configuration.registerInstances(new ReadWriteInterceptor());
+	public void configure(ResourceConfig config) {
+		config.registerInstances(new ReadWriteInterceptor());
 	}
 
 	@GET

@@ -1,7 +1,8 @@
 package info.stasha.testosterone.applicationlistener;
 
-import info.stasha.testosterone.jersey.JerseyRequestTest;
+import info.stasha.testosterone.Testosterone;
 import info.stasha.testosterone.jersey.JerseyRequestTestRunner;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.Test;
 import org.glassfish.jersey.server.monitoring.ApplicationEvent;
 import org.glassfish.jersey.server.monitoring.RequestEvent;
@@ -18,13 +19,13 @@ import static org.mockito.Mockito.times;
  * @author stasha
  */
 @RunWith(JerseyRequestTestRunner.class)
-public class ApplicationListenerTest extends JerseyRequestTest {
+public class ApplicationListenerTest implements Testosterone {
 
 	private static final ApplicationListener APPLICATION_LISTENER = Mockito.spy(new ApplicationListener());
 
 	@Override
-	protected void init() {
-		this.configuration.registerInstances(APPLICATION_LISTENER);
+	public void configure(ResourceConfig config) {
+		config.registerInstances(APPLICATION_LISTENER);
 	}
 
 	@AfterClass

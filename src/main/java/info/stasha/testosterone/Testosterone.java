@@ -1,15 +1,11 @@
 package info.stasha.testosterone;
 
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
-import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.server.ApplicationHandler;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.After;
 import org.junit.Before;
 
@@ -19,79 +15,53 @@ import org.junit.Before;
  */
 public interface Testosterone {
 
-	public static final Logger LOGGER = Logger.getLogger(Testosterone.class.getName());
+	static final Logger LOGGER = Logger.getLogger(Testosterone.class.getName());
 
-	public final Set<Throwable> messages = new LinkedHashSet<>();
+	//TODO fix this
+	Configuration configuration = Configuration.newInstance();
 
-	public final String BASE_URL = "http://localhost:9999/";
-
-	public final Configuration configuration = new JettyConfiguration();
-
-	public default Set<Throwable> getMessages() {
-		return messages;
+	default Set<Throwable> getMessages() {
+		return getConfiguration().getMessages();
 	}
 
-	Throwable getThrownException();
-
-	void setThrownException(Throwable throwable);
-
-	public default Client getClient(ApplicationHandler applicationHandler) {
-		ClientConfig clientConfig = new ClientConfig();
-		return ClientBuilder.newClient(clientConfig);
+	default List<Throwable> getExpectedExceptions() {
+		return getConfiguration().getExpectedExceptions();
 	}
 
-	public default WebTarget target() {
-		return client().target(BASE_URL);
+	default WebTarget target() {
+		return getConfiguration().target();
 	}
 
-	public default WebTarget target(String path) {
+	default WebTarget target(String path) {
 		return target().path(path);
 	}
 
-	public default Client client() {
+	default Client client() {
 		return getConfiguration().client();
 	}
 
-	public default Configuration getConfiguration() {
-		return configuration.get();
+	default Configuration getConfiguration() {
+		return configuration;
 	}
 
-	public default void init() {
-		getConfiguration().init();
+	default void configure(ResourceConfig config) {
+
+	}
+
+	default void setConfiguration(Configuration conf) {
+		getConfiguration().set(configuration);
 	}
 
 	@Before
-	public default void setUp() throws Exception {
+	default void setUp() throws Exception {
+		configure(getConfiguration().getResourceConfig());
+		getConfiguration().init(this);
 		getConfiguration().start();
-
 	}
 
 	@After
-	public void tearDown() throws Exception {
-		try {
-			server.stop();
-		} finally {
-			Client old = client.getAndSet(null);
-			close(old);
-		}
-	}
-
-	public default void close(final Client... clients) {
-		if (clients == null || clients.length == 0) {
-			return;
-		}
-
-		for (Client c : clients) {
-			if (c == null) {
-				continue;
-			}
-			try {
-				c.close();
-			} catch (Throwable t) {
-				LOGGER.log(Level.WARNING, "Error closing a client instance.", t);
-			}
-
-		}
+	default void tearDown() throws Exception {
+		configuration.stop();
 	}
 
 }

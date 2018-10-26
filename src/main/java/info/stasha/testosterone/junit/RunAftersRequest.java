@@ -34,8 +34,8 @@ public class RunAftersRequest extends Statement {
 
 			errors.addAll(target.getMessages());
 
-			if (target.getThrownException() != null) {
-				throw target.getThrownException();
+			if (target.getExpectedExceptions().size() > 0) {
+				throw target.getExpectedExceptions().get(0);
 			}
 
 		} catch (Throwable e) {
@@ -51,7 +51,7 @@ public class RunAftersRequest extends Statement {
 
 			// cleaning up test
 			target.getMessages().clear();
-			target.setThrownException(null);
+			target.getExpectedExceptions().clear();
 		}
 		if (errors.isEmpty()) {
 			return;

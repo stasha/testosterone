@@ -1,12 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package info.stasha.testosterone;
 
+import static info.stasha.testosterone.Testosterone.LOGGER;
 import info.stasha.testosterone.jersey.JerseyWebRequestTest;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
@@ -24,7 +22,6 @@ import org.glassfish.jersey.internal.ServiceFinderBinder;
 import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
-import org.glassfish.jersey.test.spi.TestContainerFactory;
 
 /**
  *
@@ -32,22 +29,32 @@ import org.glassfish.jersey.test.spi.TestContainerFactory;
  */
 public class JettyConfiguration implements Configuration {
 
-	public final Set<Throwable> messages = new LinkedHashSet<>();
+	private Object testObj;
+
 	public final AtomicReference<Client> client = new AtomicReference<>(null);
 	public final String BASE_URI = "http://localhost:9999/";
 
-	private ApplicationHandler application;
+	protected final Set<Throwable> messages = new LinkedHashSet<>();
+	protected final List<Throwable> expectedException = new ArrayList<>();
 
+	protected Configuration configuration;
 	private Server server;
-
-	protected ResourceConfig configuration;
+	protected ResourceConfig resourceConfig;
 	protected AbstractBinder abstractBinder;
+
+	public Set<Throwable> getMessages() {
+		return messages;
+	}
+
+	public List<Throwable> getExpectedExceptions() {
+		return expectedException;
+	}
 
 	protected ResourceConfig configure() {
 //		enable(TestProperties.LOG_TRAFFIC);
 
-		if (this.configuration == null) {
-			this.configuration = new ResourceConfig();
+		if (this.resourceConfig == null) {
+			this.resourceConfig = new ResourceConfig();
 			this.abstractBinder = new AbstractBinder() {
 				@Override
 				protected void configure() {
@@ -55,33 +62,32 @@ public class JettyConfiguration implements Configuration {
 			};
 		}
 
-		this.configuration.registerInstances(this);
-		this.configuration.register(this.abstractBinder);
+		
+		this.resourceConfig.register(this.abstractBinder);
 
-		init();
-
-		return this.configuration;
+		return this.resourceConfig;
 
 	}
 
 	@Override
-	public void init() {
+	public void init(Object obj) {
+		this.testObj = obj;
 		try {
-			this.configuration = null;
+			
+			this.resourceConfig.registerInstances(this.testObj);
 
 			server = new Server(9999);
 			ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
 			context.setContextPath("/");
 			server.setHandler(context);
 
-			this.configuration = configure();
 			// code for Jersey 2.0
-//			this.configuration.register(new ServiceFinderBinder<>(TestContainerFactory.class));
+//			this.resourceConfig.register(new ServiceFinderBinder<>(TestContainerFactory.class));
 			// code for Jersey 2.1 and higher
-			this.configuration.register(new ServiceFinderBinder<>(TestContainerFactory.class, null, RuntimeType.SERVER));
+			this.resourceConfig.register(new ServiceFinderBinder<>(Testosterone.class, null, RuntimeType.SERVER));
 
 			ServletHolder holder = new ServletHolder();
-			holder.setServlet(new ServletContainer(this.configuration));
+			holder.setServlet(new ServletContainer(this.resourceConfig));
 			holder.setInitOrder(1);
 			context.addServlet(holder, "/*");
 
@@ -93,20 +99,13 @@ public class JettyConfiguration implements Configuration {
 	@Override
 	public void start() throws Exception {
 		server.start();
-
-		ResourceConfig config = ResourceConfig.forApplication(this.configuration);
-
-		this.application = new ApplicationHandler(configuration);
-		if (application == null) {
-			throw new IllegalArgumentException("The application cannot be null");
-		}
-		
-		Client old = client().getAndSet(getClient(application));
+		Client old = client.getAndSet(getClient());
 		close(old);
 	}
 
 	@Override
 	public void stop() throws Exception {
+		this.configuration = null;
 		this.server.stop();
 	}
 
@@ -116,15 +115,54 @@ public class JettyConfiguration implements Configuration {
 	}
 
 	@Override
+	public void set(Configuration configuration) {
+		this.configuration = configuration;
+	}
+
+	@Override
 	public Configuration get() {
-		return this;
+		if (this.configuration == null) {
+			this.configuration = this;
+		}
+		return configuration;
 	}
 
 	@Override
 	public Client client() {
-		ClientConfig clientConfig = new ClientConfig();
+		return client.get();
+	}
+
+	protected Client getClient() {
+		ClientConfig clientConfig = new ClientConfig(this.resourceConfig);
 		return ClientBuilder.newClient(clientConfig);
 	}
 
+	@Override
+	public WebTarget target() {
+		return client().target(BASE_URI);
+	}
+
+	protected void close(final Client... clients) {
+		if (clients == null || clients.length == 0) {
+			return;
+		}
+
+		for (Client c : clients) {
+			if (c == null) {
+				continue;
+			}
+			try {
+				c.close();
+			} catch (Throwable t) {
+				LOGGER.log(Level.WARNING, "Error closing client instance.", t);
+			}
+
+		}
+	}
+
+	@Override
+	public ResourceConfig getResourceConfig() {
+		return configure();
+	}
 
 }

@@ -1,10 +1,11 @@
 package info.stasha.testosterone.requestfilter;
 
-import info.stasha.testosterone.jersey.JerseyRequestTest;
+import info.stasha.testosterone.Testosterone;
 import info.stasha.testosterone.jersey.JerseyRequestTestRunner;
 import org.junit.Test;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import org.glassfish.jersey.server.ResourceConfig;
 import static org.junit.Assert.assertEquals;
 import org.junit.runner.RunWith;
 
@@ -14,13 +15,13 @@ import org.junit.runner.RunWith;
  * @author stasha
  */
 @RunWith(JerseyRequestTestRunner.class)
-public class RequestFilterTest extends JerseyRequestTest {
+public class RequestFilterTest implements Testosterone {
 
 	public static final String PATH = "filterChangedMethod";
 
 	@Override
-	protected void init() {
-		this.configuration.registerInstances(new RequestFilter());
+	public void configure(ResourceConfig config) {
+		config.registerInstances(new RequestFilter());
 	}
 
 	@POST

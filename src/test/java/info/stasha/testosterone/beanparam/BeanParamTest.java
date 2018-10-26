@@ -1,6 +1,6 @@
 package info.stasha.testosterone.beanparam;
 
-import info.stasha.testosterone.jersey.JerseyRequestTest;
+import info.stasha.testosterone.Testosterone;
 import info.stasha.testosterone.jersey.JerseyRequestTestRunner;
 import org.junit.Test;
 import info.stasha.testosterone.service.User;
@@ -17,7 +17,7 @@ import org.junit.runner.RunWith;
  * @author stasha
  */
 @RunWith(JerseyRequestTestRunner.class)
-public class BeanParamTest extends JerseyRequestTest {
+public class BeanParamTest implements Testosterone {
 
 	private static final String FIRST_NAME = "Jon";
 	private static final String LAST_NAME = "Doe";

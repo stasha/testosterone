@@ -14,7 +14,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
+import org.glassfish.jersey.server.ResourceConfig;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
@@ -29,10 +31,16 @@ import org.junit.runner.RunWith;
 public class RequestTest extends JerseyRequestTest {
 
 	@Override
-	protected void init() {
-		this.configuration.register(Resource.class);
-		// Jersey 2.0 doesn't support "proxyForSameScope" method.
-		this.abstractBinder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
+	public void configure(ResourceConfig config) {
+		config.register(Resource.class);
+		config.register(new AbstractBinder() {
+			@Override
+			protected void configure() {
+				// Jersey 2.0 doesn't support "proxyForSameScope" method.
+				this.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
+			}
+
+		});
 	}
 
 	/**

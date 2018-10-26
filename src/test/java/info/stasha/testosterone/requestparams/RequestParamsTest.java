@@ -1,6 +1,6 @@
 package info.stasha.testosterone.requestparams;
 
-import info.stasha.testosterone.jersey.JerseyRequestTest;
+import info.stasha.testosterone.Testosterone;
 import info.stasha.testosterone.jersey.JerseyRequestTestRunner;
 import org.junit.Test;
 import javax.ws.rs.GET;
@@ -17,7 +17,7 @@ import org.junit.runner.RunWith;
  * @author stasha
  */
 @RunWith(JerseyRequestTestRunner.class)
-public class RequestParamsTest extends JerseyRequestTest {
+public class RequestParamsTest implements Testosterone {
 
 	private static final String FIRST_NAME = "Jon";
 	private static final String LAST_NAME = "Doe";

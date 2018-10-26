@@ -1,6 +1,6 @@
 package info.stasha.testosterone.junit;
 
-import info.stasha.testosterone.jersey.JerseyRequestTest;
+import info.stasha.testosterone.Testosterone;
 import org.junit.internal.AssumptionViolatedException;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
@@ -15,12 +15,12 @@ public class ExpectRequestException extends Statement {
 	private final FrameworkMethod method;
 	private final Statement next;
 	private final Class<? extends Throwable> expected;
-	private final JerseyRequestTest target;
+	private final Testosterone target;
 
 	public ExpectRequestException(FrameworkMethod method, Statement next, Object target, Class<? extends Throwable> expected) {
 		this.method = method;
 		this.next = next;
-		this.target = (JerseyRequestTest) target;
+		this.target = (Testosterone) target;
 		this.expected = expected;
 	}
 
@@ -29,8 +29,8 @@ public class ExpectRequestException extends Statement {
 		boolean complete = false;
 		try {
 			next.evaluate();
-			if (target.getThrownException() != null) {
-				throw target.getThrownException();
+			if (target.getExpectedExceptions().size() > 0) {
+				throw target.getExpectedExceptions().get(0);
 			}
 			complete = true;
 		} catch (AssumptionViolatedException e) {
@@ -43,7 +43,7 @@ public class ExpectRequestException extends Statement {
 				throw new Exception(message, e);
 			}
 		} finally {
-			target.setThrownException(null);
+			target.getExpectedExceptions().clear();
 		}
 		if (complete) {
 			throw new AssertionError("Expected exception: "

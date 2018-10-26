@@ -4,7 +4,9 @@ import info.stasha.testosterone.jersey.JerseyRequestTest;
 import info.stasha.testosterone.jersey.JerseyRequestTestRunner;
 import org.junit.Test;
 import javax.ws.rs.core.Context;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
+import org.glassfish.jersey.server.ResourceConfig;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -24,9 +26,14 @@ public class ServiceTest extends JerseyRequestTest {
 	private Service service;
 
 	@Override
-	protected void init() {
-		// Jersey 2.0 doesn't support "proxyForSameScope" method.
-		this.abstractBinder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
+	public void configure(ResourceConfig config) {
+		config.register(new AbstractBinder() {
+			@Override
+			protected void configure() {
+				// Jersey 2.0 doesn't support "proxyForSameScope" method.
+				this.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
+			}
+		});
 	}
 
 	@Context
