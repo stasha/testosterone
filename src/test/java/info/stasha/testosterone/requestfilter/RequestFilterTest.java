@@ -1,7 +1,7 @@
 package info.stasha.testosterone.requestfilter;
 
-import info.stasha.testosterone.Testosterone;
-import info.stasha.testosterone.TestosteroneRunner;
+import info.stasha.testosterone.jerseyon.Testosterone;
+import info.stasha.testosterone.jerseyon.TestosteroneRunner;
 import org.junit.Test;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;

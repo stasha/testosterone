@@ -1,7 +1,7 @@
 package info.stasha.testosterone.beanparam;
 
-import info.stasha.testosterone.Testosterone;
-import info.stasha.testosterone.TestosteroneRunner;
+import info.stasha.testosterone.jerseyon.Testosterone;
+import info.stasha.testosterone.jerseyon.TestosteroneRunner;
 import org.junit.Test;
 import info.stasha.testosterone.service.User;
 import javax.ws.rs.BeanParam;

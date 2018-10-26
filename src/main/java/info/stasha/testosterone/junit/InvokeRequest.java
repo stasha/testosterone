@@ -2,7 +2,7 @@ package info.stasha.testosterone.junit;
 
 import info.stasha.testosterone.annotation.Request;
 import com.mifmif.common.regex.Generex;
-import info.stasha.testosterone.Testosterone;
+import info.stasha.testosterone.jerseyon.Testosterone;
 import info.stasha.testosterone.annotation.RequestAnnotation;
 import info.stasha.testosterone.annotation.Requests;
 import java.util.Arrays;

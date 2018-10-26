@@ -1,7 +1,5 @@
-package info.stasha.testosterone;
+package info.stasha.testosterone.jerseyon;
 
-import info.stasha.testosterone.junit.RunAftersRequest;
-import info.stasha.testosterone.junit.RunBeforesRequest;
 import info.stasha.testosterone.junit.ExpectRequestException;
 import info.stasha.testosterone.junit.InvokeRequest;
 import info.stasha.testosterone.instrumentation.Instrument;
@@ -12,6 +10,8 @@ import org.apache.commons.lang3.ClassUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.internal.runners.statements.RunAfters;
+import org.junit.internal.runners.statements.RunBefores;
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
@@ -63,13 +63,13 @@ public class TestosteroneRunner extends BlockJUnit4ClassRunner {
 	@Override
 	protected Statement withBefores(FrameworkMethod method, Object target, Statement statement) {
 		List<FrameworkMethod> list = getAnnotatedMethods(Before.class);
-		return list.isEmpty() ? statement : new RunBeforesRequest(method, statement, list, target);
+		return list.isEmpty() ? statement : new RunBefores(statement, list, target);
 	}
 
 	@Override
 	protected Statement withAfters(FrameworkMethod method, Object target, Statement statement) {
 		List<FrameworkMethod> list = getAnnotatedMethods(After.class);
-		return list.isEmpty() ? statement : new RunAftersRequest(method, statement, list, target);
+		return list.isEmpty() ? statement : new RunAfters(statement, list, target);
 	}
 
 	protected List<FrameworkMethod> getAnnotatedMethods(Class<? extends Annotation> cls) {

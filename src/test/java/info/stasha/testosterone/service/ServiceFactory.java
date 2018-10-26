@@ -1,19 +1,14 @@
 package info.stasha.testosterone.service;
 
-import info.stasha.testosterone.jersey.FactorySupplier;
+import org.glassfish.hk2.api.Factory;
 
 /**
  * Service factory
  *
  * @author stasha
  */
-public class ServiceFactory implements FactorySupplier<Service> {
+public class ServiceFactory implements Factory<Service> {
 
-
-	@Override
-	public Service get() {
-		return new ServiceImpl();
-	}
 
 	@Override
 	public Service provide() {

@@ -59,6 +59,7 @@
 		<junit.version>4.12</junit.version><!-- supported versions of JUnit are 4.5 or higher -->
 		<generex.version>1.0.2</generex.version>
 		<jetty.version>9.4.12.v20180830</jetty.version>
+		<commons-lang.version>3.8.1</commons-lang.version>
 	</properties>
 	
 	<dependencies>
@@ -73,7 +74,7 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.8.1</version>
+			<version>${commons-lang.version}</version>
 		</dependency>
 
 		

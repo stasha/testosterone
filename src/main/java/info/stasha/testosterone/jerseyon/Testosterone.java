@@ -1,9 +1,10 @@
-package info.stasha.testosterone;
+package info.stasha.testosterone.jerseyon;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
@@ -18,10 +19,9 @@ import org.junit.Before;
  */
 public interface Testosterone {
 
-	static final Logger LOGGER = Logger.getLogger(Testosterone.class.getName());
+	Logger LOGGER = Logger.getLogger(Testosterone.class.getName());
 
-	//TODO: fix to return thread safe configuration without breaking tests :)
-	Map<Class<?>, Configuration> CONFIGURATION = new HashMap<>();
+	Map<Class<?>, JerseyConfiguration> CONFIGURATION = new HashMap<>();
 
 	default Set<Throwable> getMessages() {
 		return getConfiguration().getMessages();
@@ -43,9 +43,22 @@ public interface Testosterone {
 		return getConfiguration().client();
 	}
 
-	default Configuration getConfiguration() {
+	default JerseyConfiguration getConfiguration() {
 		if (!CONFIGURATION.containsKey(this.getClass())) {
-			CONFIGURATION.put(this.getClass(), new JettyConfiguration());
+			try {
+				info.stasha.testosterone.annotation.Configuration c
+						= this.getClass().getAnnotation(info.stasha.testosterone.annotation.Configuration.class);
+				JerseyConfiguration conf;
+				if (c != null) {
+					conf = (JerseyConfiguration) c.value().newInstance();
+				} else {
+					conf = new JettyConfiguration();
+				}
+				CONFIGURATION.put(this.getClass(), conf);
+			} catch (InstantiationException | IllegalAccessException ex) {
+				Logger.getLogger(Testosterone.class.getName()).log(Level.SEVERE, null, ex);
+				throw new RuntimeException(ex);
+			}
 		}
 		return CONFIGURATION.get(this.getClass());
 	}
@@ -63,6 +76,7 @@ public interface Testosterone {
 	}
 
 	default void start() throws Exception {
+		getConfiguration().stop();
 		configure(getConfiguration().getResourceConfig());
 		configure(getConfiguration().getAbstractBinder());
 		configure(getConfiguration().getResourceConfig(), getConfiguration().getAbstractBinder());

@@ -1,12 +1,11 @@
 package info.stasha.testosterone.service;
 
-import info.stasha.testosterone.Testosterone;
-import info.stasha.testosterone.TestosteroneRunner;
+import info.stasha.testosterone.jerseyon.Testosterone;
+import info.stasha.testosterone.jerseyon.TestosteroneRunner;
 import org.junit.Test;
 import javax.ws.rs.core.Context;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
-import org.glassfish.jersey.server.ResourceConfig;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -26,11 +25,8 @@ public class ServiceTest implements Testosterone {
 	private Service service;
 
 	@Override
-	public void configure(ResourceConfig config, AbstractBinder binder) {
-
-		// Jersey 2.0 doesn't support "proxyForSameScope" method.
+	public void configure( AbstractBinder binder) {
 		binder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
-
 	}
 
 	@Context
