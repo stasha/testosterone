@@ -23,7 +23,7 @@ import org.glassfish.jersey.servlet.ServletContainer;
  *
  * @author stasha
  */
-public class JettyConfiguration implements Configuration {
+public class JettyConfiguration extends Configuration {
 
 	private Object testObj;
 
@@ -51,13 +51,34 @@ public class JettyConfiguration implements Configuration {
 			this.resourceConfig = new ResourceConfig();
 		}
 
-		this.abstractBinder = new AbstractBinder() {
-			@Override
-			protected void configure() {
-			}
-		};
-
+		createAbstractBinder();
 		return this.resourceConfig;
+	}
+
+	protected void createAbstractBinder() {
+		if (this.abstractBinder == null) {
+			this.abstractBinder = new AbstractBinder() {
+				@Override
+				protected void configure() {
+				}
+			};
+		}
+	}
+
+	protected void createServer() {
+		server = new Server(9999);
+		registerServlets();
+	}
+
+	protected void registerServlets() {
+		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
+		context.setContextPath("/");
+		server.setHandler(context);
+
+		ServletHolder holder = new ServletHolder();
+		holder.setServlet(new ServletContainer(this.resourceConfig));
+		holder.setInitOrder(1);
+		context.addServlet(holder, "/*");
 	}
 
 	@Override
@@ -68,30 +89,11 @@ public class JettyConfiguration implements Configuration {
 			this.resourceConfig.register(this.testObj.getClass());
 			this.resourceConfig.register(this.abstractBinder);
 
-			server = new Server(9999);
-			ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
-			context.setContextPath("/");
-			server.setHandler(context);
-
-			// code for Jersey 2.0
-			// code for Jersey 2.1 and higher
-//			Class<?> cls = Class.forName("org.glassfish.jersey.internal.ServiceFinderBinder");
-//			if(cls.getConstructors()[0].getParameterCount() == 1){
-//				this.resourceConfig.register(cls.getDeclaredConstructor(Class.class)
-//						.newInstance(Testosterone.class));
-//			} else {
-//				this.resourceConfig.register(cls.getDeclaredConstructor(Class.class, Map.class, RuntimeType.class)
-//						.newInstance(Testosterone.class, null, RuntimeType.SERVER));
-//				
-//			}
-//			this.resourceConfig.register(new ServiceFinderBinder<>(Testosterone.class, null, RuntimeType.SERVER));
-			ServletHolder holder = new ServletHolder();
-			holder.setServlet(new ServletContainer(this.resourceConfig));
-			holder.setInitOrder(1);
-			context.addServlet(holder, "/*");
+			createServer();
 
 		} catch (Exception ex) {
 			Logger.getLogger(JettyConfiguration.class.getName()).log(Level.SEVERE, null, ex);
+			throw ex;
 		}
 	}
 
@@ -105,6 +107,7 @@ public class JettyConfiguration implements Configuration {
 	@Override
 	public void stop() throws Exception {
 		this.resourceConfig = null;
+		this.abstractBinder = null;
 		this.server.stop();
 	}
 

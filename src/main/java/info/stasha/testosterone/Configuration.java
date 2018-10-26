@@ -11,19 +11,19 @@ import org.glassfish.jersey.server.ResourceConfig;
  *
  * @author stasha
  */
-public interface Configuration {
+public abstract class Configuration {
 
-	void start() throws Exception;
+	abstract void start() throws Exception;
 
-	void stop() throws Exception;
+	abstract void stop() throws Exception;
 
-	String getBaseUri();
+	abstract String getBaseUri();
 
-	Configuration get();
+	abstract Configuration get();
 
-	ResourceConfig getResourceConfig();
+	abstract ResourceConfig getResourceConfig();
 	
-	AbstractBinder getAbstractBinder();
+	abstract AbstractBinder getAbstractBinder();
 
 	public static Configuration newInstance() {
 		return newInstance("jetty-servlet");
@@ -38,16 +38,16 @@ public interface Configuration {
 		}
 	}
 
-	void set(Configuration configuration);
+	abstract void set(Configuration configuration);
 
-	void init(Object obj);
+	abstract void init(Object obj);
 
-	Client client();
+	abstract Client client();
 
-	WebTarget target();
+	abstract WebTarget target();
 
-	Set<Throwable> getMessages();
+	abstract Set<Throwable> getMessages();
 
-	List<Throwable> getExpectedExceptions();
+	abstract List<Throwable> getExpectedExceptions();
 
 }

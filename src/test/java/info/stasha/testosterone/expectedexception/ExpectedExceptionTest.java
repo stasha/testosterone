@@ -9,7 +9,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
-import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -22,10 +21,8 @@ import org.junit.runner.RunWith;
 public class ExpectedExceptionTest implements Testosterone {
 
 	@Override
-	public void configure(ResourceConfig config, AbstractBinder binder) {
-		// Jersey 2.0 doesn't support "proxyForSameScope" method.
+	public void configure(AbstractBinder binder) {
 		binder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
-
 	}
 
 	@Test(expected = IllegalStateException.class)

@@ -1,6 +1,8 @@
 package info.stasha.testosterone;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import javax.ws.rs.client.Client;
@@ -18,8 +20,8 @@ public interface Testosterone {
 
 	static final Logger LOGGER = Logger.getLogger(Testosterone.class.getName());
 
-	//TODO fix this
-	Configuration configuration = Configuration.newInstance();
+	//TODO: fix to return thread safe configuration without breaking tests :)
+	Map<Class<?>, Configuration> CONFIGURATION = new HashMap<>();
 
 	default Set<Throwable> getMessages() {
 		return getConfiguration().getMessages();
@@ -42,10 +44,17 @@ public interface Testosterone {
 	}
 
 	default Configuration getConfiguration() {
-		return configuration;
+		if (!CONFIGURATION.containsKey(this.getClass())) {
+			CONFIGURATION.put(this.getClass(), new JettyConfiguration());
+		}
+		return CONFIGURATION.get(this.getClass());
 	}
 
 	default void configure(ResourceConfig config) {
+
+	}
+
+	default void configure(AbstractBinder binder) {
 
 	}
 
@@ -53,21 +62,26 @@ public interface Testosterone {
 
 	}
 
-	default void setConfiguration(Configuration conf) {
-		getConfiguration().set(configuration);
-	}
-
-	@Before
-	default void beforeTest() throws Exception {
+	default void start() throws Exception {
 		configure(getConfiguration().getResourceConfig());
+		configure(getConfiguration().getAbstractBinder());
 		configure(getConfiguration().getResourceConfig(), getConfiguration().getAbstractBinder());
 		getConfiguration().init(this);
 		getConfiguration().start();
 	}
 
+	default void stop() throws Exception {
+		getConfiguration().stop();
+	}
+
+	@Before
+	default void beforeTest() throws Exception {
+		start();
+	}
+
 	@After
 	default void afterTest() throws Exception {
-		getConfiguration().stop();
+		stop();
 	}
 
 }
