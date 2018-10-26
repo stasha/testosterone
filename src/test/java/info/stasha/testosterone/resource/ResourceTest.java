@@ -1,7 +1,7 @@
 package info.stasha.testosterone.resource;
 
+import info.stasha.testosterone.Testosterone;
 import info.stasha.testosterone.TestosteroneRunner;
-import info.stasha.testosterone.TestosteroneWithAbstractBinder;
 import org.junit.Test;
 import info.stasha.testosterone.service.Service;
 import info.stasha.testosterone.service.ServiceFactory;
@@ -17,7 +17,7 @@ import org.junit.runner.RunWith;
  * @author stasha
  */
 @RunWith(TestosteroneRunner.class)
-public class ResourceTest implements TestosteroneWithAbstractBinder {
+public class ResourceTest implements Testosterone {
 
 	@Override
 	public void configure(ResourceConfig config, AbstractBinder binder) {

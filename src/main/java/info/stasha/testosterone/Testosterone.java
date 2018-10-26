@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.After;
 import org.junit.Before;
@@ -48,6 +49,10 @@ public interface Testosterone {
 
 	}
 
+	default void configure(ResourceConfig config, AbstractBinder binder) {
+
+	}
+
 	default void setConfiguration(Configuration conf) {
 		getConfiguration().set(configuration);
 	}
@@ -55,6 +60,7 @@ public interface Testosterone {
 	@Before
 	default void beforeTest() throws Exception {
 		configure(getConfiguration().getResourceConfig());
+		configure(getConfiguration().getResourceConfig(), getConfiguration().getAbstractBinder());
 		getConfiguration().init(this);
 		getConfiguration().start();
 	}

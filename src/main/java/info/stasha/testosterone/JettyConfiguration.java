@@ -4,20 +4,18 @@ import static info.stasha.testosterone.Testosterone.LOGGER;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ws.rs.RuntimeType;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.internal.ServiceFinderBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
@@ -38,6 +36,7 @@ public class JettyConfiguration implements Configuration {
 	protected Configuration configuration;
 	private Server server;
 	protected ResourceConfig resourceConfig;
+	protected AbstractBinder abstractBinder;
 
 	public Set<Throwable> getMessages() {
 		return messages;
@@ -52,6 +51,12 @@ public class JettyConfiguration implements Configuration {
 			this.resourceConfig = new ResourceConfig();
 		}
 
+		this.abstractBinder = new AbstractBinder() {
+			@Override
+			protected void configure() {
+			}
+		};
+
 		return this.resourceConfig;
 	}
 
@@ -61,6 +66,7 @@ public class JettyConfiguration implements Configuration {
 		try {
 
 			this.resourceConfig.register(this.testObj.getClass());
+			this.resourceConfig.register(this.abstractBinder);
 
 			server = new Server(9999);
 			ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
@@ -79,7 +85,6 @@ public class JettyConfiguration implements Configuration {
 //				
 //			}
 //			this.resourceConfig.register(new ServiceFinderBinder<>(Testosterone.class, null, RuntimeType.SERVER));
-
 			ServletHolder holder = new ServletHolder();
 			holder.setServlet(new ServletContainer(this.resourceConfig));
 			holder.setInitOrder(1);
@@ -157,6 +162,11 @@ public class JettyConfiguration implements Configuration {
 	@Override
 	public ResourceConfig getResourceConfig() {
 		return configure();
+	}
+
+	@Override
+	public AbstractBinder getAbstractBinder() {
+		return this.abstractBinder;
 	}
 
 }

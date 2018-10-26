@@ -1,7 +1,7 @@
 package info.stasha.testosterone.request;
 
+import info.stasha.testosterone.Testosterone;
 import info.stasha.testosterone.TestosteroneRunner;
-import info.stasha.testosterone.TestosteroneWithAbstractBinder;
 import info.stasha.testosterone.annotation.Request;
 import info.stasha.testosterone.annotation.Requests;
 import info.stasha.testosterone.resource.Resource;
@@ -28,7 +28,7 @@ import org.junit.runner.RunWith;
  * @author stasha
  */
 @RunWith(TestosteroneRunner.class)
-public class RequestTest implements TestosteroneWithAbstractBinder {
+public class RequestTest implements Testosterone {
 
 	@Override
 	public void configure(ResourceConfig config, AbstractBinder binder) {

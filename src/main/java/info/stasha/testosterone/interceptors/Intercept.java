@@ -27,7 +27,7 @@ public class Intercept {
 				if (ex instanceof AssertionError) {
 					orig.getMessages().add(ex);
 				} else {
-					
+					orig.getExpectedExceptions().add(ex);
 				}
 			}
 			return null;

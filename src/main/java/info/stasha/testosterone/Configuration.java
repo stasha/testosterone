@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 
 /**
@@ -21,6 +22,8 @@ public interface Configuration {
 	Configuration get();
 
 	ResourceConfig getResourceConfig();
+	
+	AbstractBinder getAbstractBinder();
 
 	public static Configuration newInstance() {
 		return newInstance("jetty-servlet");

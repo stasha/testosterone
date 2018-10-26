@@ -1,7 +1,7 @@
 package info.stasha.testosterone.expectedexception;
 
+import info.stasha.testosterone.Testosterone;
 import info.stasha.testosterone.TestosteroneRunner;
-import info.stasha.testosterone.TestosteroneWithAbstractBinder;
 import info.stasha.testosterone.service.Service;
 import info.stasha.testosterone.service.ServiceFactory;
 import javax.ws.rs.GET;
@@ -19,7 +19,7 @@ import org.junit.runner.RunWith;
  * @author stasha
  */
 @RunWith(TestosteroneRunner.class)
-public class ExpectedExceptionTest implements TestosteroneWithAbstractBinder {
+public class ExpectedExceptionTest implements Testosterone {
 
 	@Override
 	public void configure(ResourceConfig config, AbstractBinder binder) {

@@ -1,7 +1,7 @@
 package info.stasha.testosterone.service;
 
+import info.stasha.testosterone.Testosterone;
 import info.stasha.testosterone.TestosteroneRunner;
-import info.stasha.testosterone.TestosteroneWithAbstractBinder;
 import org.junit.Test;
 import javax.ws.rs.core.Context;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.times;
  * @author stasha
  */
 @RunWith(TestosteroneRunner.class)
-public class ServiceTest implements TestosteroneWithAbstractBinder {
+public class ServiceTest implements Testosterone {
 
 	private Service service;
 
