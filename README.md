@@ -24,7 +24,7 @@ https://repo.maven.apache.org/maven2/info/stasha/testosterone/
 
 ### Application event listener test
 ```
-@RunWith(JerseyRequestTestRunner.class)
+@RunWith(TestosteroneRunner.class)
 public class ApplicationListenerTest extends JerseyRequestTest {
 
 	private static final ApplicationListener APPLICATION_LISTENER = Mockito.spy(new ApplicationListener());
@@ -48,7 +48,7 @@ public class ApplicationListenerTest extends JerseyRequestTest {
 ```
 ### BeanParam test
 ```
-@RunWith(JerseyRequestTestRunner.class)
+@RunWith(TestosteroneRunner.class)
 public class BeanParamTest extends JerseyRequestTest {
 
 	private static final String FIRST_NAME = "Jon";
@@ -78,7 +78,7 @@ public class BeanParamTest extends JerseyRequestTest {
 
 ### Exception mapper test
 ```
-@RunWith(JerseyRequestTestRunner.class)
+@RunWith(TestosteroneRunner.class)
 public class ExceptionMappingProviderTest extends JerseyRequestTest {
 
 	public static final String PATH = "exceptionMapping";
@@ -104,7 +104,7 @@ public class ExceptionMappingProviderTest extends JerseyRequestTest {
 ```
 ### Expected exception test
 ```
-@RunWith(JerseyRequestTestRunner.class)
+@RunWith(TestosteroneRunner.class)
 public class ExpectedExceptionTest extends JerseyRequestTest {
 
 	public ExpectedExceptionTest() {
@@ -133,7 +133,7 @@ public class ExpectedExceptionTest extends JerseyRequestTest {
 
 ### Injectables test
 ```
-@RunWith(JerseyRequestTestRunner.class)
+@RunWith(TestosteroneRunner.class)
 public class InjectablesTest extends JerseyWebRequestTest {
 
 	@Context
@@ -221,7 +221,7 @@ public class InjectablesTest extends JerseyWebRequestTest {
 
 ### ReadWrite interceptor test
 ```
-@RunWith(JerseyRequestTestRunner.class)
+@RunWith(TestosteroneRunner.class)
 public class ReadWriteInterceptorTest extends JerseyRequestTest {
 
 	public static final String PATH = "changeTextInterceptor";
@@ -254,7 +254,7 @@ public class ReadWriteInterceptorTest extends JerseyRequestTest {
 
 ### Request test
 ```
-@RunWith(JerseyRequestTestRunner.class)
+@RunWith(TestosteroneRunner.class)
 public class RequestTest extends JerseyRequestTest {
 
 	public RequestTest() {
@@ -369,7 +369,7 @@ public class RequestTest extends JerseyRequestTest {
 
 ### Request filter test
 ```
-@RunWith(JerseyRequestTestRunner.class)
+@RunWith(TestosteroneRunner.class)
 public class RequestFilterTest extends JerseyRequestTest {
 
 	public static final String PATH = "filterChangedMethod";
@@ -396,7 +396,7 @@ public class RequestFilterTest extends JerseyRequestTest {
 
 ### Request params test
 ```
-@RunWith(JerseyRequestTestRunner.class)
+@RunWith(TestosteroneRunner.class)
 public class RequestParamsTest extends JerseyRequestTest {
 
 	private static final String FIRST_NAME = "Jon";
@@ -430,7 +430,7 @@ public class RequestParamsTest extends JerseyRequestTest {
 
 ### Resource test
 ```
-@RunWith(JerseyRequestTestRunner.class)
+@RunWith(TestosteroneRunner.class)
 public class ResourceTest extends JerseyRequestTest {
 
 	public ResourceTest() {
@@ -454,7 +454,7 @@ public class ResourceTest extends JerseyRequestTest {
 ```
 ### Service test
 ```
-@RunWith(JerseyRequestTestRunner.class)
+@RunWith(TestosteroneRunner.class)
 public class ServiceTest extends JerseyRequestTest {
 
 	private Service service;

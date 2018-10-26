@@ -2,7 +2,7 @@ package info.stasha.testosterone.exceptionmapper;
 
 import info.stasha.testosterone.Testosterone;
 import info.stasha.testosterone.annotation.DontIntercept;
-import info.stasha.testosterone.jersey.JerseyRequestTestRunner;
+import info.stasha.testosterone.TestosteroneRunner;
 import org.junit.Test;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -15,7 +15,7 @@ import org.junit.runner.RunWith;
  *
  * @author stasha
  */
-@RunWith(JerseyRequestTestRunner.class)
+@RunWith(TestosteroneRunner.class)
 public class ExceptionMappingProviderTest implements Testosterone {
 
 	public static final String PATH = "exceptionMapping";

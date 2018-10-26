@@ -1,7 +1,7 @@
 package info.stasha.testosterone.applicationlistener;
 
 import info.stasha.testosterone.Testosterone;
-import info.stasha.testosterone.jersey.JerseyRequestTestRunner;
+import info.stasha.testosterone.TestosteroneRunner;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.Test;
 import org.glassfish.jersey.server.monitoring.ApplicationEvent;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.times;
  *
  * @author stasha
  */
-@RunWith(JerseyRequestTestRunner.class)
+@RunWith(TestosteroneRunner.class)
 public class ApplicationListenerTest implements Testosterone {
 
 	private static final ApplicationListener APPLICATION_LISTENER = Mockito.spy(new ApplicationListener());

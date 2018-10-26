@@ -1,7 +1,7 @@
 package info.stasha.testosterone.request;
 
-import info.stasha.testosterone.jersey.JerseyRequestTest;
-import info.stasha.testosterone.jersey.JerseyRequestTestRunner;
+import info.stasha.testosterone.TestosteroneRunner;
+import info.stasha.testosterone.TestosteroneWithAbstractBinder;
 import info.stasha.testosterone.annotation.Request;
 import info.stasha.testosterone.annotation.Requests;
 import info.stasha.testosterone.resource.Resource;
@@ -27,20 +27,15 @@ import org.junit.runner.RunWith;
  *
  * @author stasha
  */
-@RunWith(JerseyRequestTestRunner.class)
-public class RequestTest extends JerseyRequestTest {
+@RunWith(TestosteroneRunner.class)
+public class RequestTest implements TestosteroneWithAbstractBinder {
 
 	@Override
-	public void configure(ResourceConfig config) {
+	public void configure(ResourceConfig config, AbstractBinder binder) {
 		config.register(Resource.class);
-		config.register(new AbstractBinder() {
-			@Override
-			protected void configure() {
-				// Jersey 2.0 doesn't support "proxyForSameScope" method.
-				this.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
-			}
+		// Jersey 2.0 doesn't support "proxyForSameScope" method.
+		binder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
 
-		});
 	}
 
 	/**

@@ -1,10 +1,10 @@
 package info.stasha.testosterone;
 
 import static info.stasha.testosterone.Testosterone.LOGGER;
-import info.stasha.testosterone.jersey.JerseyWebRequestTest;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
@@ -16,10 +16,8 @@ import javax.ws.rs.client.WebTarget;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.internal.ServiceFinderBinder;
-import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
@@ -40,7 +38,6 @@ public class JettyConfiguration implements Configuration {
 	protected Configuration configuration;
 	private Server server;
 	protected ResourceConfig resourceConfig;
-	protected AbstractBinder abstractBinder;
 
 	public Set<Throwable> getMessages() {
 		return messages;
@@ -51,30 +48,19 @@ public class JettyConfiguration implements Configuration {
 	}
 
 	protected ResourceConfig configure() {
-//		enable(TestProperties.LOG_TRAFFIC);
-
 		if (this.resourceConfig == null) {
 			this.resourceConfig = new ResourceConfig();
-			this.abstractBinder = new AbstractBinder() {
-				@Override
-				protected void configure() {
-				}
-			};
 		}
 
-		
-		this.resourceConfig.register(this.abstractBinder);
-
 		return this.resourceConfig;
-
 	}
 
 	@Override
 	public void init(Object obj) {
 		this.testObj = obj;
 		try {
-			
-			this.resourceConfig.registerInstances(this.testObj);
+
+			this.resourceConfig.register(this.testObj.getClass());
 
 			server = new Server(9999);
 			ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
@@ -82,9 +68,17 @@ public class JettyConfiguration implements Configuration {
 			server.setHandler(context);
 
 			// code for Jersey 2.0
-//			this.resourceConfig.register(new ServiceFinderBinder<>(TestContainerFactory.class));
 			// code for Jersey 2.1 and higher
-			this.resourceConfig.register(new ServiceFinderBinder<>(Testosterone.class, null, RuntimeType.SERVER));
+//			Class<?> cls = Class.forName("org.glassfish.jersey.internal.ServiceFinderBinder");
+//			if(cls.getConstructors()[0].getParameterCount() == 1){
+//				this.resourceConfig.register(cls.getDeclaredConstructor(Class.class)
+//						.newInstance(Testosterone.class));
+//			} else {
+//				this.resourceConfig.register(cls.getDeclaredConstructor(Class.class, Map.class, RuntimeType.class)
+//						.newInstance(Testosterone.class, null, RuntimeType.SERVER));
+//				
+//			}
+//			this.resourceConfig.register(new ServiceFinderBinder<>(Testosterone.class, null, RuntimeType.SERVER));
 
 			ServletHolder holder = new ServletHolder();
 			holder.setServlet(new ServletContainer(this.resourceConfig));
@@ -92,7 +86,7 @@ public class JettyConfiguration implements Configuration {
 			context.addServlet(holder, "/*");
 
 		} catch (Exception ex) {
-			Logger.getLogger(JerseyWebRequestTest.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(JettyConfiguration.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
 
@@ -105,7 +99,7 @@ public class JettyConfiguration implements Configuration {
 
 	@Override
 	public void stop() throws Exception {
-		this.configuration = null;
+		this.resourceConfig = null;
 		this.server.stop();
 	}
 

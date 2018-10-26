@@ -1,7 +1,7 @@
 package info.stasha.testosterone.service;
 
-import info.stasha.testosterone.jersey.JerseyRequestTest;
-import info.stasha.testosterone.jersey.JerseyRequestTestRunner;
+import info.stasha.testosterone.TestosteroneRunner;
+import info.stasha.testosterone.TestosteroneWithAbstractBinder;
 import org.junit.Test;
 import javax.ws.rs.core.Context;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -20,20 +20,17 @@ import static org.mockito.Mockito.times;
  *
  * @author stasha
  */
-@RunWith(JerseyRequestTestRunner.class)
-public class ServiceTest extends JerseyRequestTest {
+@RunWith(TestosteroneRunner.class)
+public class ServiceTest implements TestosteroneWithAbstractBinder {
 
 	private Service service;
 
 	@Override
-	public void configure(ResourceConfig config) {
-		config.register(new AbstractBinder() {
-			@Override
-			protected void configure() {
-				// Jersey 2.0 doesn't support "proxyForSameScope" method.
-				this.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
-			}
-		});
+	public void configure(ResourceConfig config, AbstractBinder binder) {
+
+		// Jersey 2.0 doesn't support "proxyForSameScope" method.
+		binder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
+
 	}
 
 	@Context

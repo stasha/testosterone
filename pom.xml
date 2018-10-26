@@ -117,13 +117,14 @@
 		</dependency>
 
 		<!-- jersey 2.26 version specific -->
-		<!--		
-		<dependency>
+				
+<!--		<dependency>
 			<groupId>org.glassfish.jersey.inject</groupId>
 			<artifactId>jersey-hk2</artifactId>
 			<version>${jersey.version}</version>
-		</dependency>
-		-->
+			<scope>provided</scope>
+		</dependency>-->
+		
 
 		
 		<!-- supported JUnit versions are 4.5 - 4.12 -->

@@ -53,15 +53,15 @@ public interface Testosterone {
 	}
 
 	@Before
-	default void setUp() throws Exception {
+	default void beforeTest() throws Exception {
 		configure(getConfiguration().getResourceConfig());
 		getConfiguration().init(this);
 		getConfiguration().start();
 	}
 
 	@After
-	default void tearDown() throws Exception {
-		configuration.stop();
+	default void afterTest() throws Exception {
+		getConfiguration().stop();
 	}
 
 }

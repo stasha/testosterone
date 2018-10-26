@@ -1,7 +1,7 @@
 package info.stasha.testosterone.expectedexception;
 
-import info.stasha.testosterone.Testosterone;
-import info.stasha.testosterone.jersey.JerseyRequestTestRunner;
+import info.stasha.testosterone.TestosteroneRunner;
+import info.stasha.testosterone.TestosteroneWithAbstractBinder;
 import info.stasha.testosterone.service.Service;
 import info.stasha.testosterone.service.ServiceFactory;
 import javax.ws.rs.GET;
@@ -18,18 +18,14 @@ import org.junit.runner.RunWith;
  *
  * @author stasha
  */
-@RunWith(JerseyRequestTestRunner.class)
-public class ExpectedExceptionTest implements Testosterone {
+@RunWith(TestosteroneRunner.class)
+public class ExpectedExceptionTest implements TestosteroneWithAbstractBinder {
 
 	@Override
-	public void configure(ResourceConfig config) {
-		config.register(new AbstractBinder() {
-			@Override
-			protected void configure() {
-				// Jersey 2.0 doesn't support "proxyForSameScope" method.
-				this.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
-			}
-		});
+	public void configure(ResourceConfig config, AbstractBinder binder) {
+		// Jersey 2.0 doesn't support "proxyForSameScope" method.
+		binder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
+
 	}
 
 	@Test(expected = IllegalStateException.class)

@@ -1,4 +1,4 @@
-package info.stasha.testosterone.jersey;
+package info.stasha.testosterone;
 
 import info.stasha.testosterone.junit.RunAftersRequest;
 import info.stasha.testosterone.junit.RunBeforesRequest;
@@ -24,11 +24,11 @@ import org.junit.runners.model.TestClass;
  *
  * @author stasha
  */
-public class JerseyRequestTestRunner extends BlockJUnit4ClassRunner {
+public class TestosteroneRunner extends BlockJUnit4ClassRunner {
 
 	protected Class<?> testClass;
 
-	public JerseyRequestTestRunner(Class<?> clazz) throws Throwable {
+	public TestosteroneRunner(Class<?> clazz) throws Throwable {
 		super(Instrument.testClass(clazz));
 		this.testClass = clazz;
 	}

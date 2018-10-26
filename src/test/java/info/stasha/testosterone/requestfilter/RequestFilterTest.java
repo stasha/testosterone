@@ -1,7 +1,7 @@
 package info.stasha.testosterone.requestfilter;
 
 import info.stasha.testosterone.Testosterone;
-import info.stasha.testosterone.jersey.JerseyRequestTestRunner;
+import info.stasha.testosterone.TestosteroneRunner;
 import org.junit.Test;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -14,7 +14,7 @@ import org.junit.runner.RunWith;
  *
  * @author stasha
  */
-@RunWith(JerseyRequestTestRunner.class)
+@RunWith(TestosteroneRunner.class)
 public class RequestFilterTest implements Testosterone {
 
 	public static final String PATH = "filterChangedMethod";
