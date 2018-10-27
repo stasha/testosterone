@@ -77,7 +77,6 @@
 			<version>${commons-lang.version}</version>
 		</dependency>
 
-		
 		<dependency>
 			<groupId>com.github.mifmif</groupId>
 			<artifactId>generex</artifactId>
@@ -119,7 +118,7 @@
 
 		<!-- jersey 2.26 version specific -->
 				
-<!--		<dependency>
+		<!--		<dependency>
 			<groupId>org.glassfish.jersey.inject</groupId>
 			<artifactId>jersey-hk2</artifactId>
 			<version>${jersey.version}</version>
