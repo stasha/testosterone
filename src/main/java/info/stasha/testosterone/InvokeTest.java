@@ -1,12 +1,12 @@
-package info.stasha.testosterone.junit;
+package info.stasha.testosterone;
 
 import info.stasha.testosterone.annotation.Request;
 import com.mifmif.common.regex.Generex;
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.annotation.RequestAnnotation;
 import info.stasha.testosterone.annotation.Requests;
-import static info.stasha.testosterone.interceptors.Interceptors.invokeInitialMethod;
-import info.stasha.testosterone.jersey.TestosteroneMain;
+import static info.stasha.testosterone.Interceptors.invokeInitialMethod;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -20,28 +20,25 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import org.glassfish.jersey.message.internal.MessageBodyProviderNotFoundException;
-import org.junit.runners.model.FrameworkMethod;
-import org.junit.runners.model.Statement;
 
 /**
  * Class responsible for invoking test method.
  *
  * @author stasha
  */
-public class InvokeRequest extends Statement {
+public class InvokeTest {
 
 	private static final String EXECUTION_ERROR_MESSAGE = "Test failed with message: ";
 
-	private final FrameworkMethod method;
+	private final Method method;
 	private final Testosterone target;
 
-	public InvokeRequest(FrameworkMethod method, Object target) {
+	public InvokeTest(Method method, Object target) {
 		this.method = method;
 		this.target = (Testosterone) target;
 	}
 
-	@Override
-	public void evaluate() throws Throwable {
+	public void execute() throws Throwable {
 
 		invokeInitialMethod("beforeTest", target);
 
@@ -169,9 +166,9 @@ public class InvokeRequest extends Statement {
 								resp = webTarget.request().get();
 						}
 
-						for (Class<?> param : method.getMethod().getParameterTypes()) {
+						for (Class<?> param : method.getParameterTypes()) {
 							if (param.equals(Response.class)) {
-								method.invokeExplosively(target, resp);
+								method.invoke(target, resp);
 							}
 						}
 
@@ -196,14 +193,14 @@ public class InvokeRequest extends Statement {
 				}
 			}
 
-			if (!TestosteroneMain.getMain(target).getMain().getMessages().isEmpty()) {
-				throw TestosteroneMain.getMain(target).getMain().getMessages().iterator().next();
+			if (!MainTest.getMain(target).getMain().getMessages().isEmpty()) {
+				throw MainTest.getMain(target).getMain().getMessages().iterator().next();
 			}
-			if (!TestosteroneMain.getMain(target).getMain().getExpectedExceptions().isEmpty()) {
-				throw TestosteroneMain.getMain(target).getMain().getExpectedExceptions().iterator().next();
+			if (!MainTest.getMain(target).getMain().getExpectedExceptions().isEmpty()) {
+				throw MainTest.getMain(target).getMain().getExpectedExceptions().iterator().next();
 			}
 		} finally {
-			TestosteroneMain.removeMain(target);
+			MainTest.removeMain(target);
 			invokeInitialMethod("afterTest", target);
 		}
 	}

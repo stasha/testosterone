@@ -1,6 +1,5 @@
-package info.stasha.testosterone.interceptors;
+package info.stasha.testosterone;
 
-import info.stasha.testosterone.jersey.TestosteroneMain;
 import info.stasha.testosterone.jersey.Testosterone;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -60,7 +59,7 @@ public class Interceptors {
 		 */
 		@RuntimeType
 		public static void constructor(@This Testosterone orig) {
-			TestosteroneMain.getMain(orig).setMain(orig);
+			MainTest.getMain(orig).setMain(orig);
 		}
 
 		/**
@@ -112,9 +111,9 @@ public class Interceptors {
 					return zuper.call();
 				} catch (Throwable ex) {
 					if (ex instanceof AssertionError) {
-						TestosteroneMain.getMain(orig).getMain().getMessages().add(ex);
+						MainTest.getMain(orig).getMain().getMessages().add(ex);
 					} else {
-						TestosteroneMain.getMain(orig).getMain().getExpectedExceptions().add(ex);
+						MainTest.getMain(orig).getMain().getExpectedExceptions().add(ex);
 					}
 				}
 				return null;

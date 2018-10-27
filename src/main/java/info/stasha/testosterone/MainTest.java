@@ -1,5 +1,6 @@
-package info.stasha.testosterone.jersey;
+package info.stasha.testosterone;
 
+import info.stasha.testosterone.jersey.Testosterone;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,16 +10,16 @@ import java.util.Map;
  *
  * @author stasha
  */
-public class TestosteroneMain {
+public class MainTest {
 
-	private static final Map<Class<?>, TestosteroneMain> PAIRS = new HashMap<>();
+	private static final Map<Class<?>, MainTest> PAIRS = new HashMap<>();
 
 	private Testosterone main;
 
-	public static TestosteroneMain getMain(Testosterone obj) {
-		TestosteroneMain m = PAIRS.get(obj.getClass());
+	public static MainTest getMain(Testosterone obj) {
+		MainTest m = PAIRS.get(obj.getClass());
 		if (m == null) {
-			m = new TestosteroneMain();
+			m = new MainTest();
 		}
 		return m;
 	}

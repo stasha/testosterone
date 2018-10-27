@@ -1,9 +1,9 @@
-package info.stasha.testosterone.jersey;
+package info.stasha.testosterone.junit;
 
-import info.stasha.testosterone.junit.ExpectRequestException;
-import info.stasha.testosterone.junit.InvokeRequest;
-import info.stasha.testosterone.instrument.Instrument;
+import info.stasha.testosterone.InvokeTest;
+import info.stasha.testosterone.jersey.Testosterone;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.List;
 import org.junit.Test;
 import org.junit.runner.Description;
@@ -20,8 +20,25 @@ public class TestosteroneRunner extends BlockJUnit4ClassRunner {
 
 	protected Class<?> testClass;
 
+	public static class Invoker extends Statement {
+
+		private final Method method;
+		private final Testosterone target;
+
+		public Invoker(Method method, Object target) {
+			this.method = method;
+			this.target = (Testosterone) target;
+		}
+
+		@Override
+		public void evaluate() throws Throwable {
+			new InvokeTest(method, target).execute();
+		}
+
+	}
+
 	public TestosteroneRunner(Class<?> clazz) throws Throwable {
-		super(Instrument.testClass(clazz));
+		super(InstrumentTest.testClass(clazz));
 		this.testClass = clazz;
 	}
 
@@ -41,14 +58,12 @@ public class TestosteroneRunner extends BlockJUnit4ClassRunner {
 
 	@Override
 	protected Statement methodInvoker(FrameworkMethod method, Object target) {
-		return new InvokeRequest(method, target);
+		return new Invoker(method.getMethod(), target);
 	}
-
 
 	@Override
 	protected Description describeChild(FrameworkMethod method) {
 		return Description.createTestDescription(this.testClass, testName(method), method.getAnnotations());
 	}
-
 
 }

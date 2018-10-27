@@ -1,9 +1,9 @@
-package info.stasha.testosterone.instrument;
+package info.stasha.testosterone.junit;
 
 import info.stasha.testosterone.annotation.DontIntercept;
 import info.stasha.testosterone.jersey.GetAnnotation;
 import info.stasha.testosterone.jersey.PathAnnotation;
-import info.stasha.testosterone.interceptors.Interceptors;
+import info.stasha.testosterone.Interceptors;
 import javax.ws.rs.Path;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.description.modifier.Visibility;
@@ -24,13 +24,14 @@ import org.junit.Test;
  *
  * @author stasha
  */
-public class Instrument {
+public class InstrumentTest {
 
 	/**
 	 * Returns new instrumented class that extends test class
 	 *
 	 * @param clazz
 	 * @return
+	 * @throws java.lang.NoSuchMethodException
 	 */
 	public static Class<?> testClass(Class<?> clazz) throws NoSuchMethodException {
 

@@ -2,7 +2,7 @@ package info.stasha.testosterone.exceptionmapper;
 
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.annotation.DontIntercept;
-import info.stasha.testosterone.jersey.TestosteroneRunner;
+import info.stasha.testosterone.junit.TestosteroneRunner;
 import org.junit.Test;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

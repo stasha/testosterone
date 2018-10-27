@@ -1,7 +1,7 @@
 package info.stasha.testosterone.injectables;
 
 import info.stasha.testosterone.jersey.Testosterone;
-import info.stasha.testosterone.jersey.TestosteroneRunner;
+import info.stasha.testosterone.junit.TestosteroneRunner;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
