@@ -2,7 +2,7 @@ package info.stasha.testosterone.jersey;
 
 import info.stasha.testosterone.junit.ExpectRequestException;
 import info.stasha.testosterone.junit.InvokeRequest;
-import info.stasha.testosterone.junit.Instrument;
+import info.stasha.testosterone.instrument.Instrument;
 import java.lang.annotation.Annotation;
 import java.util.List;
 import org.junit.Test;
@@ -42,14 +42,6 @@ public class TestosteroneRunner extends BlockJUnit4ClassRunner {
 	@Override
 	protected Statement methodInvoker(FrameworkMethod method, Object target) {
 		return new InvokeRequest(method, target);
-	}
-
-	@Override
-	protected Statement possiblyExpectingExceptions(FrameworkMethod method, Object target, Statement next) {
-		Test annotation = method.getAnnotation(Test.class);
-		Class<? extends Throwable> exception
-				= (annotation.expected() == null || annotation.expected() == Test.None.class) ? null : annotation.expected();
-		return exception != null ? new ExpectRequestException(method, next, target, exception) : next;
 	}
 
 

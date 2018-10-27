@@ -1,4 +1,4 @@
-package info.stasha.testosterone.junit;
+package info.stasha.testosterone.instrument;
 
 import info.stasha.testosterone.annotation.DontIntercept;
 import info.stasha.testosterone.jersey.GetAnnotation;

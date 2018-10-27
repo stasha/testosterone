@@ -6,6 +6,7 @@ import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.annotation.RequestAnnotation;
 import info.stasha.testosterone.annotation.Requests;
 import static info.stasha.testosterone.interceptors.Interceptors.invokeInitialMethod;
+import info.stasha.testosterone.jersey.TestosteroneMain;
 import java.util.Arrays;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -42,7 +43,7 @@ public class InvokeRequest extends Statement {
 	@Override
 	public void evaluate() throws Throwable {
 
-		invokeInitialMethod("beforeTest", target, false);
+		invokeInitialMethod("beforeTest", target);
 
 		try {
 			Path p = method.getAnnotation(Path.class);
@@ -177,7 +178,7 @@ public class InvokeRequest extends Statement {
 						try {
 							try {
 //							System.out.println("-----");
-							System.out.println(resp);
+								System.out.println(resp);
 //							System.out.println("-----");
 								if (resp.getStatus() > 400) {
 									throw new Error(EXECUTION_ERROR_MESSAGE + " " + resp);
@@ -194,11 +195,16 @@ public class InvokeRequest extends Statement {
 					}
 				}
 			}
+
+			if (!TestosteroneMain.getMain(target).getMain().getMessages().isEmpty()) {
+				throw TestosteroneMain.getMain(target).getMain().getMessages().iterator().next();
+			}
+			if (!TestosteroneMain.getMain(target).getMain().getExpectedExceptions().isEmpty()) {
+				throw TestosteroneMain.getMain(target).getMain().getExpectedExceptions().iterator().next();
+			}
 		} finally {
-			System.out.println("----");
-			System.out.println("Ending test: " + target.getClass().getSimpleName() + ":" + method.getName());
-			System.out.println("");
-			invokeInitialMethod("afterTest", target, false);
+			TestosteroneMain.removeMain(target);
+			invokeInitialMethod("afterTest", target);
 		}
 	}
 }

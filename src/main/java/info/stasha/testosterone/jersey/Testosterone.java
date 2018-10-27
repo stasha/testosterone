@@ -75,6 +75,7 @@ public interface Testosterone {
 
 	default void start() throws Exception {
 		if (!getConfiguration().isRunning()) {
+			System.out.println("");
 			getConfiguration().stop();
 			configure(getConfiguration().getResourceConfig());
 			configure(getConfiguration().getAbstractBinder());
@@ -87,6 +88,7 @@ public interface Testosterone {
 	default void stop() throws Exception {
 		if (getConfiguration().isRunning()) {
 			getConfiguration().stop();
+			System.out.println("");
 		}
 	}
 
@@ -96,6 +98,7 @@ public interface Testosterone {
 
 	default void afterTest() throws Exception {
 		stop();
+		
 	}
 
 }
