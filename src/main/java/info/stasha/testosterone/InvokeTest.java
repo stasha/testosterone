@@ -194,10 +194,16 @@ public class InvokeTest {
 			}
 
 			if (!MainTest.getMain(target).getMain().getMessages().isEmpty()) {
-				throw MainTest.getMain(target).getMain().getMessages().iterator().next();
+				Throwable t = MainTest.getMain(target).getMain().getMessages().iterator().next();
+				MainTest.getMain(target).getMain().getMessages().clear();
+
+				throw t;
 			}
 			if (!MainTest.getMain(target).getMain().getExpectedExceptions().isEmpty()) {
-				throw MainTest.getMain(target).getMain().getExpectedExceptions().iterator().next();
+				Throwable t = MainTest.getMain(target).getMain().getExpectedExceptions().iterator().next();
+				MainTest.getMain(target).getMain().getExpectedExceptions().clear();
+				
+				throw t;
 			}
 		} finally {
 			MainTest.removeMain(target);
