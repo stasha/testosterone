@@ -1,7 +1,7 @@
 package info.stasha.testosterone.interceptors;
 
-import info.stasha.testosterone.jerseyon.TestosteroneMain;
-import info.stasha.testosterone.jerseyon.Testosterone;
+import info.stasha.testosterone.jersey.TestosteroneMain;
+import info.stasha.testosterone.jersey.Testosterone;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

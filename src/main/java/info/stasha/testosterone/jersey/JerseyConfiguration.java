@@ -1,6 +1,6 @@
-package info.stasha.testosterone.jerseyon;
+package info.stasha.testosterone.jersey;
 
-import static info.stasha.testosterone.jerseyon.Testosterone.LOGGER;
+import static info.stasha.testosterone.jersey.Testosterone.LOGGER;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;

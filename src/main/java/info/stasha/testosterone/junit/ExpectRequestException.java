@@ -1,6 +1,6 @@
 package info.stasha.testosterone.junit;
 
-import info.stasha.testosterone.jerseyon.Testosterone;
+import info.stasha.testosterone.jersey.Testosterone;
 import org.junit.internal.AssumptionViolatedException;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;

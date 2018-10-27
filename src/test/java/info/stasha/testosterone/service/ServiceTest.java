@@ -1,7 +1,7 @@
 package info.stasha.testosterone.service;
 
-import info.stasha.testosterone.jerseyon.Testosterone;
-import info.stasha.testosterone.jerseyon.TestosteroneRunner;
+import info.stasha.testosterone.jersey.Testosterone;
+import info.stasha.testosterone.jersey.TestosteroneRunner;
 import org.junit.Test;
 import javax.ws.rs.core.Context;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;

@@ -1,4 +1,4 @@
-package info.stasha.testosterone.jerseyon;
+package info.stasha.testosterone.jersey;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;

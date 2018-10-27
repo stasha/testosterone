@@ -1,8 +1,8 @@
 package info.stasha.testosterone.junit;
 
 import info.stasha.testosterone.annotation.DontIntercept;
-import info.stasha.testosterone.jerseyon.GetAnnotation;
-import info.stasha.testosterone.jerseyon.PathAnnotation;
+import info.stasha.testosterone.jersey.GetAnnotation;
+import info.stasha.testosterone.jersey.PathAnnotation;
 import info.stasha.testosterone.interceptors.Interceptors;
 import javax.ws.rs.Path;
 import net.bytebuddy.ByteBuddy;

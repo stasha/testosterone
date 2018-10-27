@@ -1,4 +1,4 @@
-package info.stasha.testosterone.jerseyon;
+package info.stasha.testosterone.jersey;
 
 import java.util.HashMap;
 import java.util.List;

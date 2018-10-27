@@ -1,4 +1,4 @@
-package info.stasha.testosterone.jerseyon;
+package info.stasha.testosterone.jersey;
 
 import java.lang.annotation.Annotation;
 import javax.ws.rs.Path;

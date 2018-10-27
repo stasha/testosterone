@@ -1,7 +1,7 @@
 package info.stasha.testosterone.readwriteinterceptor;
 
-import info.stasha.testosterone.jerseyon.Testosterone;
-import info.stasha.testosterone.jerseyon.TestosteroneRunner;
+import info.stasha.testosterone.jersey.Testosterone;
+import info.stasha.testosterone.jersey.TestosteroneRunner;
 import org.junit.Test;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

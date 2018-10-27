@@ -1,7 +1,7 @@
 package info.stasha.testosterone.request;
 
-import info.stasha.testosterone.jerseyon.Testosterone;
-import info.stasha.testosterone.jerseyon.TestosteroneRunner;
+import info.stasha.testosterone.jersey.Testosterone;
+import info.stasha.testosterone.jersey.TestosteroneRunner;
 import info.stasha.testosterone.annotation.Request;
 import info.stasha.testosterone.annotation.Requests;
 import info.stasha.testosterone.resource.Resource;
