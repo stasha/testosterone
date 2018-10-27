@@ -10,8 +10,6 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.junit.After;
-import org.junit.Before;
 
 /**
  *
@@ -76,24 +74,26 @@ public interface Testosterone {
 	}
 
 	default void start() throws Exception {
-		getConfiguration().stop();
-		configure(getConfiguration().getResourceConfig());
-		configure(getConfiguration().getAbstractBinder());
-		configure(getConfiguration().getResourceConfig(), getConfiguration().getAbstractBinder());
-		getConfiguration().init(this);
-		getConfiguration().start();
+		if (!getConfiguration().isRunning()) {
+			getConfiguration().stop();
+			configure(getConfiguration().getResourceConfig());
+			configure(getConfiguration().getAbstractBinder());
+			configure(getConfiguration().getResourceConfig(), getConfiguration().getAbstractBinder());
+			getConfiguration().init(this);
+			getConfiguration().start();
+		}
 	}
 
 	default void stop() throws Exception {
-		getConfiguration().stop();
+		if (getConfiguration().isRunning()) {
+			getConfiguration().stop();
+		}
 	}
 
-	@Before
 	default void beforeTest() throws Exception {
 		start();
 	}
 
-	@After
 	default void afterTest() throws Exception {
 		stop();
 	}

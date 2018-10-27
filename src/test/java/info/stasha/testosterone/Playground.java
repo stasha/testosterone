@@ -1,9 +1,12 @@
 package info.stasha.testosterone;
 
 import info.stasha.testosterone.annotation.Configuration;
+import info.stasha.testosterone.annotation.Request;
 import info.stasha.testosterone.jerseyon.JerseyConfiguration;
 import info.stasha.testosterone.jerseyon.Testosterone;
 import info.stasha.testosterone.jerseyon.TestosteroneRunner;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,18 +21,18 @@ import org.junit.runner.RunWith;
 //@Configuration(JettyConfiguration.class)
 public class Playground implements Testosterone {
 
-	@Before
-	public void setUp() {
-		System.out.println("setup");
-	}
 
-	@After
-	public void tearDown() {
-		System.out.println("after");
+	@GET
+	@Path("req")
+	public void req() {
+		System.out.println("req");
 	}
 
 	@Test
+	@GET
+	@Path("test")
 	public void test() {
 		System.out.println("test");
+		target("req").request().get();
 	}
 }

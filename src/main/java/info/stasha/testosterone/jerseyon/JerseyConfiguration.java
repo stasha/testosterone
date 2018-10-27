@@ -64,6 +64,10 @@ public class JerseyConfiguration {
 			};
 		}
 	}
+	
+	protected boolean isRunning(){
+		return server != null && server.isStarted();
+	}
 
 	public String getBaseUri() {
 		return BASE_URI;

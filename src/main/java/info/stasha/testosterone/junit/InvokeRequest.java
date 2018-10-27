@@ -5,6 +5,7 @@ import com.mifmif.common.regex.Generex;
 import info.stasha.testosterone.jerseyon.Testosterone;
 import info.stasha.testosterone.annotation.RequestAnnotation;
 import info.stasha.testosterone.annotation.Requests;
+import static info.stasha.testosterone.interceptors.Interceptors.invokeInitialMethod;
 import java.util.Arrays;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -41,154 +42,163 @@ public class InvokeRequest extends Statement {
 	@Override
 	public void evaluate() throws Throwable {
 
-		Path p = method.getAnnotation(Path.class);
-		String path = "";
-		if (p != null) {
-			path = p.value();
-		}
+		invokeInitialMethod("beforeTest", target, false);
 
-		GET get = method.getAnnotation(GET.class);
-		POST post = method.getAnnotation(POST.class);
-		PUT put = method.getAnnotation(PUT.class);
-		DELETE delete = method.getAnnotation(DELETE.class);
-		HEAD head = method.getAnnotation(HEAD.class);
-		OPTIONS options = method.getAnnotation(OPTIONS.class);
-
-		String requestMethod = HttpMethod.GET;
-
-		Request requestAnnotatoin = method.getAnnotation(Request.class);
-		Requests requestsAnnotation = method.getAnnotation(Requests.class);
-
-		if (requestAnnotatoin != null && requestsAnnotation != null) {
-			throw new IllegalStateException("You can use @Requests and @Request annotations on the same method: "
-					+ method.getName());
-		}
-
-		int requestsRepeat = (requestsAnnotation == null || requestsAnnotation.repeat() == 0) ? 1 : requestsAnnotation.repeat();
-
-		for (int i = 0; i < requestsRepeat; ++i) {
-
-			Request[] reqs;
-
-			if (requestsAnnotation != null) {
-				reqs = requestsAnnotation.requests();
-				if (reqs.length == 0) {
-					throw new IllegalStateException("@Requests annotation may not be empty.");
-				}
-			} else if (requestAnnotatoin != null) {
-				reqs = new Request[]{requestAnnotatoin};
-			} else {
-				reqs = new Request[]{new RequestAnnotation(path)};
+		try {
+			Path p = method.getAnnotation(Path.class);
+			String path = "";
+			if (p != null) {
+				path = p.value();
 			}
 
-			for (Request r : reqs) {
+			GET get = method.getAnnotation(GET.class);
+			POST post = method.getAnnotation(POST.class);
+			PUT put = method.getAnnotation(PUT.class);
+			DELETE delete = method.getAnnotation(DELETE.class);
+			HEAD head = method.getAnnotation(HEAD.class);
+			OPTIONS options = method.getAnnotation(OPTIONS.class);
 
-				if (Arrays.stream(r.excludeFromRepeat()).anyMatch(((Integer) (i + 1))::equals)) {
-					continue;
-				}
+			String requestMethod = HttpMethod.GET;
 
-				requestAnnotatoin = r;
+			Request requestAnnotatoin = method.getAnnotation(Request.class);
+			Requests requestsAnnotation = method.getAnnotation(Requests.class);
 
-				if (requestAnnotatoin.method() != null) {
-					requestMethod = requestAnnotatoin.method();
+			if (requestAnnotatoin != null && requestsAnnotation != null) {
+				throw new IllegalStateException("You can use @Requests and @Request annotations on the same method: "
+						+ method.getName());
+			}
+
+			int requestsRepeat = (requestsAnnotation == null || requestsAnnotation.repeat() == 0) ? 1 : requestsAnnotation.repeat();
+
+			for (int i = 0; i < requestsRepeat; ++i) {
+
+				Request[] reqs;
+
+				if (requestsAnnotation != null) {
+					reqs = requestsAnnotation.requests();
+					if (reqs.length == 0) {
+						throw new IllegalStateException("@Requests annotation may not be empty.");
+					}
+				} else if (requestAnnotatoin != null) {
+					reqs = new Request[]{requestAnnotatoin};
 				} else {
-					if (post != null) {
-						requestMethod = HttpMethod.POST;
-					} else if (put != null) {
-						requestMethod = HttpMethod.PUT;
-					} else if (delete != null) {
-						requestMethod = HttpMethod.DELETE;
-					} else if (head != null) {
-						requestMethod = HttpMethod.HEAD;
-					} else if (options != null) {
-						requestMethod = HttpMethod.OPTIONS;
-					} else {
-						requestMethod = HttpMethod.GET;
-					}
+					reqs = new Request[]{new RequestAnnotation(path)};
 				}
 
-				int requestRepeat = requestAnnotatoin.repeat() == 0 ? 1 : requestAnnotatoin.repeat();
-				String normalizedUrl = requestAnnotatoin.url();
-				normalizedUrl = normalizedUrl
-						.replaceAll("\\?", "\\\\\\?")
-						.replaceAll("\\&", "\\\\\\&")
-						.replaceAll("\\.", "\\\\\\.")
-						.replaceAll("\\*", "\\\\\\*");
-				Generex generex = new Generex(normalizedUrl);
-				//generex.random();
-				for (int m = 0; m < requestRepeat; ++m) {
-					String generexUrl = generex.random();
+				for (Request r : reqs) {
 
-					String[] url = generexUrl.split("\\?");
+					if (Arrays.stream(r.excludeFromRepeat()).anyMatch(((Integer) (i + 1))::equals)) {
+						continue;
+					}
 
-					WebTarget webTarget = target.target(url[0]);
+					requestAnnotatoin = r;
 
-					if (url.length > 1 && !url[1].isEmpty()) {
+					if (requestAnnotatoin.method() != null) {
+						requestMethod = requestAnnotatoin.method();
+					} else {
+						if (post != null) {
+							requestMethod = HttpMethod.POST;
+						} else if (put != null) {
+							requestMethod = HttpMethod.PUT;
+						} else if (delete != null) {
+							requestMethod = HttpMethod.DELETE;
+						} else if (head != null) {
+							requestMethod = HttpMethod.HEAD;
+						} else if (options != null) {
+							requestMethod = HttpMethod.OPTIONS;
+						} else {
+							requestMethod = HttpMethod.GET;
+						}
+					}
 
-						String[] query = url[1].split("&");
+					int requestRepeat = requestAnnotatoin.repeat() == 0 ? 1 : requestAnnotatoin.repeat();
+					String normalizedUrl = requestAnnotatoin.url();
+					normalizedUrl = normalizedUrl
+							.replaceAll("\\?", "\\\\\\?")
+							.replaceAll("\\&", "\\\\\\&")
+							.replaceAll("\\.", "\\\\\\.")
+							.replaceAll("\\*", "\\\\\\*");
+					Generex generex = new Generex(normalizedUrl);
+					//generex.random();
+					for (int m = 0; m < requestRepeat; ++m) {
+						String generexUrl = generex.random();
 
-						for (String params : query) {
-							String[] param = params.split("=");
-							String value;
-							if (param.length == 1) {
-								value = "";
-							} else {
-								value = param[1];
+						String[] url = generexUrl.split("\\?");
+
+						WebTarget webTarget = target.target(url[0]);
+
+						if (url.length > 1 && !url[1].isEmpty()) {
+
+							String[] query = url[1].split("&");
+
+							for (String params : query) {
+								String[] param = params.split("=");
+								String value;
+								if (param.length == 1) {
+									value = "";
+								} else {
+									value = param[1];
+								}
+								webTarget = webTarget.queryParam(param[0], value);
 							}
-							webTarget = webTarget.queryParam(param[0], value);
 						}
-					}
 
-					for (String headerParam : requestAnnotatoin.headerParams()) {
-					}
-
-					Response resp;
-
-					switch (requestMethod) {
-						case HttpMethod.POST:
-							resp = webTarget.request().post(Entity.json(null));
-							break;
-						case HttpMethod.PUT:
-							resp = webTarget.request().put(Entity.json(null));
-							break;
-						case HttpMethod.DELETE:
-							resp = webTarget.request().delete();
-							break;
-						case HttpMethod.HEAD:
-							resp = webTarget.request().head();
-							break;
-						case HttpMethod.OPTIONS:
-							resp = webTarget.request().options();
-							break;
-						default:
-							resp = webTarget.request().get();
-					}
-
-					for (Class<?> param : method.getMethod().getParameterTypes()) {
-						if (param.equals(Response.class)) {
-							method.invokeExplosively(target, resp);
+						for (String headerParam : requestAnnotatoin.headerParams()) {
 						}
-					}
 
-					try {
+						Response resp;
+
+						switch (requestMethod) {
+							case HttpMethod.POST:
+								resp = webTarget.request().post(Entity.json(null));
+								break;
+							case HttpMethod.PUT:
+								resp = webTarget.request().put(Entity.json(null));
+								break;
+							case HttpMethod.DELETE:
+								resp = webTarget.request().delete();
+								break;
+							case HttpMethod.HEAD:
+								resp = webTarget.request().head();
+								break;
+							case HttpMethod.OPTIONS:
+								resp = webTarget.request().options();
+								break;
+							default:
+								resp = webTarget.request().get();
+						}
+
+						for (Class<?> param : method.getMethod().getParameterTypes()) {
+							if (param.equals(Response.class)) {
+								method.invokeExplosively(target, resp);
+							}
+						}
+
 						try {
-							System.out.println("-----");
+							try {
+//							System.out.println("-----");
 							System.out.println(resp);
-							System.out.println("-----");
-							if (resp.getStatus() > 400) {
-								throw new Error(EXECUTION_ERROR_MESSAGE + " " + resp);
+//							System.out.println("-----");
+								if (resp.getStatus() > 400) {
+									throw new Error(EXECUTION_ERROR_MESSAGE + " " + resp);
+								}
+							} catch (MessageBodyProviderNotFoundException ex) {
+								throw new Error(EXECUTION_ERROR_MESSAGE + " " + ex.getMessage());
 							}
-						} catch (MessageBodyProviderNotFoundException ex) {
-							throw new Error(EXECUTION_ERROR_MESSAGE + " " + ex.getMessage());
-						}
-					} catch (Error ex) {
-						if (target.getMessages().isEmpty()) {
-							System.out.println(ex.getMessage());
-							throw new Error(ex.getMessage());
+						} catch (Error ex) {
+							if (target.getMessages().isEmpty()) {
+								System.out.println(ex.getMessage());
+								throw new Error(ex.getMessage());
+							}
 						}
 					}
 				}
 			}
+		} finally {
+			System.out.println("----");
+			System.out.println("Ending test: " + target.getClass().getSimpleName() + ":" + method.getName());
+			System.out.println("");
+			invokeInitialMethod("afterTest", target, false);
 		}
 	}
 }

@@ -1,8 +1,8 @@
-package info.stasha.testosterone.instrumentation;
+package info.stasha.testosterone.junit;
 
 import info.stasha.testosterone.annotation.DontIntercept;
-import info.stasha.testosterone.annotation.GetAnnotation;
-import info.stasha.testosterone.annotation.PathAnnotation;
+import info.stasha.testosterone.jerseyon.GetAnnotation;
+import info.stasha.testosterone.jerseyon.PathAnnotation;
 import info.stasha.testosterone.interceptors.Interceptors;
 import javax.ws.rs.Path;
 import net.bytebuddy.ByteBuddy;
@@ -12,7 +12,6 @@ import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.implementation.SuperMethodCall;
 import net.bytebuddy.implementation.attribute.MethodAttributeAppender;
 import net.bytebuddy.matcher.ElementMatchers;
-import static net.bytebuddy.matcher.ElementMatchers.anyOf;
 import static net.bytebuddy.matcher.ElementMatchers.isAnnotatedWith;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 import static net.bytebuddy.matcher.ElementMatchers.not;
@@ -38,37 +37,39 @@ public class Instrument {
 		return new ByteBuddy()
 				.subclass(clazz)
 				.name(clazz.getName() + "_")
+				//
 				.defineMethod("__created__", Void.class, Visibility.PUBLIC)
 				.intercept(MethodDelegation.to(Interceptors.Intercept.class))
+				//
 				.constructor(ElementMatchers.isDefaultConstructor())
 				.intercept(SuperMethodCall.INSTANCE.andThen(
 						MethodCall.invoke(named("__created__"))))
 				.annotateType(new PathAnnotation(""))
-				
+				//
 				.method(isAnnotatedWith(Before.class))
 				.intercept(MethodDelegation.to(Interceptors.Intercept.Before.class))
 				.attribute(MethodAttributeAppender.NoOp.INSTANCE)
-				
+				//
 				.method(isAnnotatedWith(After.class))
 				.intercept(MethodDelegation.to(Interceptors.Intercept.After.class))
 				.attribute(MethodAttributeAppender.NoOp.INSTANCE)
+				//
 				
 				.method(isAnnotatedWith(Test.class)
 						.and(not(isAnnotatedWith(Path.class)))
 						.and(not(isAnnotatedWith(DontIntercept.class)))
 				)
-				.intercept(MethodDelegation.to(Interceptors.Intercept.Test.class))
+				.intercept(MethodDelegation.to(Interceptors.Intercept.PathAndTest.class))
 				.attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
 				.annotateMethod(new PathAnnotation())
 				.annotateMethod(new GetAnnotation())
-				
+				//
 				.method(isAnnotatedWith(Path.class)
 						.and(not(isAnnotatedWith(DontIntercept.class)))
 				)
-				.intercept(MethodDelegation.to(Interceptors.Intercept.Test.class))
+				.intercept(MethodDelegation.to(Interceptors.Intercept.PathAndTest.class))
 				.attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
-				
-				
+				//
 				.make()
 				.load(clazz.getClassLoader())
 				.getLoaded();

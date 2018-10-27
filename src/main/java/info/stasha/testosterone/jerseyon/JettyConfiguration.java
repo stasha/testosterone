@@ -15,6 +15,11 @@ public class JettyConfiguration extends JerseyConfiguration {
 	protected Server server;
 
 	@Override
+	protected boolean isRunning() {
+		return server != null && server.isStarted();
+	}
+
+	@Override
 	protected void createServer() {
 		server = new Server(9999);
 		registerServlets();
