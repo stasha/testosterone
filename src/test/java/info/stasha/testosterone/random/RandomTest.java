@@ -1,8 +1,8 @@
 package info.stasha.testosterone.random;
 
 
-import info.stasha.testosterone.resource.Resource;
-import info.stasha.testosterone.service.Service;
+import info.stasha.testosterone.jersey.resource.Resource;
+import info.stasha.testosterone.jersey.service.Service;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
