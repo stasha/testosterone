@@ -3,7 +3,7 @@ package info.stasha.testosterone.servlet.servletfilter;
 import info.stasha.testosterone.servlet.*;
 import info.stasha.testosterone.annotation.Request;
 import info.stasha.testosterone.jersey.Testosterone;
-import info.stasha.testosterone.junit.TestosteroneRunner;
+import info.stasha.testosterone.junit4.TestosteroneRunner;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;

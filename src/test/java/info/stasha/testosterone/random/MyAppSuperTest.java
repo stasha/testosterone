@@ -1,7 +1,7 @@
 package info.stasha.testosterone.random;
 
 import info.stasha.testosterone.jersey.Testosterone;
-import info.stasha.testosterone.junit.TestosteroneRunner;
+import info.stasha.testosterone.junit4.TestosteroneRunner;
 import info.stasha.testosterone.jersey.resource.Resource;
 import info.stasha.testosterone.jersey.service.Service;
 import info.stasha.testosterone.jersey.service.ServiceFactory;

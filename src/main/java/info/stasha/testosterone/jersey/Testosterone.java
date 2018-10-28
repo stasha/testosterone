@@ -1,21 +1,25 @@
 package info.stasha.testosterone.jersey;
 
-import info.stasha.testosterone.servlet.ServletContainerConfig;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
+
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
+
+import info.stasha.testosterone.servlet.ServletContainerConfig;
 
 /**
  *
  * @author stasha
  */
+
 public interface Testosterone {
 
 	Logger LOGGER = Logger.getLogger(Testosterone.class.getName());

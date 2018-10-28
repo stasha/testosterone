@@ -1,15 +1,18 @@
-package info.stasha.testosterone.junit;
+package info.stasha.testosterone.junit4;
 
-import info.stasha.testosterone.InvokeTest;
-import info.stasha.testosterone.jersey.Testosterone;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
+
 import org.junit.Test;
 import org.junit.runner.Description;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
+
+import info.stasha.testosterone.Instrument;
+import info.stasha.testosterone.InvokeTest;
+import info.stasha.testosterone.jersey.Testosterone;
 
 /**
  * Test runner for running JerseyRequestTests.
@@ -38,7 +41,7 @@ public class TestosteroneRunner extends BlockJUnit4ClassRunner {
 	}
 
 	public TestosteroneRunner(Class<?> clazz) throws Throwable {
-		super(InstrumentTest.testClass(clazz));
+		super(Instrument.testClass(clazz));
 		this.testClass = clazz;
 	}
 

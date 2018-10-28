@@ -27,8 +27,10 @@ public class Interceptors {
 		Class<?> klass = type;
 		final List<Method> allMethods = new ArrayList<>(Arrays.asList(klass.getDeclaredMethods()));
 		for (final Method method : allMethods) {
+			System.out.println(method.getName());
 			for (Annotation anon : method.getAnnotations()) {
-				if (anon.getClass().getSimpleName().equals(className)) {
+				System.out.println(anon.getClass().getName() + " : " + anon.annotationType().getName());
+				if (anon.annotationType().getName().toString().contains(className)) {
 					methods.add(method);
 				}
 			}
@@ -104,9 +106,14 @@ public class Interceptors {
 			 */
 			@RuntimeType
 //			public static Object test(@Origin Method zuper, @This Testosterone orig) throws Exception {
-			public static Object test(@SuperCall Callable<?> zuper, @Origin Method method, @This Testosterone orig) throws Throwable {
+			public static Object test(@SuperCall Callable<?> zuper, @Origin Method method, @This Testosterone orig)
+					throws Throwable {
 				try {
+//					if (Thread.currentThread().getName().contains("main")) {
+//						new InvokeTest(method, orig).execute();
+//					} else {
 					return zuper.call();
+//					}
 				} catch (Throwable ex) {
 					if (ex instanceof AssertionError) {
 						MainTest.getMain(orig).getMain().getMessages().add(ex);

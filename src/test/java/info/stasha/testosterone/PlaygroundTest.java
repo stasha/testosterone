@@ -6,7 +6,7 @@
 package info.stasha.testosterone;
 
 import info.stasha.testosterone.jersey.Testosterone;
-import info.stasha.testosterone.junit.TestosteroneRunner;
+import info.stasha.testosterone.junit4.TestosteroneRunner;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import org.junit.Assert;

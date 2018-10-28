@@ -1,7 +1,7 @@
 package info.stasha.testosterone.jersey.expectedexception;
 
 import info.stasha.testosterone.jersey.Testosterone;
-import info.stasha.testosterone.junit.TestosteroneRunner;
+import info.stasha.testosterone.junit4.TestosteroneRunner;
 import info.stasha.testosterone.jersey.service.Service;
 import info.stasha.testosterone.jersey.service.ServiceFactory;
 import javax.ws.rs.GET;

@@ -1,7 +1,7 @@
 package info.stasha.testosterone.jersey.applicationlistener;
 
 import info.stasha.testosterone.jersey.Testosterone;
-import info.stasha.testosterone.junit.TestosteroneRunner;
+import info.stasha.testosterone.junit4.TestosteroneRunner;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.Test;
 import org.glassfish.jersey.server.monitoring.ApplicationEvent;

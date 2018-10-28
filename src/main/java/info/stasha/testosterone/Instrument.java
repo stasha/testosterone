@@ -1,10 +1,14 @@
-package info.stasha.testosterone.junit;
+package info.stasha.testosterone;
+
+import static net.bytebuddy.matcher.ElementMatchers.isAnnotatedWith;
+import static net.bytebuddy.matcher.ElementMatchers.named;
+import static net.bytebuddy.matcher.ElementMatchers.not;
+
+import javax.ws.rs.Path;
 
 import info.stasha.testosterone.annotation.DontIntercept;
 import info.stasha.testosterone.jersey.GetAnnotation;
 import info.stasha.testosterone.jersey.PathAnnotation;
-import info.stasha.testosterone.Interceptors;
-import javax.ws.rs.Path;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.description.modifier.Visibility;
 import net.bytebuddy.implementation.MethodCall;
@@ -12,19 +16,13 @@ import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.implementation.SuperMethodCall;
 import net.bytebuddy.implementation.attribute.MethodAttributeAppender;
 import net.bytebuddy.matcher.ElementMatchers;
-import static net.bytebuddy.matcher.ElementMatchers.isAnnotatedWith;
-import static net.bytebuddy.matcher.ElementMatchers.named;
-import static net.bytebuddy.matcher.ElementMatchers.not;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * Instrumentation
  *
  * @author stasha
  */
-public class InstrumentTest {
+public class Instrument {
 
 	/**
 	 * Returns new instrumented class that extends test class
@@ -47,16 +45,18 @@ public class InstrumentTest {
 						MethodCall.invoke(named("__created__"))))
 				.annotateType(new PathAnnotation(""))
 				//
-				.method(isAnnotatedWith(Before.class))
+				.method(isAnnotatedWith(named("org.junit.Before"))
+						.or(isAnnotatedWith(named("org.junit.jupiter.api.BeforeEach"))))
 				.intercept(MethodDelegation.to(Interceptors.Intercept.Before.class))
 				.attribute(MethodAttributeAppender.NoOp.INSTANCE)
 				//
-				.method(isAnnotatedWith(After.class))
+				.method(isAnnotatedWith(named("org.junit.After"))
+						.or(isAnnotatedWith(named("org.junit.jupiter.api.AfterEach"))))
 				.intercept(MethodDelegation.to(Interceptors.Intercept.After.class))
 				.attribute(MethodAttributeAppender.NoOp.INSTANCE)
 				//
-				
-				.method(isAnnotatedWith(Test.class)
+				.method(isAnnotatedWith(named("org.junit.Test"))
+						.or(isAnnotatedWith(named("org.junit.jupiter.api.Test")))
 						.and(not(isAnnotatedWith(Path.class)))
 						.and(not(isAnnotatedWith(DontIntercept.class)))
 				)
