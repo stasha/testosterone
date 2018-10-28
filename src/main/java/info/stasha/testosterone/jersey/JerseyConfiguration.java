@@ -1,6 +1,7 @@
 package info.stasha.testosterone.jersey;
 
 import static info.stasha.testosterone.jersey.Testosterone.LOGGER;
+import info.stasha.testosterone.servlet.ServletContainerConfig;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -64,8 +66,12 @@ public class JerseyConfiguration {
 			};
 		}
 	}
-	
-	protected boolean isRunning(){
+
+	public ServletContainerConfig getServletContainerConfig() {
+		throw new NotSupportedException("servlet configuration is not supported by default jersey config.");
+	}
+
+	protected boolean isRunning() {
 		return server != null && server.isStarted();
 	}
 

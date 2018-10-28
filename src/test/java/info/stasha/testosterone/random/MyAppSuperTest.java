@@ -1,4 +1,4 @@
-package info.stasha.testosterone;
+package info.stasha.testosterone.random;
 
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.junit.TestosteroneRunner;

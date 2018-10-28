@@ -18,8 +18,6 @@ import net.bytebuddy.implementation.bind.annotation.This;
 /**
  * Interceptors
  *
- * TODO: Remove JUnit dependencies
- *
  * @author stasha
  */
 public class Interceptors {

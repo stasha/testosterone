@@ -1,4 +1,4 @@
-package info.stasha.testosterone;
+package info.stasha.testosterone.random;
 
 
 import info.stasha.testosterone.resource.Resource;
@@ -16,7 +16,7 @@ import org.junit.Test;
 import static org.mockito.AdditionalAnswers.delegatesTo;
 import org.mockito.Mockito;
 
-public class HelloWorldTest extends MyAppSuperTest {
+public class RandomTest extends MyAppSuperTest {
 
 	private static final String INTERNAL_RESOURCE_PATH = "internalTestResourceMethod";
 

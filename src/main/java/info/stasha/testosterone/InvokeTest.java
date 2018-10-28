@@ -166,8 +166,10 @@ public class InvokeTest {
 								resp = webTarget.request().get();
 						}
 
+						boolean hasResponseParam = false;
 						for (Class<?> param : method.getParameterTypes()) {
 							if (param.equals(Response.class)) {
+								hasResponseParam = true;
 								method.invoke(target, resp);
 							}
 						}
@@ -177,7 +179,7 @@ public class InvokeTest {
 //							System.out.println("-----");
 								System.out.println(resp);
 //							System.out.println("-----");
-								if (resp.getStatus() > 400) {
+								if (!hasResponseParam && resp.getStatus() > 400) {
 									throw new Error(EXECUTION_ERROR_MESSAGE + " " + resp);
 								}
 							} catch (MessageBodyProviderNotFoundException ex) {
@@ -202,7 +204,7 @@ public class InvokeTest {
 			if (!MainTest.getMain(target).getMain().getExpectedExceptions().isEmpty()) {
 				Throwable t = MainTest.getMain(target).getMain().getExpectedExceptions().iterator().next();
 				MainTest.getMain(target).getMain().getExpectedExceptions().clear();
-				
+
 				throw t;
 			}
 		} finally {

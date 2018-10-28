@@ -100,7 +100,7 @@
 			<version>${jetty.version}</version>
 		</dependency>
 		
-		<!-- jersey global -->
+		<!-- provided dependencies -->
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
 			<artifactId>jersey-container-grizzly2-servlet</artifactId>
@@ -123,12 +123,12 @@
 			<scope>provided</scope>
 		</dependency>
 		
-		
 		<!-- supported JUnit versions are 4.5 - 4.12 -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>${junit.version}</version>
+			<scope>provided</scope>
 		</dependency>
 			
 			

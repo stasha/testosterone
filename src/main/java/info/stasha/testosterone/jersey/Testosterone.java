@@ -1,5 +1,6 @@
 package info.stasha.testosterone.jersey;
 
+import info.stasha.testosterone.servlet.ServletContainerConfig;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,13 +74,45 @@ public interface Testosterone {
 
 	}
 
+	default void configure(ServletContainerConfig config) {
+
+	}
+
+	default void configure(ResourceConfig config, ServletContainerConfig servletConfig) {
+
+	}
+
+	default void configure(AbstractBinder binder, ServletContainerConfig servletConfig) {
+
+	}
+
+	default void configure(ResourceConfig config, AbstractBinder binder, ServletContainerConfig servletConfig) {
+
+	}
+
 	default void start() throws Exception {
 		if (!getConfiguration().isRunning()) {
 			System.out.println("");
 			getConfiguration().stop();
+			
 			configure(getConfiguration().getResourceConfig());
 			configure(getConfiguration().getAbstractBinder());
-			configure(getConfiguration().getResourceConfig(), getConfiguration().getAbstractBinder());
+			
+			configure(getConfiguration().getResourceConfig(),
+					getConfiguration().getAbstractBinder());
+			
+			configure(getConfiguration().getServletContainerConfig());
+			
+			configure(getConfiguration().getResourceConfig(),
+					getConfiguration().getServletContainerConfig());
+			
+			configure(getConfiguration().getAbstractBinder(),
+					getConfiguration().getServletContainerConfig());
+			
+			configure(getConfiguration().getResourceConfig(),
+					getConfiguration().getAbstractBinder(),
+					getConfiguration().getServletContainerConfig());
+			
 			getConfiguration().init(this);
 			getConfiguration().start();
 		}
@@ -98,7 +131,7 @@ public interface Testosterone {
 
 	default void afterTest() throws Exception {
 		stop();
-		
+
 	}
 
 }
