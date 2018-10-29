@@ -8,16 +8,25 @@ import org.junit.jupiter.api.extension.TestInstanceFactoryContext;
 import org.junit.jupiter.api.extension.TestInstantiationException;
 
 import info.stasha.testosterone.Instrument;
-import info.stasha.testosterone.junit5.Testosterone.ContextParameterResolver;
+import info.stasha.testosterone.junit5.Testosterone.ContextInjectParameterResolver;
 import info.stasha.testosterone.junit5.Testosterone.TestosteroneFactory;
-
+import javax.inject.Inject;
 import javax.ws.rs.core.Context;
 
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 
-@Extensions({@ExtendWith(TestosteroneFactory.class), @ExtendWith(ContextParameterResolver.class)})
+/**
+ * Testosterone "runner" for JUnit 5.
+ *
+ * TODO: Remove hard dependency on @Context and @Inject
+ *
+ * @author stasha
+ */
+@Extensions({
+	@ExtendWith(TestosteroneFactory.class)
+	, @ExtendWith(ContextInjectParameterResolver.class)})
 public interface Testosterone extends info.stasha.testosterone.jersey.Testosterone {
 
 	public static class TestosteroneFactory implements TestInstanceFactory {
@@ -33,20 +42,22 @@ public interface Testosterone extends info.stasha.testosterone.jersey.Testostero
 		}
 	}
 
-	public static class ContextParameterResolver implements ParameterResolver {
+	public static class ContextInjectParameterResolver implements ParameterResolver {
+
+		private Class<?> cls;
 
 		@Override
-		public Object resolveParameter(ParameterContext parameterContext,
-				ExtensionContext extensionContext) throws ParameterResolutionException {
-			return new Object();
+		public Object resolveParameter(ParameterContext pc, ExtensionContext rc) throws ParameterResolutionException {
+			return cls.cast(null);
 		}
 
 		@Override
-		public boolean supportsParameter(ParameterContext parameterContext,
-				ExtensionContext extensionContext) throws ParameterResolutionException {
-			return true;
+		public boolean supportsParameter(ParameterContext pc, ExtensionContext ec) throws ParameterResolutionException {
+			if (pc.isAnnotated(Context.class) || pc.isAnnotated(Inject.class)) {
+				cls = pc.getParameter().getType();
+				return true;
+			}
+			return false;
 		}
-
 	}
-
 }

@@ -48,7 +48,6 @@ public class JUnit5Test implements Testosterone {
 		assertEquals("Returned message should equal", Service.RESPONSE_TEXT, service.getText());
 	}
 	
-	@Disabled
 	@Test
 	public void methodInjectionTest(@Context Service service) {
 		assertEquals("Returned message should equal", Service.RESPONSE_TEXT, service.getText());
