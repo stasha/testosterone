@@ -33,7 +33,7 @@ public class Instrument {
 	 */
 	public static Class<?> testClass(Class<?> clazz) throws NoSuchMethodException {
 
-		return new ByteBuddy()
+		Class<?> cls =  new ByteBuddy()
 				.subclass(clazz)
 				.name(clazz.getName() + "_")
 				//
@@ -74,6 +74,10 @@ public class Instrument {
 				.make()
 				.load(clazz.getClassLoader())
 				.getLoaded();
+		
+//		Interceptors.getMethodsAnnotatedWith(cls, "Test");
+		
+		return cls;
 
 	}
 }

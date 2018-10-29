@@ -65,6 +65,7 @@ public class InjectablesTest implements Testosterone {
 
 	@Test
 	public void injectablesTest() {
+		System.out.println("Inside injectableTest");
 		assertNotNull("Application should not be null", application);
 		assertNotNull("HttpHeaders should not be null", httpHeaders);
 		assertNotNull("Request should not be null", request);
@@ -94,6 +95,7 @@ public class InjectablesTest implements Testosterone {
 			@Context ServletConfig servletConfig,
 			@Context ServletContext servletContext
 	) {
+		System.out.println("Inside injectableMethodTest");
 		assertNotNull("Application should not be null", application);
 		assertNotNull("HttpHeaders should not be null", httpHeaders);
 		assertNotNull("Request should not be null", request);

@@ -1,18 +1,16 @@
 package info.stasha.testosterone.junit4;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.Description;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
-import org.junit.runners.model.Statement;
 
 import info.stasha.testosterone.Instrument;
-import info.stasha.testosterone.InvokeTest;
 import info.stasha.testosterone.jersey.Testosterone;
+import org.junit.runners.model.Statement;
 
 /**
  * Test runner for running JerseyRequestTests.
@@ -25,17 +23,23 @@ public class TestosteroneRunner extends BlockJUnit4ClassRunner {
 
 	public static class Invoker extends Statement {
 
-		private final Method method;
+		private final FrameworkMethod method;
 		private final Testosterone target;
 
-		public Invoker(Method method, Object target) {
+		public Invoker(FrameworkMethod method, Object target) {
 			this.method = method;
 			this.target = (Testosterone) target;
 		}
 
 		@Override
 		public void evaluate() throws Throwable {
-			new InvokeTest(method, target).execute();
+//			
+			try {
+				method.invokeExplosively(target, new Object[method.getMethod().getParameterCount()]);
+			} catch (IllegalArgumentException ex) {
+				System.out.println("Failed to invoke from runner");
+				throw ex;
+			}
 		}
 
 	}
@@ -61,7 +65,7 @@ public class TestosteroneRunner extends BlockJUnit4ClassRunner {
 
 	@Override
 	protected Statement methodInvoker(FrameworkMethod method, Object target) {
-		return new Invoker(method.getMethod(), target);
+		return new Invoker(method, target);
 	}
 
 	@Override

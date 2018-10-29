@@ -84,6 +84,9 @@ public class JerseyConfiguration {
 	}
 
 	public Client client() {
+		if(client.get() == null) {
+			client.getAndSet(getClient());
+		}
 		return client.get();
 	}
 

@@ -8,12 +8,20 @@ import org.junit.jupiter.api.extension.TestInstanceFactoryContext;
 import org.junit.jupiter.api.extension.TestInstantiationException;
 
 import info.stasha.testosterone.Instrument;
+import info.stasha.testosterone.junit5.Testosterone.ContextParameterResolver;
 import info.stasha.testosterone.junit5.Testosterone.TestosteroneFactory;
 
-@Extensions(@ExtendWith(TestosteroneFactory.class))
+import javax.ws.rs.core.Context;
+
+import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.api.extension.ParameterResolutionException;
+import org.junit.jupiter.api.extension.ParameterResolver;
+
+@Extensions({@ExtendWith(TestosteroneFactory.class), @ExtendWith(ContextParameterResolver.class)})
 public interface Testosterone extends info.stasha.testosterone.jersey.Testosterone {
 
 	public static class TestosteroneFactory implements TestInstanceFactory {
+
 		@Override
 		public Object createTestInstance(TestInstanceFactoryContext factoryContext, ExtensionContext extensionContext)
 				throws TestInstantiationException {
@@ -24,4 +32,21 @@ public interface Testosterone extends info.stasha.testosterone.jersey.Testostero
 			}
 		}
 	}
+
+	public static class ContextParameterResolver implements ParameterResolver {
+
+		@Override
+		public Object resolveParameter(ParameterContext parameterContext,
+				ExtensionContext extensionContext) throws ParameterResolutionException {
+			return new Object();
+		}
+
+		@Override
+		public boolean supportsParameter(ParameterContext parameterContext,
+				ExtensionContext extensionContext) throws ParameterResolutionException {
+			return true;
+		}
+
+	}
+
 }

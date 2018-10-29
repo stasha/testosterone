@@ -27,6 +27,7 @@ public class ExpectedExceptionTest implements Testosterone {
 
 	@Test(expected = IllegalStateException.class)
 	public void illegalStateExceptionTest(@Context Service service) {
+		System.out.println("");
 		service.throwIllegalStateException();
 	}
 

@@ -10,7 +10,6 @@ import info.stasha.testosterone.junit4.TestosteroneRunner;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -22,12 +21,8 @@ import org.junit.runner.RunWith;
 //@Configuration(JerseyConfiguration.class)
 //@Configuration(JettyConfiguration.class)
 public class PlaygroundTest implements Testosterone {
-	
 
-		@Before
-	public void before() {
-		System.out.println("before");
-	}
+	
 
 	@GET
 	@Path("req")
