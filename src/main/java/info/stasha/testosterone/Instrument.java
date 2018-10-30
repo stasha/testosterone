@@ -9,6 +9,10 @@ import javax.ws.rs.Path;
 import info.stasha.testosterone.annotation.DontIntercept;
 import info.stasha.testosterone.jersey.GetAnnotation;
 import info.stasha.testosterone.jersey.PathAnnotation;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.description.modifier.Visibility;
 import net.bytebuddy.implementation.MethodCall;
@@ -33,12 +37,26 @@ public class Instrument {
 	 */
 	public static Class<?> testClass(Class<?> clazz) throws NoSuchMethodException {
 
-		Class<?> cls =  new ByteBuddy()
+		int testCount = 0;
+		for (Method method : clazz.getMethods()) {
+			try {
+				if (method.isAnnotationPresent((Class<? extends Annotation>) Class.forName("org.junit.Test"))
+						|| method.isAnnotationPresent((Class<? extends Annotation>) Class.forName("org.junit.jupiter.api.Test"))) {
+					testCount++;
+				}
+			} catch (ClassNotFoundException ex) {
+				throw new RuntimeException(ex);
+			}
+		}
+
+		Class<?> cls = new ByteBuddy()
 				.subclass(clazz)
 				.name(clazz.getName() + "_")
 				//
 				.defineMethod("__created__", Void.class, Visibility.PUBLIC)
 				.intercept(MethodDelegation.to(Interceptors.Intercept.class))
+				//
+				.defineField("testCount", Integer.class, Visibility.PUBLIC)
 				//
 				.constructor(ElementMatchers.isDefaultConstructor())
 				.intercept(SuperMethodCall.INSTANCE.andThen(
@@ -74,9 +92,8 @@ public class Instrument {
 				.make()
 				.load(clazz.getClassLoader())
 				.getLoaded();
-		
+
 //		Interceptors.getMethodsAnnotatedWith(cls, "Test");
-		
 		return cls;
 
 	}
