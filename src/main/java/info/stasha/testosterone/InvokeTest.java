@@ -6,7 +6,6 @@ import static info.stasha.testosterone.Interceptors.getMethodsAnnotatedWith;
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.annotation.RequestAnnotation;
 import info.stasha.testosterone.annotation.Requests;
-import static info.stasha.testosterone.Interceptors.invokeInitialMethod;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;

@@ -93,10 +93,11 @@ public class JettyConfiguration extends JerseyConfiguration {
 
 	@Override
 	public void start() throws Exception {
+		prepare();
+
 		if (server != null && !server.isRunning()) {
 			server.start();
 		}
-		prepare();
 	}
 
 	@Override

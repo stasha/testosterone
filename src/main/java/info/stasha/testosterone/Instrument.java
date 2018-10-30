@@ -11,8 +11,6 @@ import info.stasha.testosterone.jersey.GetAnnotation;
 import info.stasha.testosterone.jersey.PathAnnotation;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.description.modifier.Visibility;
 import net.bytebuddy.implementation.MethodCall;

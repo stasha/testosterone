@@ -1,10 +1,13 @@
 package info.stasha.testosterone;
 
+import net.bytebuddy.ByteBuddy;
 import org.glassfish.hk2.api.Factory;
 import org.mockito.Mockito;
 
 /**
- * Creates Jersey factory objects based on passed class.
+ * Creates Jersey factory objects based on passed class.<br>
+ *
+ * NOTE: Making factories this way fails in Jersey 2.0, 2.1, 2.2, 2.3
  *
  * @author stasha
  */
@@ -17,6 +20,7 @@ public class GenericMockitoFactory {
 	}
 
 	private static Factory newInstance(Class<?> obj, Type mode) {
+
 		return new Factory() {
 			@Override
 			public Object provide() {
@@ -27,7 +31,7 @@ public class GenericMockitoFactory {
 						case MOCK:
 							return Mockito.mock(obj);
 						default:
-							return obj.cast(obj.newInstance());
+							return obj.newInstance();
 					}
 				} catch (InstantiationException | IllegalAccessException ex) {
 					throw new RuntimeException(ex);

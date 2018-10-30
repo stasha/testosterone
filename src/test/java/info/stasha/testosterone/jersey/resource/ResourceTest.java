@@ -20,8 +20,12 @@ import org.junit.runner.RunWith;
 public class ResourceTest implements Testosterone {
 
 	@Override
-	public void configure(ResourceConfig config, AbstractBinder binder) {
+	public void configure(ResourceConfig config) {
 		config.register(Resource.class);
+	}
+
+	@Override
+	public void configure(AbstractBinder binder) {
 		binder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
 	}
 

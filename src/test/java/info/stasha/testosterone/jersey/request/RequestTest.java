@@ -31,11 +31,13 @@ import org.junit.runner.RunWith;
 public class RequestTest implements Testosterone {
 
 	@Override
-	public void configure(ResourceConfig config, AbstractBinder binder) {
+	public void configure(ResourceConfig config) {
 		config.register(Resource.class);
-		// Jersey 2.0 doesn't support "proxyForSameScope" method.
-		binder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
+	}
 
+	@Override
+	public void configure(AbstractBinder binder) {
+		binder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
 	}
 
 	/**

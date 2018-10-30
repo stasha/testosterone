@@ -19,7 +19,6 @@ import info.stasha.testosterone.servlet.ServletContainerConfig;
  *
  * @author stasha
  */
-
 public interface Testosterone {
 
 	Logger LOGGER = Logger.getLogger(Testosterone.class.getName());
@@ -74,10 +73,6 @@ public interface Testosterone {
 
 	}
 
-	default void configure(ResourceConfig config, AbstractBinder binder) {
-
-	}
-
 	default void configure(ServletContainerConfig config) {
 
 	}
@@ -86,37 +81,25 @@ public interface Testosterone {
 
 	}
 
-	default void configure(AbstractBinder binder, ServletContainerConfig servletConfig) {
-
-	}
-
-	default void configure(ResourceConfig config, AbstractBinder binder, ServletContainerConfig servletConfig) {
-
-	}
-
 	default void start() throws Exception {
 		if (!getConfiguration().isRunning()) {
 			System.out.println("");
 			getConfiguration().stop();
-			
+
 			configure(getConfiguration().getResourceConfig());
-			configure(getConfiguration().getAbstractBinder());
 			
-			configure(getConfiguration().getResourceConfig(),
-					getConfiguration().getAbstractBinder());
-			
+			getConfiguration().getResourceConfig().register(new AbstractBinder() {
+				@Override
+				protected void configure() {
+					Testosterone.this.configure(this);
+				}
+			});
+
 			configure(getConfiguration().getServletContainerConfig());
-			
+
 			configure(getConfiguration().getResourceConfig(),
 					getConfiguration().getServletContainerConfig());
-			
-			configure(getConfiguration().getAbstractBinder(),
-					getConfiguration().getServletContainerConfig());
-			
-			configure(getConfiguration().getResourceConfig(),
-					getConfiguration().getAbstractBinder(),
-					getConfiguration().getServletContainerConfig());
-			
+
 			getConfiguration().init(this);
 			getConfiguration().start();
 		}

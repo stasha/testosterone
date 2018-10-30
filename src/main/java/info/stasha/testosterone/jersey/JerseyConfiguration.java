@@ -16,7 +16,6 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -34,7 +33,6 @@ public class JerseyConfiguration {
 	protected final List<Throwable> expectedException = new ArrayList<>();
 	protected JerseyConfiguration configuration;
 	protected ResourceConfig resourceConfig;
-	protected AbstractBinder abstractBinder;
 	protected final AtomicReference<Client> client = new AtomicReference<>(null);
 
 	private HttpServer server;
@@ -53,18 +51,7 @@ public class JerseyConfiguration {
 			this.resourceConfig = new ResourceConfig();
 		}
 
-		createAbstractBinder();
 		return this.resourceConfig;
-	}
-
-	protected void createAbstractBinder() {
-		if (this.abstractBinder == null) {
-			this.abstractBinder = new AbstractBinder() {
-				@Override
-				protected void configure() {
-				}
-			};
-		}
 	}
 
 	public ServletContainerConfig getServletContainerConfig() {
@@ -84,7 +71,7 @@ public class JerseyConfiguration {
 	}
 
 	public Client client() {
-		if(client.get() == null) {
+		if (client.get() == null) {
 			client.getAndSet(getClient());
 		}
 		return client.get();
@@ -121,10 +108,6 @@ public class JerseyConfiguration {
 		return configure();
 	}
 
-	public AbstractBinder getAbstractBinder() {
-		return this.abstractBinder;
-	}
-
 	protected void createServer() throws URISyntaxException {
 		server = GrizzlyHttpServerFactory.createHttpServer(new URI(BASE_URI), configure());
 	}
@@ -136,7 +119,6 @@ public class JerseyConfiguration {
 
 	protected void cleanUp() {
 		this.resourceConfig = null;
-		this.abstractBinder = null;
 
 		closeClient(client.get());
 	}
@@ -160,9 +142,7 @@ public class JerseyConfiguration {
 		this.testObj = obj;
 
 		try {
-
 			this.resourceConfig.register(this.testObj.getClass());
-			this.resourceConfig.register(this.abstractBinder);
 
 			createServer();
 
