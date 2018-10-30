@@ -1,5 +1,6 @@
 package info.stasha.testosterone;
 
+import info.stasha.testosterone.jersey.JerseyConfiguration;
 import info.stasha.testosterone.jersey.Testosterone;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -119,6 +120,7 @@ public class Interceptors {
 				Test t = method.getAnnotation(Test.class);
 				Class<? extends Throwable> expected = t != null ? t.expected() : null;
 				Method m = orig.getClass().getMethod(method.getName(), method.getParameterTypes());
+				JerseyConfiguration config = orig.getConfiguration();
 
 				if (isMain) {
 					Set<Throwable> messages = MainTest.getMain(orig).getMain().getMessages();
@@ -140,7 +142,13 @@ public class Interceptors {
 						if (isMain) {
 							messages.clear();
 							exception.clear();
-							invokeInitialMethod("afterTest", orig);
+
+							config.setTestExecutedCount(config.getTestExecutedCount() + 1);
+
+							if (config.getTestExecutedCount() == config.getTestCount()) {
+								invokeInitialMethod("afterTest", orig);
+							}
+
 						}
 					}
 

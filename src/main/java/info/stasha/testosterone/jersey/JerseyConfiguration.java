@@ -2,6 +2,8 @@ package info.stasha.testosterone.jersey;
 
 import static info.stasha.testosterone.jersey.Testosterone.LOGGER;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -37,6 +39,9 @@ public class JerseyConfiguration {
 
 	private HttpServer server;
 	protected Object testObj;
+
+	private int testCount;
+	private int testExecutedCount;
 
 	public Set<Throwable> getMessages() {
 		return messages;
@@ -138,18 +143,44 @@ public class JerseyConfiguration {
 		cleanUp();
 	}
 
-	public void init(Object obj) throws Exception {
+	public void initConfiguration(Object obj) {
 		this.testObj = obj;
+		this.resourceConfig.register(this.testObj.getClass());
+	}
 
+	public void init(Object obj) throws Exception {
 		try {
-			this.resourceConfig.register(this.testObj.getClass());
-
 			createServer();
 
 		} catch (Exception ex) {
 			Logger.getLogger(JettyConfiguration.class.getName()).log(Level.SEVERE, null, ex);
 			throw ex;
 		}
+	}
+
+	public Integer getTestCount() {
+		if (this.testCount == 0) {
+			for (Method method : this.testObj.getClass().getMethods()) {
+				try {
+					if (method.isAnnotationPresent((Class<? extends Annotation>) Class.forName("org.junit.Test"))
+							|| method.isAnnotationPresent((Class<? extends Annotation>) Class.forName("org.junit.jupiter.api.Test"))) {
+						this.testCount++;
+					}
+				} catch (ClassNotFoundException ex) {
+					throw new RuntimeException(ex);
+				}
+			}
+		}
+
+		return this.testCount;
+	}
+
+	public int getTestExecutedCount() {
+		return testExecutedCount;
+	}
+
+	public void setTestExecutedCount(int testExecutedCount) {
+		this.testExecutedCount = testExecutedCount;
 	}
 
 }

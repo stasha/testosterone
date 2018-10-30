@@ -35,18 +35,6 @@ public class Instrument {
 	 */
 	public static Class<?> testClass(Class<?> clazz) throws NoSuchMethodException {
 
-		int testCount = 0;
-		for (Method method : clazz.getMethods()) {
-			try {
-				if (method.isAnnotationPresent((Class<? extends Annotation>) Class.forName("org.junit.Test"))
-						|| method.isAnnotationPresent((Class<? extends Annotation>) Class.forName("org.junit.jupiter.api.Test"))) {
-					testCount++;
-				}
-			} catch (ClassNotFoundException ex) {
-				throw new RuntimeException(ex);
-			}
-		}
-
 		Class<?> cls = new ByteBuddy()
 				.subclass(clazz)
 				.name(clazz.getName() + "_")

@@ -1,5 +1,6 @@
 package info.stasha.testosterone.jersey;
 
+import info.stasha.testosterone.Suite;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,14 @@ public interface Testosterone {
 	Logger LOGGER = Logger.getLogger(Testosterone.class.getName());
 
 	Map<Class<?>, JerseyConfiguration> CONFIGURATION = new HashMap<>();
+
+	default int getTestCount() {
+		return getConfiguration().getTestCount();
+	}
+
+	default int getTestExecutedCount() {
+		return getConfiguration().getTestExecutedCount();
+	}
 
 	default Set<Throwable> getMessages() {
 		return getConfiguration().getMessages();
@@ -81,25 +90,38 @@ public interface Testosterone {
 
 	}
 
+	/**
+	 * Suite classes.
+	 *
+	 * @param suite
+	 */
+	default void configure(Suite suite) {
+
+	}
+
+	default void initConfiguration() {
+		configure(getConfiguration().getResourceConfig());
+
+		getConfiguration().getResourceConfig().register(new AbstractBinder() {
+			@Override
+			protected void configure() {
+				Testosterone.this.configure(this);
+			}
+		});
+
+		configure(getConfiguration().getServletContainerConfig());
+
+		configure(getConfiguration().getResourceConfig(),
+				getConfiguration().getServletContainerConfig());
+
+		getConfiguration().initConfiguration(this);
+	}
+
 	default void start() throws Exception {
 		if (!getConfiguration().isRunning()) {
 			System.out.println("");
 			getConfiguration().stop();
-
-			configure(getConfiguration().getResourceConfig());
-			
-			getConfiguration().getResourceConfig().register(new AbstractBinder() {
-				@Override
-				protected void configure() {
-					Testosterone.this.configure(this);
-				}
-			});
-
-			configure(getConfiguration().getServletContainerConfig());
-
-			configure(getConfiguration().getResourceConfig(),
-					getConfiguration().getServletContainerConfig());
-
+			initConfiguration();
 			getConfiguration().init(this);
 			getConfiguration().start();
 		}
