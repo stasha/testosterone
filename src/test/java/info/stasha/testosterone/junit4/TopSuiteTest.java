@@ -13,6 +13,6 @@ import org.junit.runner.RunWith;
 	RunTestsAndSuitesSuite.class
 })
 @Configuration(serverStarts = Configuration.ServerStarts.DONT_START)
-public class TopSuite implements Testosterone {
+public class TopSuiteTest implements Testosterone {
 
 }

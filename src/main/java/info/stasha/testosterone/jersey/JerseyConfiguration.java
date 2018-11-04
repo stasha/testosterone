@@ -121,7 +121,12 @@ public class JerseyConfiguration implements Configuration {
 	}
 
 	public WebTarget target() {
+		try {
 		return client().target(baseUri());
+		}catch(Exception ex){
+			ex.printStackTrace();
+			throw ex;
+		}
 	}
 
 	protected void closeClient(final Client... clients) {
@@ -135,6 +140,7 @@ public class JerseyConfiguration implements Configuration {
 			}
 			try {
 				c.close();
+				client.getAndSet(null);
 			} catch (Throwable ex) {
 				LOGGER.log(Level.WARNING, "Error closing client instance.", ex);
 			}

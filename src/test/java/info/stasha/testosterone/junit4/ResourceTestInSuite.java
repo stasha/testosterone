@@ -14,9 +14,8 @@ import org.junit.runner.RunWith;
  * @author stasha
  */
 @RunWith(TestosteroneRunner.class)
-public class ResourceTest implements Testosterone {
+public class ResourceTestInSuite implements Testosterone {
 
-	@Ignore(value = "Doesn't work when project is build but it works when testing just TopSuite")
 	@Test
 	@Request(url = Resource.HELLO_WORLD_PATH)
 	public void helloWorldTest(Response resp) {

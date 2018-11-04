@@ -16,11 +16,11 @@ import org.junit.runner.RunWith;
  */
 @RunWith(TestosteroneSuiteRunner.class)
 @org.junit.runners.Suite.SuiteClasses({
-	ResourceTest.class,
+	ResourceTestInSuite.class,
 	RunPerTestClassSuite.class,
 	RunPerTestMethodSuite.class
 })
-@Configuration(serverStarts = Configuration.ServerStarts.PER_CLASS)
+@Configuration(serverStarts = Configuration.ServerStarts.PARENT_CONFIGURATION)
 public class RunTestsAndSuitesSuite implements Testosterone {
 
 	@Override

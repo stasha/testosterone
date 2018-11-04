@@ -25,7 +25,8 @@ import static org.mockito.Mockito.times;
 @RunWith(TestosteroneRunner.class)
 public class ServletListenerTest implements Testosterone {
 
-	ServletListener listener = Mockito.spy(new ServletListener());
+	//TODO: Fix this
+	private static final ServletListener listener = Mockito.spy(new ServletListener());
 
 	@Override
 	public void configure(ServletContainerConfig sc) {
