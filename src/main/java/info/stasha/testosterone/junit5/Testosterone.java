@@ -12,6 +12,8 @@ import info.stasha.testosterone.junit5.Testosterone.ContextInjectParameterResolv
 import info.stasha.testosterone.junit5.Testosterone.TestosteroneFactory;
 import javax.inject.Inject;
 import javax.ws.rs.core.Context;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
@@ -35,8 +37,14 @@ public interface Testosterone extends info.stasha.testosterone.jersey.Testostero
 		public Object createTestInstance(TestInstanceFactoryContext factoryContext, ExtensionContext extensionContext)
 				throws TestInstantiationException {
 			try {
-				return Instrument.testClass(factoryContext.getTestClass()).newInstance();
-			} catch (InstantiationException | IllegalAccessException | NoSuchMethodException ex) {
+				return Instrument.testClass(
+						factoryContext.getTestClass(),
+						new BeforeEachAnnotation(),
+						new AfterEachAnnotation(),
+						new BeforeAllAnnotation(),
+						new AfterAllAnnotation()
+				).newInstance();
+			} catch (InstantiationException | IllegalAccessException ex) {
 				throw new RuntimeException(ex);
 			}
 		}
@@ -59,5 +67,15 @@ public interface Testosterone extends info.stasha.testosterone.jersey.Testostero
 			}
 			return false;
 		}
+	}
+
+	@BeforeAll
+	public static void beforeClass() {
+		Thread.currentThread().getStackTrace()[1].getClassName();
+	}
+
+	@AfterAll
+	public static void afterClass() {
+		System.out.println("after class");
 	}
 }

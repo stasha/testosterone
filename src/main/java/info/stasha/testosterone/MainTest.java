@@ -12,12 +12,20 @@ import java.util.Map;
  */
 public class MainTest {
 
-	private static final Map<Class<?>, MainTest> PAIRS = new HashMap<>();
+	private static final Map<String, MainTest> PAIRS = new HashMap<>();
 
 	private Testosterone main;
 
 	public static MainTest getMain(Testosterone obj) {
-		MainTest m = PAIRS.get(obj.getClass());
+		MainTest m = PAIRS.get(obj.getClass().getName());
+		if (m == null) {
+			m = new MainTest();
+		}
+		return m;
+	}
+	
+	public static MainTest getMain(Class<?> cls) {
+		MainTest m = PAIRS.get(cls.getName());
 		if (m == null) {
 			m = new MainTest();
 		}
@@ -25,7 +33,11 @@ public class MainTest {
 	}
 
 	public static void removeMain(Testosterone obj) {
-		PAIRS.remove(obj.getClass());
+		PAIRS.remove(obj.getClass().getName());
+	}
+	
+	public static void removeMain(Class<?> obj) {
+		PAIRS.remove(obj.getName());
 	}
 
 	public Testosterone getMain() {
@@ -35,7 +47,7 @@ public class MainTest {
 	public void setMain(Testosterone obj) {
 		if (this.main == null) {
 			this.main = obj;
-			PAIRS.put(obj.getClass(), this);
+			PAIRS.put(obj.getClass().getName(), this);
 		}
 	}
 

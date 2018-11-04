@@ -11,7 +11,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.ws.rs.core.Response;
-import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,8 +32,8 @@ public class ServletFilterTest implements Testosterone {
 		sc.addFilter(filter, "/*");
 	}
 
-	@After
-	public void tearDown() {
+	@Override
+	public void afterServerStop() {
 		Mockito.verify(filter, times(1)).destroy();
 	}
 

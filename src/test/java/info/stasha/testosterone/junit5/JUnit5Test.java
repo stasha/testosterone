@@ -15,22 +15,25 @@ import org.glassfish.jersey.process.internal.RequestScoped;
 import static org.junit.Assert.assertEquals;
 import org.junit.jupiter.api.Disabled;
 
+@Disabled
 public class JUnit5Test implements Testosterone {
 
 	@Override
 	public void configure(AbstractBinder binder) {
 		binder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
 	}
-	
-	@Context 
+
+	@Context
 	private Service service;
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
+		System.out.println("beforeAll");
 	}
 
 	@AfterAll
 	static void tearDownAfterClass() throws Exception {
+		System.out.println("afterAll");
 	}
 
 	@BeforeEach
@@ -47,7 +50,7 @@ public class JUnit5Test implements Testosterone {
 	public void classInjectionTest() {
 		assertEquals("Returned message should equal", Service.RESPONSE_TEXT, service.getText());
 	}
-	
+
 	@Test
 	public void methodInjectionTest(@Context Service service) {
 		assertEquals("Returned message should equal", Service.RESPONSE_TEXT, service.getText());

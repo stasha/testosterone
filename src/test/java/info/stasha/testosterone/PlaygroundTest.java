@@ -1,36 +1,64 @@
 package info.stasha.testosterone;
 
-import info.stasha.testosterone.jersey.Testosterone;
+import info.stasha.testosterone.annotation.Configuration;
+import info.stasha.testosterone.jersey.resource.Resource;
 import info.stasha.testosterone.jersey.service.Service;
 import info.stasha.testosterone.jersey.service.Service2;
 import info.stasha.testosterone.jersey.service.ServiceImpl;
-import info.stasha.testosterone.junit4.TestosteroneRunner;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.times;
-
-
 
 /**
  *
  * @author stasha
  */
-@RunWith(TestosteroneRunner.class)
-//@Configuration(JerseyConfiguration.class)
-//@Configuration(JettyConfiguration.class)
-public class PlaygroundTest implements Testosterone {
+@Configuration(serverStarts = Configuration.ServerStarts.PER_TEST, port = 9998)
+public class PlaygroundTest extends SuperTest {
+
+	@Override
+	public void configure(ResourceConfig config) {
+		config.register(Resource.class);
+		config.register(Resource.class);
+		config.register(Resource.class);
+		config.register(Resource.class);
+	}
 
 	@Override
 	public void configure(AbstractBinder binder) {
 		binder.bindFactory(GenericMockitoFactory.mock(ServiceImpl.class)).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
 		binder.bindFactory(GenericMockitoFactory.get(ServiceImpl.class)).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
+	}
+
+	@BeforeClass
+	public static void beforeClass() {
+		System.out.println("internal before class");
+	}
+
+	@AfterClass
+	public static void afterClass() {
+		System.out.println("internal after class");
+	}
+
+	@Before
+	public void before() {
+		System.out.println("before");
+	}
+
+	@After
+	public void after() {
+		System.out.println("after");
 	}
 
 	@Context
@@ -55,7 +83,7 @@ public class PlaygroundTest implements Testosterone {
 		Mockito.verify(service, times(1)).getText();
 		target("req").request().get();
 	}
-	
+
 	@Test(expected = AssertionError.class)
 	@GET
 	@Path("test2")

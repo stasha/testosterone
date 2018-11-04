@@ -1,5 +1,6 @@
 package info.stasha.testosterone;
 
+import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.jersey.JerseyConfiguration;
 import info.stasha.testosterone.jersey.Testosterone;
 import java.lang.reflect.InvocationTargetException;
@@ -7,7 +8,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,7 +16,6 @@ import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.implementation.bind.annotation.SuperCall;
 import net.bytebuddy.implementation.bind.annotation.This;
-import org.junit.Test;
 
 /**
  * Interceptors
@@ -67,7 +66,41 @@ public class Interceptors {
 		 */
 		@RuntimeType
 		public static void constructor(@This Testosterone orig) {
-			MainTest.getMain(orig).setMain(orig);
+		}
+
+		/**
+		 * @BeforeClass annotation interceptor
+		 */
+		public static class BeforeClass {
+
+			@RuntimeType
+			public static void beforeClass(@Origin Method method) throws Exception {
+				Testosterone.Setup setup = Testosterone.SETUP.get(method.getDeclaringClass().getName());
+				Testosterone t = setup != null ? setup.getTestosterone() : null;
+				t = t == null ? (Testosterone) method.getDeclaringClass().newInstance() : t;
+
+				if (t.getSetup().isSuite()
+						|| t.getConfiguration().serverStarts() == Configuration.ServerStarts.PER_CLASS
+						|| (t.getSetup().getParent() == null && t.getConfiguration().serverStarts() == Configuration.ServerStarts.PARENT_CONFIGURATION)) {
+					t.beforeTest();
+				}
+			}
+		}
+
+		/**
+		 * @AfterClass annotation interceptor
+		 */
+		public static class AfterClass {
+
+			@RuntimeType
+			public static void afterClass(@Origin Method method) throws Exception {
+				Testosterone t = Testosterone.SETUP.get(method.getDeclaringClass().getName()).getTestosterone();
+				if (t.getSetup().isSuite()
+						|| t.getConfiguration().serverStarts() == Configuration.ServerStarts.PER_CLASS
+						|| (t.getSetup().getParent() == null && t.getConfiguration().serverStarts() == Configuration.ServerStarts.PARENT_CONFIGURATION)) {
+					t.getConfiguration().getResourceObject().afterTest();
+				}
+			}
 		}
 
 		/**
@@ -77,10 +110,24 @@ public class Interceptors {
 
 			@RuntimeType
 			public static void before(@SuperCall Callable<?> zuper, @This Testosterone orig) throws Exception {
-				// running server so it can be used even in @Before method
-				invokeInitialMethod("beforeTest", orig);
-
+				if (orig.getConfiguration().serverStarts() == Configuration.ServerStarts.PER_TEST) {
+					invokeInitialMethod("beforeTest", orig);
+				}
 				zuper.call();
+			}
+
+			/**
+			 * Invoked by __before__ method
+			 *
+			 * @param orig
+			 * @throws Exception
+			 */
+			@RuntimeType
+			public static void before(@This Testosterone orig) throws Exception {
+				if (orig.getConfiguration().serverStarts() == Configuration.ServerStarts.PER_TEST) {
+					invokeInitialMethod("beforeTest", orig);
+					System.out.println("__before__");
+				}
 			}
 		}
 
@@ -91,10 +138,25 @@ public class Interceptors {
 
 			@RuntimeType
 			public static void after(@SuperCall Callable<?> zuper, @This Testosterone orig) throws Exception {
-				// running server so it can be used even in @After method
-				invokeInitialMethod("afterTest", orig);
+				if (orig.getConfiguration().serverStarts() == Configuration.ServerStarts.PER_TEST) {
+					invokeInitialMethod("afterTest", orig);
+				}
 
 				zuper.call();
+			}
+
+			/**
+			 * Invoked by __after__ method
+			 *
+			 * @param orig
+			 * @throws Exception
+			 */
+			@RuntimeType
+			public static void after(@This Testosterone orig) throws Exception {
+				if (orig.getConfiguration().serverStarts() == Configuration.ServerStarts.PER_TEST) {
+					System.out.println("__after__");
+					invokeInitialMethod("afterTest", orig);
+				}
 			}
 		}
 
@@ -116,53 +178,44 @@ public class Interceptors {
 			@RuntimeType
 			public static Object test(@SuperCall Callable<?> zuper, @AllArguments Object[] args, @Origin Method method, @This Testosterone orig) throws Throwable {
 
-				boolean isMain = Thread.currentThread().getName().contains("main");
-				Test t = method.getAnnotation(Test.class);
-				Class<? extends Throwable> expected = t != null ? t.expected() : null;
-				Method m = orig.getClass().getMethod(method.getName(), method.getParameterTypes());
 				JerseyConfiguration config = orig.getConfiguration();
+				Testosterone testingObject = config.getTestObject();
+				Testosterone resourceObject = config.getResourceObject();
+
+				if (testingObject == null) {
+					config.setTestObject(orig);
+					config.setTestThreadName(Thread.currentThread().getName());
+					testingObject = orig;
+				}
+
+				boolean isMain = Thread.currentThread().getName().equals(config.getTestThreadName());
+				Method resourceMethod = resourceObject.getClass().getMethod(method.getName(), method.getParameterTypes());
 
 				if (isMain) {
-					Set<Throwable> messages = MainTest.getMain(orig).getMain().getMessages();
-					List<Throwable> exception = MainTest.getMain(orig).getMain().getExpectedExceptions();
 
 					try {
-						invokeInitialMethod("beforeTest", orig);
+						new InvokeTest(resourceMethod, resourceObject).execute();
 
-						new InvokeTest(m, orig).execute();
+						testingObject.throwErrorMessage();
+						testingObject.throwExpectedException();
 
-						if (!messages.isEmpty()) {
-							throw messages.iterator().next();
-						}
-
-						if (!exception.isEmpty()) {
-							throw exception.iterator().next();
-						}
 					} finally {
-						if (isMain) {
-							messages.clear();
-							exception.clear();
-
-							config.setTestExecutedCount(config.getTestExecutedCount() + 1);
-
-							if (config.getTestExecutedCount() == config.getTestCount()) {
-								invokeInitialMethod("afterTest", orig);
-							}
-
-						}
+						testingObject.getMessages().clear();
+						testingObject.getExpectedExceptions().clear();
 					}
 
 				} else {
 					try {
-						List<Method> me = getMethodsAnnotatedWith(orig.getClass(), m.getName() + "$accessor$");
+						List<Method> me = getMethodsAnnotatedWith(orig.getClass(), resourceMethod.getName() + "$accessor$");
 
-						m = me.get(0);
-						m.setAccessible(true);
+						resourceMethod = me.get(0);
+						resourceMethod.setAccessible(true);
 
 						try {
-							return m.invoke(orig, args);
+							return resourceMethod.invoke(orig, args);
 						} catch (IllegalArgumentException ex) {
 							System.out.println("Failed to invoke from interceptor");
+							ex.printStackTrace();
 							throw ex;
 						}
 					} catch (Throwable ex) {
@@ -171,9 +224,10 @@ public class Interceptors {
 						}
 
 						if (ex instanceof AssertionError) {
-							MainTest.getMain(orig).getMain().getMessages().add(ex);
+							testingObject.getMessages().add(ex);
 						} else {
-							MainTest.getMain(orig).getMain().getExpectedExceptions().add(ex);
+//							ex.printStackTrace();
+							testingObject.getExpectedExceptions().add(ex);
 						}
 					}
 				}

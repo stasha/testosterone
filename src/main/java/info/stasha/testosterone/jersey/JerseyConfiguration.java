@@ -1,9 +1,9 @@
 package info.stasha.testosterone.jersey;
 
+import info.stasha.testosterone.annotation.Configuration;
 import static info.stasha.testosterone.jersey.Testosterone.LOGGER;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -17,6 +17,7 @@ import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.UriBuilder;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
@@ -27,21 +28,57 @@ import org.glassfish.jersey.server.ResourceConfig;
  *
  * @author stasha
  */
-public class JerseyConfiguration {
+public class JerseyConfiguration implements Configuration {
 
-	protected static String BASE_URI = "http://localhost:9999/";
+	protected boolean managedByParentConfiguration = false;
+	protected String baseUri = "http://localhost/";
+	protected int port = 9999;
+	protected ServerStarts serverStarts = ServerStarts.PARENT_CONFIGURATION;
 
 	protected final Set<Throwable> messages = new LinkedHashSet<>();
 	protected final List<Throwable> expectedException = new ArrayList<>();
 	protected JerseyConfiguration configuration;
+	protected ServletContainerConfig servletContainerConfig = new ServletContainerConfig();
+
 	protected ResourceConfig resourceConfig;
 	protected final AtomicReference<Client> client = new AtomicReference<>(null);
 
 	private HttpServer server;
-	protected Object testObj;
+	protected Testosterone resourceObject;
+	protected Testosterone testObject;
+	protected String testThreadName;
 
-	private int testCount;
-	private int testExecutedCount;
+	public boolean isManagedByParentConfiguration() {
+		return managedByParentConfiguration;
+	}
+
+	public void setManagedByParentConfiguration(boolean managedByParentConfiguration) {
+		this.managedByParentConfiguration = managedByParentConfiguration;
+	}
+
+	public Testosterone getResourceObject() {
+		return resourceObject;
+	}
+
+	public void setResourceObject(Testosterone resourceObject) {
+		this.resourceObject = resourceObject;
+	}
+
+	public Testosterone getTestObject() {
+		return testObject;
+	}
+
+	public String getTestThreadName() {
+		return testThreadName;
+	}
+
+	public void setTestThreadName(String testThreadName) {
+		this.testThreadName = testThreadName;
+	}
+
+	public void setTestObject(Testosterone testObject) {
+		this.testObject = testObject;
+	}
 
 	public Set<Throwable> getMessages() {
 		return messages;
@@ -60,19 +97,15 @@ public class JerseyConfiguration {
 	}
 
 	public ServletContainerConfig getServletContainerConfig() {
-		throw new NotSupportedException("servlet configuration is not supported by default jersey config.");
+		return null;
+	}
+
+	public void setServletContainerConfig(ServletContainerConfig servletContainerConfig) {
+		this.servletContainerConfig = servletContainerConfig;
 	}
 
 	protected boolean isRunning() {
 		return server != null && server.isStarted();
-	}
-
-	public String getBaseUri() {
-		return BASE_URI;
-	}
-
-	public void setBaseUri(String baseUri) {
-		BASE_URI = baseUri;
 	}
 
 	public Client client() {
@@ -88,7 +121,7 @@ public class JerseyConfiguration {
 	}
 
 	public WebTarget target() {
-		return client().target(BASE_URI);
+		return client().target(baseUri());
 	}
 
 	protected void closeClient(final Client... clients) {
@@ -113,8 +146,12 @@ public class JerseyConfiguration {
 		return configure();
 	}
 
+	public void setResourceConfig(ResourceConfig resourceConfig) {
+		this.resourceConfig = resourceConfig;
+	}
+
 	protected void createServer() throws URISyntaxException {
-		server = GrizzlyHttpServerFactory.createHttpServer(new URI(BASE_URI), configure());
+		server = GrizzlyHttpServerFactory.createHttpServer(new URI(baseUri()), configure());
 	}
 
 	protected void prepare() {
@@ -143,12 +180,12 @@ public class JerseyConfiguration {
 		cleanUp();
 	}
 
-	public void initConfiguration(Object obj) {
-		this.testObj = obj;
-		this.resourceConfig.register(this.testObj.getClass());
+	public void initConfiguration(Testosterone obj) {
+		this.resourceObject = obj;
+		this.resourceConfig.register(obj.getClass());
 	}
 
-	public void init(Object obj) throws Exception {
+	public void init() throws Exception {
 		try {
 			createServer();
 
@@ -158,29 +195,48 @@ public class JerseyConfiguration {
 		}
 	}
 
-	public Integer getTestCount() {
-		if (this.testCount == 0) {
-			for (Method method : this.testObj.getClass().getMethods()) {
-				try {
-					if (method.isAnnotationPresent((Class<? extends Annotation>) Class.forName("org.junit.Test"))
-							|| method.isAnnotationPresent((Class<? extends Annotation>) Class.forName("org.junit.jupiter.api.Test"))) {
-						this.testCount++;
-					}
-				} catch (ClassNotFoundException ex) {
-					throw new RuntimeException(ex);
-				}
-			}
-		}
-
-		return this.testCount;
+	public void setBaseUri(String baseUri) {
+		this.baseUri = baseUri;
 	}
 
-	public int getTestExecutedCount() {
-		return testExecutedCount;
+	public void setPort(int port) {
+		this.port = port;
 	}
 
-	public void setTestExecutedCount(int testExecutedCount) {
-		this.testExecutedCount = testExecutedCount;
+	public void setServerStarts(ServerStarts serverStarts) {
+		this.serverStarts = serverStarts;
 	}
+
+	@Override
+	public String baseUri() {
+		return UriBuilder.fromUri(this.baseUri).port(port()).build().toString();
+	}
+
+	@Override
+	public int port() {
+		return this.port;
+	}
+
+	@Override
+	public ServerStarts serverStarts() {
+		return this.serverStarts;
+	}
+
+	@Override
+	public Class<? extends Annotation> annotationType() {
+		return Configuration.class;
+	}
+
+	@Override
+	public Class<?> configuration() {
+		return this.getClass();
+	}
+
+	@Override
+	public String toString() {
+		return "JerseyConfiguration{" + "testObject=" + testObject.getClass().getName() + '}';
+	}
+	
+	
 
 }

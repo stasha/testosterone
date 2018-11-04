@@ -47,6 +47,10 @@ public class InvokeTest {
 			path = p.value();
 		}
 
+		System.out.println("");
+		System.out.println("Running: " + target.getClass().getName() + ":" + method.getName() + " - at path: " + path);
+		System.out.println("");
+
 		GET get = method.getAnnotation(GET.class);
 		POST post = method.getAnnotation(POST.class);
 		PUT put = method.getAnnotation(PUT.class);

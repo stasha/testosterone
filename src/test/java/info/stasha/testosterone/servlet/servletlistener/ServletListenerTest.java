@@ -9,7 +9,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequestEvent;
 import javax.ws.rs.core.Response;
-import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,8 +32,8 @@ public class ServletListenerTest implements Testosterone {
 		sc.addListener(listener);
 	}
 
-	@After
-	public void tearDown() {
+	@Override
+	public void afterServerStop() {
 		Mockito.verify(listener, times(1)).contextDestroyed(any(ServletContextEvent.class));
 	}
 

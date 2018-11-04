@@ -33,7 +33,7 @@ public class JettyConfiguration extends JerseyConfiguration {
 
 	@Override
 	protected void createServer() {
-		server = new Server(9999);
+		server = new Server(port());
 		registerServlets();
 	}
 
@@ -96,7 +96,12 @@ public class JettyConfiguration extends JerseyConfiguration {
 		prepare();
 
 		if (server != null && !server.isRunning()) {
-			server.start();
+			try {
+				System.out.println("Starting server: " + baseUri() + " for test: " + this.getResourceObject().getClass().getName());
+				server.start();
+			} catch (java.net.BindException ex) {
+				throw new RuntimeException("Server failed to start for resource: " + getResourceObject(), ex);
+			}
 		}
 	}
 
@@ -104,6 +109,8 @@ public class JettyConfiguration extends JerseyConfiguration {
 	public void stop() throws Exception {
 		cleanUp();
 		if (server != null && server.isRunning()) {
+			System.out.println("");
+			System.out.println("Stopping server " + baseUri() + " for test: " + this.getResourceObject().getClass().getName());
 			server.stop();
 		}
 	}
