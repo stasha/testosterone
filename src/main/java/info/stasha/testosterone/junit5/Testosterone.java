@@ -8,12 +8,11 @@ import org.junit.jupiter.api.extension.TestInstanceFactoryContext;
 import org.junit.jupiter.api.extension.TestInstantiationException;
 
 import info.stasha.testosterone.Instrument;
+import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.junit5.Testosterone.ContextInjectParameterResolver;
 import info.stasha.testosterone.junit5.Testosterone.TestosteroneFactory;
 import javax.inject.Inject;
 import javax.ws.rs.core.Context;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
@@ -29,6 +28,7 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 @Extensions({
 	@ExtendWith(TestosteroneFactory.class)
 	, @ExtendWith(ContextInjectParameterResolver.class)})
+@Configuration(serverStarts = Configuration.ServerStarts.PER_TEST)
 public interface Testosterone extends info.stasha.testosterone.jersey.Testosterone {
 
 	public static class TestosteroneFactory implements TestInstanceFactory {
@@ -69,13 +69,4 @@ public interface Testosterone extends info.stasha.testosterone.jersey.Testostero
 		}
 	}
 
-	@BeforeAll
-	public static void beforeClass() {
-		Thread.currentThread().getStackTrace()[1].getClassName();
-	}
-
-	@AfterAll
-	public static void afterClass() {
-		System.out.println("after class");
-	}
 }

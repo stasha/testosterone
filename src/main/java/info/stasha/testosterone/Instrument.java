@@ -117,7 +117,7 @@ public class Instrument {
 
 			CLASSES.put(clazz, cls);
 
-					Interceptors.getMethodsAnnotatedWith(cls, "Test");
+//					Interceptors.getMethodsAnnotatedWith(cls, "Test");
 		}
 
 		return CLASSES.get(clazz);

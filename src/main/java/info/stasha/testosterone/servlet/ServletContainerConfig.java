@@ -18,7 +18,7 @@ public class ServletContainerConfig {
 	private String jerseyServletPath = "/*";
 	private final Set<Servlet> servlets = new LinkedHashSet<>();
 	private final Set<Filter> filters = new LinkedHashSet<>();
-	private final Set<EventListener> listeners = new LinkedHashSet<>();
+	private final Set<Listener> listeners = new LinkedHashSet<>();
 	private final Map<String, String> contextParams = new LinkedHashMap<>();
 
 	public ServletContainerConfig setJerseyServletPath(String path) {
@@ -80,7 +80,7 @@ public class ServletContainerConfig {
 
 	public ServletContainerConfig addListener(Class<? extends EventListener> clazz) {
 		try {
-			listeners.add(clazz.newInstance());
+			listeners.add(new Listener(clazz.newInstance()));
 		} catch (InstantiationException | IllegalAccessException ex) {
 			Logger.getLogger(ServletContainerConfig.class.getName()).log(Level.SEVERE, null, ex);
 			throw new RuntimeException(ex);
@@ -89,7 +89,7 @@ public class ServletContainerConfig {
 	}
 
 	public ServletContainerConfig addListener(EventListener listener) {
-		listeners.add(listener);
+		listeners.add(new Listener(listener));
 		return this;
 	}
 
@@ -106,7 +106,7 @@ public class ServletContainerConfig {
 		return filters;
 	}
 
-	public Set<? extends EventListener> getListeners() {
+	public Set<? extends Listener> getListeners() {
 		return listeners;
 	}
 

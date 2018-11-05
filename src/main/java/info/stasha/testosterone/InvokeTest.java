@@ -197,7 +197,7 @@ public class InvokeTest {
 							throw new Error(EXECUTION_ERROR_MESSAGE + " " + ex.getMessage());
 						}
 					} catch (Error ex) {
-						if (target.getMessages().isEmpty()) {
+						if (target.getConfiguration().getMessages().isEmpty()) {
 							System.out.println(ex.getMessage());
 							throw new Error(ex.getMessage());
 						}

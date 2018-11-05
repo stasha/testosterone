@@ -27,13 +27,13 @@ public class JettyConfiguration extends JerseyConfiguration {
 	}
 
 	@Override
-	protected boolean isRunning() {
+	public boolean isRunning() {
 		return server != null && server.isStarted();
 	}
 
 	@Override
 	protected void createServer() {
-		server = new Server(port());
+		server = new Server(getPort());
 		registerServlets();
 	}
 
@@ -47,7 +47,7 @@ public class JettyConfiguration extends JerseyConfiguration {
 		});
 
 		servletContainerConfig.getListeners().forEach((t) -> {
-			context.addEventListener(t);
+			context.addEventListener(t.getListener());
 		});
 
 		servletContainerConfig.getServlets().forEach((t) -> {
@@ -97,7 +97,7 @@ public class JettyConfiguration extends JerseyConfiguration {
 
 		if (server != null && !server.isRunning()) {
 			try {
-				System.out.println("Starting server: " + baseUri() + " for test: " + this.getResourceObject().getClass().getName());
+				System.out.println("Starting server: " + getBaseUri() + " for test: " + this.getResourceObject().getClass().getName());
 				server.start();
 			} catch (java.net.BindException ex) {
 				throw new RuntimeException("Server failed to start for resource: " + getResourceObject(), ex);
@@ -110,7 +110,7 @@ public class JettyConfiguration extends JerseyConfiguration {
 		cleanUp();
 		if (server != null && server.isRunning()) {
 			System.out.println("");
-			System.out.println("Stopping server " + baseUri() + " for test: " + this.getResourceObject().getClass().getName());
+			System.out.println("Stopping server " + getBaseUri() + " for test: " + this.getResourceObject().getClass().getName());
 			server.stop();
 		}
 	}

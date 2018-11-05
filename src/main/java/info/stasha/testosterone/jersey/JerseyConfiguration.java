@@ -1,9 +1,9 @@
 package info.stasha.testosterone.jersey;
 
-import info.stasha.testosterone.annotation.Configuration;
+import info.stasha.testosterone.TestosteroneConfig;
+import info.stasha.testosterone.annotation.Configuration.ServerStarts;
 import static info.stasha.testosterone.jersey.Testosterone.LOGGER;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
-import java.lang.annotation.Annotation;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -13,7 +13,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ws.rs.NotSupportedException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -28,9 +27,8 @@ import org.glassfish.jersey.server.ResourceConfig;
  *
  * @author stasha
  */
-public class JerseyConfiguration implements Configuration {
+public class JerseyConfiguration implements TestosteroneConfig {
 
-	protected boolean managedByParentConfiguration = false;
 	protected String baseUri = "http://localhost/";
 	protected int port = 9999;
 	protected ServerStarts serverStarts = ServerStarts.PARENT_CONFIGURATION;
@@ -48,44 +46,58 @@ public class JerseyConfiguration implements Configuration {
 	protected Testosterone testObject;
 	protected String testThreadName;
 
-	public boolean isManagedByParentConfiguration() {
-		return managedByParentConfiguration;
-	}
-
-	public void setManagedByParentConfiguration(boolean managedByParentConfiguration) {
-		this.managedByParentConfiguration = managedByParentConfiguration;
-	}
-
+	@Override
 	public Testosterone getResourceObject() {
 		return resourceObject;
 	}
 
+	@Override
 	public void setResourceObject(Testosterone resourceObject) {
 		this.resourceObject = resourceObject;
 	}
 
+	@Override
 	public Testosterone getTestObject() {
 		return testObject;
 	}
 
+	@Override
 	public String getTestThreadName() {
 		return testThreadName;
 	}
 
+	@Override
 	public void setTestThreadName(String testThreadName) {
 		this.testThreadName = testThreadName;
 	}
 
+	@Override
 	public void setTestObject(Testosterone testObject) {
 		this.testObject = testObject;
 	}
 
+	@Override
 	public Set<Throwable> getMessages() {
 		return messages;
 	}
 
+	@Override
 	public List<Throwable> getExpectedExceptions() {
 		return expectedException;
+	}
+
+	@Override
+	public void throwErrorMessage() throws Throwable {
+		if (getMessages().size() > 0) {
+			throw getMessages().iterator().next();
+		}
+	}
+
+	@Override
+	public void throwExpectedException() throws Throwable {
+		if (getExpectedExceptions().size() > 0) {
+			throw getExpectedExceptions().iterator().next();
+		}
 	}
 
 	protected ResourceConfig configure() {
@@ -96,18 +108,21 @@ public class JerseyConfiguration implements Configuration {
 		return this.resourceConfig;
 	}
 
+	@Override
 	public ServletContainerConfig getServletContainerConfig() {
 		return null;
 	}
 
+	@Override
 	public void setServletContainerConfig(ServletContainerConfig servletContainerConfig) {
 		this.servletContainerConfig = servletContainerConfig;
 	}
 
-	protected boolean isRunning() {
+	public boolean isRunning() {
 		return server != null && server.isStarted();
 	}
 
+	@Override
 	public Client client() {
 		if (client.get() == null) {
 			client.getAndSet(getClient());
@@ -120,10 +135,11 @@ public class JerseyConfiguration implements Configuration {
 		return ClientBuilder.newClient(clientConfig);
 	}
 
+	@Override
 	public WebTarget target() {
 		try {
-		return client().target(baseUri());
-		}catch(Exception ex){
+			return client().target(getBaseUri());
+		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw ex;
 		}
@@ -148,16 +164,18 @@ public class JerseyConfiguration implements Configuration {
 		}
 	}
 
+	@Override
 	public ResourceConfig getResourceConfig() {
 		return configure();
 	}
 
+	@Override
 	public void setResourceConfig(ResourceConfig resourceConfig) {
 		this.resourceConfig = resourceConfig;
 	}
 
 	protected void createServer() throws URISyntaxException {
-		server = GrizzlyHttpServerFactory.createHttpServer(new URI(baseUri()), configure());
+		server = GrizzlyHttpServerFactory.createHttpServer(new URI(getBaseUri()), configure());
 	}
 
 	protected void prepare() {
@@ -171,6 +189,7 @@ public class JerseyConfiguration implements Configuration {
 		closeClient(client.get());
 	}
 
+	@Override
 	public void start() throws Exception {
 		prepare();
 
@@ -179,6 +198,7 @@ public class JerseyConfiguration implements Configuration {
 		}
 	}
 
+	@Override
 	public void stop() throws Exception {
 		if (server != null && server.isStarted()) {
 			server.stop();
@@ -186,63 +206,57 @@ public class JerseyConfiguration implements Configuration {
 		cleanUp();
 	}
 
+	@Override
 	public void initConfiguration(Testosterone obj) {
 		this.resourceObject = obj;
 		this.resourceConfig.register(obj.getClass());
+
+		init();
 	}
 
-	public void init() throws Exception {
+	@Override
+	public void init() {
 		try {
 			createServer();
 
 		} catch (Exception ex) {
 			Logger.getLogger(JettyConfiguration.class.getName()).log(Level.SEVERE, null, ex);
-			throw ex;
 		}
 	}
 
+	@Override
 	public void setBaseUri(String baseUri) {
 		this.baseUri = baseUri;
 	}
 
+	@Override
 	public void setPort(int port) {
 		this.port = port;
 	}
 
+	@Override
 	public void setServerStarts(ServerStarts serverStarts) {
 		this.serverStarts = serverStarts;
 	}
 
 	@Override
-	public String baseUri() {
-		return UriBuilder.fromUri(this.baseUri).port(port()).build().toString();
+	public String getBaseUri() {
+		return UriBuilder.fromUri(this.baseUri).port(getPort()).build().toString();
 	}
 
 	@Override
-	public int port() {
+	public int getPort() {
 		return this.port;
 	}
 
 	@Override
-	public ServerStarts serverStarts() {
+	public ServerStarts getServerStarts() {
 		return this.serverStarts;
-	}
-
-	@Override
-	public Class<? extends Annotation> annotationType() {
-		return Configuration.class;
-	}
-
-	@Override
-	public Class<?> configuration() {
-		return this.getClass();
 	}
 
 	@Override
 	public String toString() {
 		return "JerseyConfiguration{" + "testObject=" + testObject.getClass().getName() + '}';
 	}
-	
-	
 
 }

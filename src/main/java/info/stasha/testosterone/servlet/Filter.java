@@ -1,8 +1,10 @@
 package info.stasha.testosterone.servlet;
 
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import javax.servlet.DispatcherType;
 import static javax.servlet.DispatcherType.*;
 
@@ -61,5 +63,48 @@ public class Filter {
 		this.dispatchers = dispatchers;
 		return this;
 	}
+
+	@Override
+	public int hashCode() {
+		int hash = 3;
+		hash = 29 * hash + Objects.hashCode(this.clazz);
+		hash = 29 * hash + Objects.hashCode(this.filter);
+		hash = 29 * hash + Arrays.deepHashCode(this.urlPattern);
+		hash = 29 * hash + Objects.hashCode(this.initParams);
+		hash = 29 * hash + Objects.hashCode(this.dispatchers);
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final Filter other = (Filter) obj;
+		if (!Objects.equals(this.clazz, other.clazz)) {
+			return false;
+		}
+		if (!Objects.equals(this.filter, other.filter)) {
+			return false;
+		}
+		if (!Arrays.deepEquals(this.urlPattern, other.urlPattern)) {
+			return false;
+		}
+		if (!Objects.equals(this.initParams, other.initParams)) {
+			return false;
+		}
+		if (!Objects.equals(this.dispatchers, other.dispatchers)) {
+			return false;
+		}
+		return true;
+	}
+
+	
 
 }

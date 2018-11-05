@@ -1,7 +1,6 @@
 package info.stasha.testosterone;
 
 import info.stasha.testosterone.annotation.Configuration;
-import info.stasha.testosterone.jersey.JerseyConfiguration;
 import info.stasha.testosterone.jersey.Testosterone;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -75,14 +74,14 @@ public class Interceptors {
 
 			@RuntimeType
 			public static void beforeClass(@Origin Method method) throws Exception {
-				Testosterone.Setup setup = Testosterone.SETUP.get(method.getDeclaringClass().getName());
+				TestosteroneSetup setup = TestosteroneConfigFactory.SETUP.get(method.getDeclaringClass().getName());
 				Testosterone t = setup != null ? setup.getTestosterone() : null;
 				t = t == null ? (Testosterone) method.getDeclaringClass().newInstance() : t;
 
 				if (t.getSetup().isSuite()
-						|| t.getConfiguration().serverStarts() == Configuration.ServerStarts.PER_CLASS
-						|| (t.getSetup().getParent() == null && t.getConfiguration().serverStarts() == Configuration.ServerStarts.PARENT_CONFIGURATION)) {
-					t.beforeTest();
+						|| t.getConfiguration().getServerStarts() == Configuration.ServerStarts.PER_CLASS
+						|| (t.getSetup().getParent() == null && t.getConfiguration().getServerStarts() == Configuration.ServerStarts.PARENT_CONFIGURATION)) {
+					t.start();
 				}
 			}
 		}
@@ -94,11 +93,11 @@ public class Interceptors {
 
 			@RuntimeType
 			public static void afterClass(@Origin Method method) throws Exception {
-				Testosterone t = Testosterone.SETUP.get(method.getDeclaringClass().getName()).getTestosterone();
+				Testosterone t = TestosteroneConfigFactory.SETUP.get(method.getDeclaringClass().getName()).getTestosterone();
 				if (t.getSetup().isSuite()
-						|| t.getConfiguration().serverStarts() == Configuration.ServerStarts.PER_CLASS
-						|| (t.getSetup().getParent() == null && t.getConfiguration().serverStarts() == Configuration.ServerStarts.PARENT_CONFIGURATION)) {
-					t.getConfiguration().getResourceObject().afterTest();
+						|| t.getConfiguration().getServerStarts() == Configuration.ServerStarts.PER_CLASS
+						|| (t.getSetup().getParent() == null && t.getConfiguration().getServerStarts() == Configuration.ServerStarts.PARENT_CONFIGURATION)) {
+					t.getConfiguration().getResourceObject().stop();
 				}
 			}
 		}
@@ -110,8 +109,8 @@ public class Interceptors {
 
 			@RuntimeType
 			public static void before(@SuperCall Callable<?> zuper, @This Testosterone orig) throws Exception {
-				if (orig.getConfiguration().serverStarts() == Configuration.ServerStarts.PER_TEST) {
-					invokeInitialMethod("beforeTest", orig);
+				if (orig.getConfiguration().getServerStarts() == Configuration.ServerStarts.PER_TEST) {
+					invokeInitialMethod("start", orig);
 				}
 				zuper.call();
 			}
@@ -124,8 +123,8 @@ public class Interceptors {
 			 */
 			@RuntimeType
 			public static void before(@This Testosterone orig) throws Exception {
-				if (orig.getConfiguration().serverStarts() == Configuration.ServerStarts.PER_TEST) {
-					invokeInitialMethod("beforeTest", orig);
+				if (orig.getConfiguration().getServerStarts() == Configuration.ServerStarts.PER_TEST) {
+					invokeInitialMethod("start", orig);
 					System.out.println("__before__");
 				}
 			}
@@ -138,8 +137,8 @@ public class Interceptors {
 
 			@RuntimeType
 			public static void after(@SuperCall Callable<?> zuper, @This Testosterone orig) throws Exception {
-				if (orig.getConfiguration().serverStarts() == Configuration.ServerStarts.PER_TEST) {
-					invokeInitialMethod("afterTest", orig);
+				if (orig.getConfiguration().getServerStarts() == Configuration.ServerStarts.PER_TEST) {
+					invokeInitialMethod("stop", orig);
 				}
 
 				zuper.call();
@@ -153,9 +152,9 @@ public class Interceptors {
 			 */
 			@RuntimeType
 			public static void after(@This Testosterone orig) throws Exception {
-				if (orig.getConfiguration().serverStarts() == Configuration.ServerStarts.PER_TEST) {
+				if (orig.getConfiguration().getServerStarts() == Configuration.ServerStarts.PER_TEST) {
 					System.out.println("__after__");
-					invokeInitialMethod("afterTest", orig);
+					invokeInitialMethod("stop", orig);
 				}
 			}
 		}
@@ -178,7 +177,7 @@ public class Interceptors {
 			@RuntimeType
 			public static Object test(@SuperCall Callable<?> zuper, @AllArguments Object[] args, @Origin Method method, @This Testosterone orig) throws Throwable {
 
-				JerseyConfiguration config = orig.getConfiguration();
+				TestosteroneConfig config = orig.getConfiguration();
 				Testosterone testingObject = config.getTestObject();
 				Testosterone resourceObject = config.getResourceObject();
 
@@ -196,12 +195,12 @@ public class Interceptors {
 					try {
 						new InvokeTest(resourceMethod, resourceObject).execute();
 
-						testingObject.throwErrorMessage();
-						testingObject.throwExpectedException();
+						config.throwErrorMessage();
+						config.throwExpectedException();
 
 					} finally {
-						testingObject.getMessages().clear();
-						testingObject.getExpectedExceptions().clear();
+						config.getMessages().clear();
+						config.getExpectedExceptions().clear();
 					}
 
 				} else {
@@ -224,10 +223,10 @@ public class Interceptors {
 						}
 
 						if (ex instanceof AssertionError) {
-							testingObject.getMessages().add(ex);
+							config.getMessages().add(ex);
 						} else {
 //							ex.printStackTrace();
-							testingObject.getExpectedExceptions().add(ex);
+							config.getExpectedExceptions().add(ex);
 						}
 					}
 				}

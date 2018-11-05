@@ -15,7 +15,7 @@ import org.glassfish.jersey.process.internal.RequestScoped;
 import static org.junit.Assert.assertEquals;
 import org.junit.jupiter.api.Disabled;
 
-@Disabled
+//@Disabled
 public class JUnit5Test implements Testosterone {
 
 	@Override

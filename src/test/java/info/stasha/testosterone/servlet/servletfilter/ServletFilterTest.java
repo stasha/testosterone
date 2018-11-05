@@ -24,8 +24,8 @@ import static org.mockito.Mockito.times;
  */
 @RunWith(TestosteroneRunner.class)
 public class ServletFilterTest implements Testosterone {
-	//TODO : fix this
-	private static final AccessFilter filter = Mockito.spy(new AccessFilter());
+
+	private AccessFilter filter = Mockito.spy(new AccessFilter());
 
 	@Override
 	public void configure(ServletContainerConfig sc) {
@@ -46,5 +46,5 @@ public class ServletFilterTest implements Testosterone {
 				any(ServletResponse.class),
 				any(FilterChain.class));
 	}
-
+	
 }
