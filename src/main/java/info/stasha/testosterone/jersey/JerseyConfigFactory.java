@@ -1,47 +1,72 @@
 package info.stasha.testosterone.jersey;
 
-import info.stasha.testosterone.TestosteroneConfig;
-import info.stasha.testosterone.TestosteroneConfigFactory;
-import info.stasha.testosterone.TestosteroneSetup;
+import info.stasha.testosterone.Setup;
 import info.stasha.testosterone.annotation.Configuration;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import info.stasha.testosterone.ServerConfig;
+import info.stasha.testosterone.ConfigFactory;
 
 /**
+ * Factory for creating Jersey configuration.
  *
  * @author stasha
  */
-public class JerseyConfigFactory implements TestosteroneConfigFactory {
+public class JerseyConfigFactory implements ConfigFactory {
 
+	/**
+	 * Returns key used for storing setups.
+	 *
+	 * @param obj
+	 * @return
+	 */
 	protected String getKey(Testosterone obj) {
 		return obj.getClass().getName();
 	}
 
-	public TestosteroneConfig newConfiguration() {
-		return new JerseyConfiguration();
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @return
+	 */
+	@Override
+	public ServerConfig newConfiguration() {
+		return new GrizzlyServerConfig();
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @param obj
+	 * @return
+	 */
 	@Override
-	public TestosteroneConfig getConfiguration(Testosterone obj) {
+	public ServerConfig getConfiguration(Testosterone obj) {
 		return getSetup(obj).getConfiguration();
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @param obj
+	 * @return
+	 */
 	@Override
-	public TestosteroneSetup getSetup(Testosterone obj) {
+	public Setup getSetup(Testosterone obj) {
 		if (!SETUP.containsKey(getKey(obj))) {
 			try {
 				Configuration ca = obj.getClass().getAnnotation(Configuration.class);
 				if (ca == null) {
+					//TODO: fix this so it searches all superclasses not just first one
 					for (Class<?> cls : obj.getClass().getSuperclass().getInterfaces()) {
 						if (cls.isAnnotationPresent(Configuration.class)) {
 							ca = cls.getAnnotation(Configuration.class);
 						}
 					}
 				}
-				TestosteroneConfig config;
+				ServerConfig config;
 				if (ca != null) {
-					config = (TestosteroneConfig) ca.configuration().newInstance();
+					config = (ServerConfig) ca.configuration().newInstance();
 					config.setBaseUri(ca.baseUri());
 					config.setPort(ca.port());
 					config.setServerStarts(ca.serverStarts());
@@ -49,7 +74,7 @@ public class JerseyConfigFactory implements TestosteroneConfigFactory {
 					config = newConfiguration();
 				}
 
-				SETUP.put(getKey(obj), new TestosteroneSetup(obj, config, false));
+				SETUP.put(getKey(obj), new Setup(obj, config, false));
 
 			} catch (InstantiationException | IllegalAccessException ex) {
 				Logger.getLogger(Testosterone.class.getName()).log(Level.SEVERE, null, ex);
@@ -59,8 +84,14 @@ public class JerseyConfigFactory implements TestosteroneConfigFactory {
 		return SETUP.get(getKey(obj));
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @param obj
+	 * @return
+	 */
 	@Override
-	public TestosteroneSetup removeSetup(Testosterone obj) {
+	public Setup removeSetup(Testosterone obj) {
 		return SETUP.remove(getKey(obj));
 	}
 

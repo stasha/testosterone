@@ -31,8 +31,19 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 @Configuration(serverStarts = Configuration.ServerStarts.PER_TEST)
 public interface Testosterone extends info.stasha.testosterone.jersey.Testosterone {
 
+	/**
+	 * Factory for creating instrumented test classes
+	 */
 	public static class TestosteroneFactory implements TestInstanceFactory {
 
+		/**
+		 * {@inheritDoc }
+		 *
+		 * @param factoryContext
+		 * @param extensionContext
+		 * @return
+		 * @throws TestInstantiationException
+		 */
 		@Override
 		public Object createTestInstance(TestInstanceFactoryContext factoryContext, ExtensionContext extensionContext)
 				throws TestInstantiationException {
@@ -50,15 +61,34 @@ public interface Testosterone extends info.stasha.testosterone.jersey.Testostero
 		}
 	}
 
+	/**
+	 * Class for handling @Context and @Inject annotations as method arguments.
+	 */
 	public static class ContextInjectParameterResolver implements ParameterResolver {
 
 		private Class<?> cls;
 
+		/**
+		 * {@inheritDoc }
+		 *
+		 * @param pc
+		 * @param rc
+		 * @return
+		 * @throws ParameterResolutionException
+		 */
 		@Override
 		public Object resolveParameter(ParameterContext pc, ExtensionContext rc) throws ParameterResolutionException {
 			return cls.cast(null);
 		}
 
+		/**
+		 * {@inheritDoc }
+		 *
+		 * @param pc
+		 * @param ec
+		 * @return
+		 * @throws ParameterResolutionException
+		 */
 		@Override
 		public boolean supportsParameter(ParameterContext pc, ExtensionContext ec) throws ParameterResolutionException {
 			if (pc.isAnnotated(Context.class) || pc.isAnnotated(Inject.class)) {

@@ -21,49 +21,108 @@ public class Filter {
 	private final Map<String, String> initParams = new LinkedHashMap<>();
 	private EnumSet<DispatcherType> dispatchers = EnumSet.of(ASYNC, ERROR, FORWARD, INCLUDE, REQUEST);
 
+	/**
+	 * Creates Filter instance based on passed Class and url patterns.
+	 *
+	 * @param clazz
+	 * @param urlPattern
+	 */
 	public Filter(Class<? extends javax.servlet.Filter> clazz, String... urlPattern) {
 		this.clazz = clazz;
 		this.urlPattern = urlPattern;
 	}
 
+	/**
+	 * Creates Filter instance based on passed javax.servlet.Filter instance and
+	 * url patterns.
+	 *
+	 * @param filter
+	 * @param urlPattern
+	 */
 	public Filter(javax.servlet.Filter filter, String... urlPattern) {
 		this.filter = filter;
 		this.urlPattern = urlPattern;
 	}
 
+	/**
+	 * Returns javax.servlet.Filter class.
+	 *
+	 * @return
+	 */
 	public Class<? extends javax.servlet.Filter> getClazz() {
 		return clazz;
 	}
 
+	/**
+	 * Sets javax.servlet.Filter class.
+	 *
+	 * @param clazz
+	 */
 	public void setClazz(Class<? extends javax.servlet.Filter> clazz) {
 		this.clazz = clazz;
 	}
 
+	/**
+	 * Returns javax.servlet.Filter instance.
+	 *
+	 * @return
+	 */
 	public javax.servlet.Filter getFilter() {
 		return filter;
 	}
 
+	/**
+	 * Sets javax.servlet.Filter instance.
+	 *
+	 * @param filter
+	 */
 	public void setFilter(javax.servlet.Filter filter) {
 		this.filter = filter;
 	}
 
+	/**
+	 * Returns all registered url patterns for the filter.
+	 *
+	 * @return
+	 */
 	public String[] getUrlPattern() {
 		return urlPattern;
 	}
 
+	/**
+	 * Returns javax.servlet.Filter init params.
+	 *
+	 * @return
+	 */
 	public Map<String, String> getInitParams() {
 		return initParams;
 	}
 
+	/**
+	 * Returns javax.servlet.Filter dispatchers.
+	 *
+	 * @return
+	 */
 	public EnumSet<DispatcherType> getDispatchers() {
 		return dispatchers;
 	}
 
+	/**
+	 * Sets javax.servlet.Filter dispatchers.
+	 *
+	 * @param dispatchers
+	 * @return
+	 */
 	public Filter setDispatchers(EnumSet<DispatcherType> dispatchers) {
 		this.dispatchers = dispatchers;
 		return this;
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @return
+	 */
 	@Override
 	public int hashCode() {
 		int hash = 3;
@@ -75,6 +134,12 @@ public class Filter {
 		return hash;
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @param obj
+	 * @return
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -104,7 +169,5 @@ public class Filter {
 		}
 		return true;
 	}
-
-	
 
 }

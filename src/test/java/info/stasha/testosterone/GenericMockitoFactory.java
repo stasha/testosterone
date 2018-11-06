@@ -1,6 +1,5 @@
 package info.stasha.testosterone;
 
-import net.bytebuddy.ByteBuddy;
 import org.glassfish.hk2.api.Factory;
 import org.mockito.Mockito;
 

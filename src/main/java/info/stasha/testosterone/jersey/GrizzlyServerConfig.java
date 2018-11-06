@@ -1,8 +1,6 @@
 package info.stasha.testosterone.jersey;
 
-import info.stasha.testosterone.TestosteroneConfig;
 import info.stasha.testosterone.annotation.Configuration.ServerStarts;
-import static info.stasha.testosterone.jersey.Testosterone.LOGGER;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -21,13 +19,14 @@ import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
+import info.stasha.testosterone.ServerConfig;
 
 /**
  * Base class for configuring Jersey
  *
  * @author stasha
  */
-public class JerseyConfiguration implements TestosteroneConfig {
+public class GrizzlyServerConfig implements ServerConfig {
 
 	protected String baseUri = "http://localhost/";
 	protected int port = 9999;
@@ -35,7 +34,6 @@ public class JerseyConfiguration implements TestosteroneConfig {
 
 	protected final Set<Throwable> messages = new LinkedHashSet<>();
 	protected final List<Throwable> expectedException = new ArrayList<>();
-	protected JerseyConfiguration configuration;
 	protected ServletContainerConfig servletContainerConfig = new ServletContainerConfig();
 
 	protected ResourceConfig resourceConfig;
@@ -46,46 +44,91 @@ public class JerseyConfiguration implements TestosteroneConfig {
 	protected Testosterone testObject;
 	protected String testThreadName;
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @return
+	 */
 	@Override
 	public Testosterone getResourceObject() {
 		return resourceObject;
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @param resourceObject
+	 */
 	@Override
 	public void setResourceObject(Testosterone resourceObject) {
 		this.resourceObject = resourceObject;
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @return
+	 */
 	@Override
 	public Testosterone getTestObject() {
 		return testObject;
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @return
+	 */
 	@Override
 	public String getTestThreadName() {
 		return testThreadName;
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @param testThreadName
+	 */
 	@Override
 	public void setTestThreadName(String testThreadName) {
 		this.testThreadName = testThreadName;
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @param testObject
+	 */
 	@Override
 	public void setTestObject(Testosterone testObject) {
 		this.testObject = testObject;
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @return
+	 */
 	@Override
 	public Set<Throwable> getMessages() {
 		return messages;
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @return
+	 */
 	@Override
 	public List<Throwable> getExpectedExceptions() {
 		return expectedException;
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @throws Throwable
+	 */
 	@Override
 	public void throwErrorMessage() throws Throwable {
 		if (getMessages().size() > 0) {
@@ -93,6 +136,11 @@ public class JerseyConfiguration implements TestosteroneConfig {
 		}
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @throws Throwable
+	 */
 	@Override
 	public void throwExpectedException() throws Throwable {
 		if (getExpectedExceptions().size() > 0) {
@@ -100,6 +148,11 @@ public class JerseyConfiguration implements TestosteroneConfig {
 		}
 	}
 
+	/**
+	 * Returns ResourceConfig.
+	 *
+	 * @return
+	 */
 	protected ResourceConfig configure() {
 		if (this.resourceConfig == null) {
 			this.resourceConfig = new ResourceConfig();
@@ -108,20 +161,41 @@ public class JerseyConfiguration implements TestosteroneConfig {
 		return this.resourceConfig;
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @return
+	 */
 	@Override
 	public ServletContainerConfig getServletContainerConfig() {
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @param servletContainerConfig
+	 */
 	@Override
 	public void setServletContainerConfig(ServletContainerConfig servletContainerConfig) {
 		this.servletContainerConfig = servletContainerConfig;
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @return
+	 */
+	@Override
 	public boolean isRunning() {
 		return server != null && server.isStarted();
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @return
+	 */
 	@Override
 	public Client client() {
 		if (client.get() == null) {
@@ -135,6 +209,11 @@ public class JerseyConfiguration implements TestosteroneConfig {
 		return ClientBuilder.newClient(clientConfig);
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @return
+	 */
 	@Override
 	public WebTarget target() {
 		try {
@@ -145,6 +224,11 @@ public class JerseyConfiguration implements TestosteroneConfig {
 		}
 	}
 
+	/**
+	 * Closes client.
+	 *
+	 * @param clients
+	 */
 	protected void closeClient(final Client... clients) {
 		if (clients == null || clients.length == 0) {
 			return;
@@ -158,37 +242,64 @@ public class JerseyConfiguration implements TestosteroneConfig {
 				c.close();
 				client.getAndSet(null);
 			} catch (Throwable ex) {
-				LOGGER.log(Level.WARNING, "Error closing client instance.", ex);
+				ex.printStackTrace();
+				throw new RuntimeException(ex);
 			}
 
 		}
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @return
+	 */
 	@Override
 	public ResourceConfig getResourceConfig() {
 		return configure();
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @param resourceConfig
+	 */
 	@Override
 	public void setResourceConfig(ResourceConfig resourceConfig) {
 		this.resourceConfig = resourceConfig;
 	}
 
+	/**
+	 * Creates server.
+	 *
+	 * @throws URISyntaxException
+	 */
 	protected void createServer() throws URISyntaxException {
 		server = GrizzlyHttpServerFactory.createHttpServer(new URI(getBaseUri()), configure());
 	}
 
+	/**
+	 * Prepares whatever :).
+	 */
 	protected void prepare() {
 		Client old = client.getAndSet(getClient());
 		closeClient(old);
 	}
 
+	/**
+	 * Cleans up configuration.
+	 */
 	protected void cleanUp() {
 		this.resourceConfig = null;
 
 		closeClient(client.get());
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @throws Exception
+	 */
 	@Override
 	public void start() throws Exception {
 		prepare();
@@ -198,6 +309,11 @@ public class JerseyConfiguration implements TestosteroneConfig {
 		}
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @throws Exception
+	 */
 	@Override
 	public void stop() throws Exception {
 		if (server != null && server.isStarted()) {
@@ -206,6 +322,11 @@ public class JerseyConfiguration implements TestosteroneConfig {
 		cleanUp();
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @param obj
+	 */
 	@Override
 	public void initConfiguration(Testosterone obj) {
 		this.resourceObject = obj;
@@ -214,46 +335,84 @@ public class JerseyConfiguration implements TestosteroneConfig {
 		init();
 	}
 
+	/**
+	 * {@inheritDoc }
+	 */
 	@Override
 	public void init() {
 		try {
 			createServer();
 
 		} catch (Exception ex) {
-			Logger.getLogger(JettyConfiguration.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(JettyServerConfig.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @param baseUri
+	 */
 	@Override
 	public void setBaseUri(String baseUri) {
 		this.baseUri = baseUri;
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @param port
+	 */
 	@Override
 	public void setPort(int port) {
 		this.port = port;
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @param serverStarts
+	 */
 	@Override
 	public void setServerStarts(ServerStarts serverStarts) {
 		this.serverStarts = serverStarts;
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @return
+	 */
 	@Override
 	public String getBaseUri() {
 		return UriBuilder.fromUri(this.baseUri).port(getPort()).build().toString();
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @return
+	 */
 	@Override
 	public int getPort() {
 		return this.port;
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @return
+	 */
 	@Override
 	public ServerStarts getServerStarts() {
 		return this.serverStarts;
 	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @return
+	 */
 	@Override
 	public String toString() {
 		return "JerseyConfiguration{" + "testObject=" + testObject.getClass().getName() + '}';

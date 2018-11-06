@@ -4,7 +4,8 @@ import java.lang.annotation.Annotation;
 import org.junit.jupiter.api.AfterAll;
 
 /**
- *
+ * @AfterAll annotation implementation.
+ * 
  * @author stasha
  */
 public class AfterAllAnnotation implements AfterAll {

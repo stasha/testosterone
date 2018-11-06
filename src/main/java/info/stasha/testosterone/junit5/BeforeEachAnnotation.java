@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import org.junit.jupiter.api.BeforeEach;
 
 /**
+ * @BeforeEach annotation implementation.
  *
  * @author stasha
  */

@@ -27,18 +27,30 @@ import org.glassfish.jersey.message.internal.MessageBodyProviderNotFoundExceptio
  *
  * @author stasha
  */
-public class InvokeTest {
+public class TestExecutorImpl implements TestExecutor {
 
 	private static final String EXECUTION_ERROR_MESSAGE = "Test failed with message: ";
 
 	private final Method method;
 	private final Testosterone target;
 
-	public InvokeTest(Method method, Object target) {
+	/**
+	 * Creates new InvokeTest instance.
+	 *
+	 * @param method
+	 * @param target
+	 */
+	public TestExecutorImpl(Method method, Object target) {
 		this.method = method;
 		this.target = (Testosterone) target;
 	}
 
+	/**
+	 * Executes http request/s to JUnit tests.
+	 *
+	 * @throws Throwable
+	 */
+	@Override
 	public void execute() throws Throwable {
 
 		Path p = method.getAnnotation(Path.class);
@@ -144,6 +156,7 @@ public class InvokeTest {
 					}
 
 					for (String headerParam : requestAnnotatoin.headerParams()) {
+						throw new UnsupportedOperationException("Header params in @Request annotation are not yet supported");
 					}
 
 					Response resp;

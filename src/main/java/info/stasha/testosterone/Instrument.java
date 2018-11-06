@@ -9,8 +9,6 @@ import javax.ws.rs.Path;
 import info.stasha.testosterone.annotation.DontIntercept;
 import info.stasha.testosterone.jersey.GetAnnotation;
 import info.stasha.testosterone.jersey.PathAnnotation;
-import info.stasha.testosterone.junit4.AfterAnnotation;
-import info.stasha.testosterone.junit4.BeforeAnnotation;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +22,7 @@ import net.bytebuddy.implementation.attribute.MethodAttributeAppender;
 import net.bytebuddy.matcher.ElementMatchers;
 
 /**
- * Instrumentation
+ * Instrumentation.
  *
  * @author stasha
  */
@@ -33,7 +31,40 @@ public class Instrument {
 	private static final Map<Class<?>, Class<?>> CLASSES = new HashMap<>();
 
 	/**
-	 * Returns new instrumented class that extends test class
+	 * Returns already instrumented class.
+	 *
+	 * @param clazz
+	 * @return
+	 */
+	public static Class<?> getInstrumentedClass(Class<?> clazz) {
+		return CLASSES.get(clazz);
+	}
+
+	/**
+	 * Returns new instrumented class that extends test class. It adds
+	 * methods:<br>
+	 * __created__ - invoked when test class is created<br>
+	 * __beforeClass__ - invoked when JUnit calls @BeforeClass<br>
+	 * __afterClass__ - invoked when JUnit calls @AfterClass<br>
+	 * __before__ - invoked when JUnit calls @Before<br>
+	 * __after__ - invoked when JUnit calls @After.<br>
+	 * <p>
+	 * New methods are annotated with corresponding annotation.</p>
+	 * <p>
+	 * Methods annotated with @Test annotation are also annotated with @Path and
+	 *
+	 * @GET annotations. In case @Path annotation is present, then nor @Path nor
+	 * @GET annotations are added.
+	 * </p>
+	 * <p>
+	 * Methods annotated with @DontIntercept annotation are skipped by
+	 * instrumentation and will behave as non normal JUnit/Jersey methods.
+	 * </p>
+	 * <p>
+	 * All methods annotated with @BeforeClass, @AfterClass, @Before, @After,
+	 * @Test and @Path are intercepted.
+	 * </p>
+	 *
 	 *
 	 * @param clazz
 	 * @param beforeAnnotation
@@ -46,7 +77,7 @@ public class Instrument {
 			Class<?> clazz,
 			Annotation beforeAnnotation,
 			Annotation afterAnnotation,
-			Annotation beforeClassAnnotation, 
+			Annotation beforeClassAnnotation,
 			Annotation afterClassAnnotation) {
 
 		if (!CLASSES.containsKey(clazz)) {
@@ -75,13 +106,13 @@ public class Instrument {
 							.or(isAnnotatedWith(named("org.junit.jupiter.api.BeforeEach"))))
 					.intercept(MethodDelegation.to(Interceptors.Intercept.Before.class))
 					.attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
-//					.attribute(MethodAttributeAppender.NoOp.INSTANCE)
+					//					.attribute(MethodAttributeAppender.NoOp.INSTANCE)
 					//
 					.method(isAnnotatedWith(named("org.junit.After"))
 							.or(isAnnotatedWith(named("org.junit.jupiter.api.AfterEach"))))
 					.intercept(MethodDelegation.to(Interceptors.Intercept.After.class))
 					.attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
-//					.attribute(MethodAttributeAppender.NoOp.INSTANCE)
+					//					.attribute(MethodAttributeAppender.NoOp.INSTANCE)
 					//
 					.method(isAnnotatedWith(named("org.junit.Test"))
 							.or(isAnnotatedWith(named("org.junit.jupiter.api.Test")))
@@ -101,13 +132,13 @@ public class Instrument {
 					//
 					.defineMethod("__before__", void.class, Visibility.PUBLIC)
 					.intercept(MethodDelegation.to(Interceptors.Intercept.Before.class))
-//					.attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
+					//					.attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
 					.attribute(MethodAttributeAppender.NoOp.INSTANCE)
 					.annotateMethod(beforeAnnotation)
 					//
 					.defineMethod("__after__", void.class, Visibility.PUBLIC)
 					.intercept(MethodDelegation.to(Interceptors.Intercept.After.class))
-//					.attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
+					//					.attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
 					.attribute(MethodAttributeAppender.NoOp.INSTANCE)
 					.annotateMethod(afterAnnotation)
 					//

@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 import javax.ws.rs.HttpMethod;
 
 /**
- * Request annotation.
+ * Request annotation based on which will "framework" send http requests.
  *
  * @author stasha
  */

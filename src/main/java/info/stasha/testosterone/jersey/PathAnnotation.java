@@ -21,6 +21,7 @@ public class PathAnnotation implements Path {
 
 	@Override
 	public String value() {
+		// returns random value in @Path annotation - @Path(randomnumber)
 		return path == null ? String.valueOf(Math.random()).replace(".", "") : path;
 	}
 
