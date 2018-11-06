@@ -1,5 +1,6 @@
 package info.stasha.testosterone.junit5;
 
+import info.stasha.testosterone.annotation.Request;
 import info.stasha.testosterone.jersey.service.Service;
 import info.stasha.testosterone.jersey.service.ServiceFactory;
 
@@ -10,12 +11,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import static org.junit.Assert.assertEquals;
-import org.junit.jupiter.api.Disabled;
 
-//@Disabled
 public class JUnit5Test implements Testosterone {
 
 	@Override
@@ -54,6 +54,12 @@ public class JUnit5Test implements Testosterone {
 	@Test
 	public void methodInjectionTest(@Context Service service) {
 		assertEquals("Returned message should equal", Service.RESPONSE_TEXT, service.getText());
+	}
+
+	@Test
+	@Request(url = "404")
+	public void requestTest(Response resp) {
+		assertEquals("Response status should be 404", 404, resp.getStatus());
 	}
 
 }
