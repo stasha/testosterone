@@ -17,7 +17,7 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import static org.junit.Assert.assertEquals;
 
-public class JUnit5Test implements Testosterone {
+public class JUnit5_2Test extends JUnit5SuperTest {
 
 	@Override
 	public void configure(AbstractBinder binder) {
@@ -25,7 +25,7 @@ public class JUnit5Test implements Testosterone {
 	}
 
 	@Context
-	private Service service;
+	protected Service service;
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
@@ -38,28 +38,28 @@ public class JUnit5Test implements Testosterone {
 	}
 
 	@BeforeEach
-	public void setUp() throws Exception {
-		System.out.println("BeforeEach");
+	public void setUp2() throws Exception {
+		System.out.println("BeforeEach 2");
 	}
 
 	@AfterEach
-	public void tearDown() throws Exception {
-		System.out.println("AfterEach");
+	public void tearDown2() throws Exception {
+		System.out.println("AfterEach 2");
 	}
 
 	@Test
-	public void classInjectionTest() {
+	public void classInjectionTest2() {
 		assertEquals("Returned message should equal", Service.RESPONSE_TEXT, service.getText());
 	}
 
 	@Test
-	public void methodInjectionTest(@Context Service service) {
+	public void methodInjectionTest2(@Context Service service) {
 		assertEquals("Returned message should equal", Service.RESPONSE_TEXT, service.getText());
 	}
 
 	@Test
 	@Request(url = "404")
-	public void requestTest(Response resp) {
+	public void requestTest2(Response resp) {
 		assertEquals("Response status should be 404", 404, resp.getStatus());
 	}
 

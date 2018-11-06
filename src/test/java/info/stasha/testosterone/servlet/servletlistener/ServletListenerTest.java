@@ -35,6 +35,7 @@ public class ServletListenerTest implements Testosterone {
 	@Override
 	public void afterServerStop() {
 		Mockito.verify(listener, times(1)).contextDestroyed(any(ServletContextEvent.class));
+		Mockito.verify(listener, times(1)).requestDestroyed(any(ServletRequestEvent.class));
 	}
 
 	@Test
@@ -42,7 +43,6 @@ public class ServletListenerTest implements Testosterone {
 	public void test(Response resp) throws ServletException, IOException {
 		Mockito.verify(listener, times(1)).contextInitialized(any(ServletContextEvent.class));
 		Mockito.verify(listener, times(1)).requestInitialized(any(ServletRequestEvent.class));
-		Mockito.verify(listener, times(1)).requestDestroyed(any(ServletRequestEvent.class));
 	}
 
 }

@@ -25,20 +25,20 @@ public class SuperTest implements Testosterone {
 	public static void afterClass() {
 		System.out.println("super internal after class");
 	}
-	
+
 	@Before
-	public void superBefore(){
+	public void superBefore() {
 		System.out.println("super before");
 	}
-	
+
 	@After
-	public void superAfter(){
+	public void superAfter() {
 		System.out.println("super after");
 	}
-	
+
 	@Test
-	public void superTest(){
+	public void superTest() {
 		System.out.println("super test");
 	}
-	
+
 }

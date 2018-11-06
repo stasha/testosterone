@@ -77,9 +77,14 @@ public class Interceptors {
 
 			@RuntimeType
 			public static void beforeClass(@Origin Method method) throws Exception {
-				Setup setup = ConfigFactory.SETUP.get(method.getDeclaringClass().getName());
+				beforeClass(method.getDeclaringClass());
+			}
+
+			public static void beforeClass(Class<?> clazz) throws Exception {
+				
+				Setup setup = ConfigFactory.SETUP.get(clazz.getName());
 				Testosterone t = setup != null ? setup.getTestosterone() : null;
-				t = t == null ? (Testosterone) method.getDeclaringClass().newInstance() : t;
+				t = t == null ? (Testosterone) clazz.newInstance() : t;
 
 				if (t.getSetup().isSuite()
 						|| t.getConfiguration().getServerStarts() == Configuration.ServerStarts.PER_CLASS
@@ -96,7 +101,12 @@ public class Interceptors {
 
 			@RuntimeType
 			public static void afterClass(@Origin Method method) throws Exception {
-				Testosterone t = ConfigFactory.SETUP.get(method.getDeclaringClass().getName()).getTestosterone();
+				afterClass(method.getDeclaringClass());
+			}
+
+			public static void afterClass(Class<?> clazz) throws Exception {
+				
+				Testosterone t = ConfigFactory.SETUP.get(clazz.getName()).getTestosterone();
 				if (t.getSetup().isSuite()
 						|| t.getConfiguration().getServerStarts() == Configuration.ServerStarts.PER_CLASS
 						|| (t.getSetup().getParent() == null && t.getConfiguration().getServerStarts() == Configuration.ServerStarts.PARENT_CONFIGURATION)) {

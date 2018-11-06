@@ -29,7 +29,6 @@ import org.junit.jupiter.api.extension.ParameterResolver;
 @Extensions({
 	@ExtendWith(TestosteroneFactory.class)
 	, @ExtendWith(ContextInjectParameterResolver.class)})
-@Configuration(serverStarts = Configuration.ServerStarts.PER_TEST)
 public interface Testosterone extends info.stasha.testosterone.jersey.Testosterone {
 
 	/**

@@ -10,13 +10,7 @@ import org.junit.runners.model.FrameworkMethod;
 
 import info.stasha.testosterone.Instrument;
 import info.stasha.testosterone.jersey.Testosterone;
-import java.util.ArrayList;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.internal.runners.statements.RunAfters;
-import org.junit.internal.runners.statements.RunBefores;
 import org.junit.runners.model.Statement;
-import org.junit.runners.model.TestClass;
 
 /**
  * Test runner for running JerseyRequestTests.
