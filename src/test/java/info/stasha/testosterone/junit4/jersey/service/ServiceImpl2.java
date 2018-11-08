@@ -1,4 +1,4 @@
-package info.stasha.testosterone.jersey.service;
+package info.stasha.testosterone.junit4.jersey.service;
 
 /**
  * Service implementation

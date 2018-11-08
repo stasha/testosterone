@@ -1,4 +1,4 @@
-package info.stasha.testosterone.jersey.readwriteinterceptor;
+package info.stasha.testosterone.junit4.jersey.readwriteinterceptor;
 
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.junit4.TestosteroneRunner;

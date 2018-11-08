@@ -28,10 +28,16 @@ public class Interceptors {
 		Class<?> klass = type;
 		final List<Method> allMethods = new ArrayList<>(Arrays.asList(klass.getDeclaredMethods()));
 		for (final Method method : allMethods) {
-//			System.out.println(method.getName());
 			if (method.getName().startsWith(className)) {
 				methods.add(method);
 			}
+//			System.out.println(method.getName());
+//			for(Parameter param : method.getParameters()){
+//				System.out.println("  param: " + param.getName());
+//				for(Annotation a : param.getAnnotations()){
+//					System.out.println("      " + a.annotationType().getName());
+//				}
+//			}
 //			for (Annotation anon : method.getAnnotations()) {
 //				System.out.println(anon.getClass().getName() + " : " + anon.annotationType().getName());
 ////				if (anon.annotationType().getName().toString().contains(className)) {
@@ -40,20 +46,6 @@ public class Interceptors {
 //			}
 		}
 		return methods;
-	}
-
-	/**
-	 *
-	 * @param methodName
-	 * @param orig
-	 */
-	public static void invokeInitialMethod(String methodName, Testosterone orig) {
-		try {
-			orig.getClass().getMethod(methodName).invoke(orig);
-		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-			Logger.getLogger(Interceptors.class.getName()).log(Level.SEVERE, null, ex);
-			throw new RuntimeException(ex);
-		}
 	}
 
 	/**
@@ -70,6 +62,18 @@ public class Interceptors {
 		public static void constructor(@This Testosterone orig) {
 		}
 
+		public static Testosterone getTestosterone(Class<?> clazz) {
+			Testosterone t = null;
+			try {
+				Setup setup = ConfigFactory.SETUP.get(clazz.getName());
+				t = setup != null ? setup.getTestosterone() : null;
+				t = t == null ? (Testosterone) clazz.newInstance() : t;
+			} catch (InstantiationException | IllegalAccessException ex) {
+				Logger.getLogger(Interceptors.class.getName()).log(Level.SEVERE, null, ex);
+			}
+			return t;
+		}
+
 		/**
 		 * @BeforeClass annotation interceptor
 		 */
@@ -80,16 +84,16 @@ public class Interceptors {
 				beforeClass(method.getDeclaringClass());
 			}
 
-			public static void beforeClass(Class<?> clazz) throws Exception {
-				
-				Setup setup = ConfigFactory.SETUP.get(clazz.getName());
-				Testosterone t = setup != null ? setup.getTestosterone() : null;
-				t = t == null ? (Testosterone) clazz.newInstance() : t;
-
+			public static void beforeClass(Class<?> clazz) {
+				Testosterone t = getTestosterone(clazz);
 				if (t.getSetup().isSuite()
 						|| t.getConfiguration().getServerStarts() == Configuration.ServerStarts.PER_CLASS
 						|| (t.getSetup().getParent() == null && t.getConfiguration().getServerStarts() == Configuration.ServerStarts.PARENT_CONFIGURATION)) {
-					t.start();
+					try {
+						t.start();
+					} catch (Exception ex) {
+						Logger.getLogger(Interceptors.class.getName()).log(Level.SEVERE, null, ex);
+					}
 				}
 			}
 		}
@@ -104,13 +108,17 @@ public class Interceptors {
 				afterClass(method.getDeclaringClass());
 			}
 
-			public static void afterClass(Class<?> clazz) throws Exception {
-				
-				Testosterone t = ConfigFactory.SETUP.get(clazz.getName()).getTestosterone();
+			public static void afterClass(Class<?> clazz) {
+
+				Testosterone t = getTestosterone(clazz);
 				if (t.getSetup().isSuite()
 						|| t.getConfiguration().getServerStarts() == Configuration.ServerStarts.PER_CLASS
 						|| (t.getSetup().getParent() == null && t.getConfiguration().getServerStarts() == Configuration.ServerStarts.PARENT_CONFIGURATION)) {
-					t.getConfiguration().getResourceObject().stop();
+					try {
+						t.stop();
+					} catch (Exception ex) {
+						Logger.getLogger(Interceptors.class.getName()).log(Level.SEVERE, null, ex);
+					}
 				}
 			}
 		}
@@ -120,14 +128,6 @@ public class Interceptors {
 		 */
 		public static class Before {
 
-			@RuntimeType
-			public static void before(@SuperCall Callable<?> zuper, @This Testosterone orig) throws Exception {
-				if (orig.getConfiguration().getServerStarts() == Configuration.ServerStarts.PER_TEST) {
-					invokeInitialMethod("start", orig);
-				}
-				zuper.call();
-			}
-
 			/**
 			 * Invoked by __before__ method
 			 *
@@ -135,10 +135,25 @@ public class Interceptors {
 			 * @throws Exception
 			 */
 			@RuntimeType
-			public static void before(@This Testosterone orig) throws Exception {
+			public static void before(@This Testosterone orig) {
 				if (orig.getConfiguration().getServerStarts() == Configuration.ServerStarts.PER_TEST) {
-					invokeInitialMethod("start", orig);
+					try {
+						orig.start();
+					} catch (Exception ex) {
+						Logger.getLogger(Interceptors.class.getName()).log(Level.SEVERE, null, ex);
+					}
 				}
+			}
+
+			@RuntimeType
+			public static void before(@SuperCall Callable<?> zuper, @This Testosterone orig) throws Exception {
+				before(orig);
+
+				zuper.call();
+			}
+
+			public static void before(Class<?> clazz) {
+				before(getTestosterone(clazz));
 			}
 		}
 
@@ -147,15 +162,6 @@ public class Interceptors {
 		 */
 		public static class After {
 
-			@RuntimeType
-			public static void after(@SuperCall Callable<?> zuper, @This Testosterone orig) throws Exception {
-				if (orig.getConfiguration().getServerStarts() == Configuration.ServerStarts.PER_TEST) {
-					invokeInitialMethod("stop", orig);
-				}
-
-				zuper.call();
-			}
-
 			/**
 			 * Invoked by __after__ method
 			 *
@@ -163,10 +169,25 @@ public class Interceptors {
 			 * @throws Exception
 			 */
 			@RuntimeType
-			public static void after(@This Testosterone orig) throws Exception {
+			public static void after(@This Testosterone orig) {
 				if (orig.getConfiguration().getServerStarts() == Configuration.ServerStarts.PER_TEST) {
-					invokeInitialMethod("stop", orig);
+					try {
+						orig.stop();
+					} catch (Exception ex) {
+						Logger.getLogger(Interceptors.class.getName()).log(Level.SEVERE, null, ex);
+					}
 				}
+			}
+
+			@RuntimeType
+			public static void after(@SuperCall Callable<?> zuper, @This Testosterone orig) throws Exception {
+				after(orig);
+
+				zuper.call();
+			}
+
+			public static void after(Class<?> clazz) {
+				after(getTestosterone(clazz));
 			}
 		}
 

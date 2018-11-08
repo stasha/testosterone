@@ -1,4 +1,4 @@
-package info.stasha.testosterone.jersey.injectables;
+package info.stasha.testosterone.junit4.jersey.injectables;
 
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.junit4.TestosteroneRunner;

@@ -1,4 +1,4 @@
-package info.stasha.testosterone.jersey.exceptionmapper;
+package info.stasha.testosterone.junit4.jersey.exceptionmapper;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;

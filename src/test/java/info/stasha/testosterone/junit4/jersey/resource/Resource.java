@@ -1,6 +1,6 @@
-package info.stasha.testosterone.jersey.resource;
+package info.stasha.testosterone.junit4.jersey.resource;
 
-import info.stasha.testosterone.jersey.service.Service;
+import info.stasha.testosterone.junit4.jersey.service.Service;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;

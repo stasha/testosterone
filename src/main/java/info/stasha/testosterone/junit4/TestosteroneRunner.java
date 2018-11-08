@@ -10,6 +10,8 @@ import org.junit.runners.model.FrameworkMethod;
 
 import info.stasha.testosterone.Instrument;
 import info.stasha.testosterone.jersey.Testosterone;
+import org.junit.runner.notification.RunListener;
+import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.Statement;
 
 /**
@@ -46,14 +48,9 @@ public class TestosteroneRunner extends BlockJUnit4ClassRunner {
 	}
 
 	public TestosteroneRunner(Class<?> clazz) throws Throwable {
-		super(Instrument.testClass(
-				clazz,
-				new BeforeAnnotation(),
-				new AfterAnnotation(),
-				new BeforeClassAnnotation(),
-				new AfterClassAnnotation()));
+		super(Instrument.testClass(clazz));
 		this.testClass = clazz;
-		cls = Instrument.testClass(clazz, null, null, null, null);
+		cls = Instrument.testClass(clazz);
 	}
 
 	@Override
@@ -79,5 +76,14 @@ public class TestosteroneRunner extends BlockJUnit4ClassRunner {
 	protected Description describeChild(FrameworkMethod method) {
 		return Description.createTestDescription(this.testClass, testName(method), method.getAnnotations());
 	}
+	
+	@Override
+	public void run(RunNotifier notifier) {
+		RunListener l = new ExecutionListener();
+        notifier.addListener(l);
+        notifier.fireTestRunStarted(getDescription());
+        super.run(notifier);
+		notifier.removeListener(l);
+    }
 
 }

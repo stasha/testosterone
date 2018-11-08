@@ -1,4 +1,4 @@
-package info.stasha.testosterone.jersey.exceptionmapper;
+package info.stasha.testosterone.junit4.jersey.exceptionmapper;
 
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.annotation.DontIntercept;

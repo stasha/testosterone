@@ -1,7 +1,6 @@
-package info.stasha.testosterone;
+package info.stasha.testosterone.junit4;
 
 import info.stasha.testosterone.jersey.Testosterone;
-import info.stasha.testosterone.junit4.TestosteroneRunner;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

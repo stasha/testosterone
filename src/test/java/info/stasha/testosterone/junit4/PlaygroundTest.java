@@ -1,10 +1,10 @@
-package info.stasha.testosterone;
+package info.stasha.testosterone.junit4;
 
 import info.stasha.testosterone.annotation.Configuration;
-import info.stasha.testosterone.jersey.resource.Resource;
-import info.stasha.testosterone.jersey.service.Service;
-import info.stasha.testosterone.jersey.service.Service2;
-import info.stasha.testosterone.jersey.service.ServiceImpl;
+import info.stasha.testosterone.junit4.jersey.resource.Resource;
+import info.stasha.testosterone.junit4.jersey.service.Service;
+import info.stasha.testosterone.junit4.jersey.service.Service2;
+import info.stasha.testosterone.junit4.jersey.service.ServiceImpl;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;

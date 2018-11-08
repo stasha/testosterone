@@ -1,9 +1,8 @@
 package info.stasha.testosterone.junit5;
 
-import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.annotation.Request;
-import info.stasha.testosterone.jersey.service.Service;
-import info.stasha.testosterone.jersey.service.ServiceFactory;
+import info.stasha.testosterone.junit4.jersey.service.Service;
+import info.stasha.testosterone.junit4.jersey.service.ServiceFactory;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -15,7 +14,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class JUnit5_2Test extends JUnit5SuperTest {
 
@@ -49,18 +48,18 @@ public class JUnit5_2Test extends JUnit5SuperTest {
 
 	@Test
 	public void classInjectionTest2() {
-		assertEquals("Returned message should equal", Service.RESPONSE_TEXT, service.getText());
+		assertEquals(Service.RESPONSE_TEXT, service.getText());
 	}
 
 	@Test
 	public void methodInjectionTest2(@Context Service service) {
-		assertEquals("Returned message should equal", Service.RESPONSE_TEXT, service.getText());
+		assertEquals(Service.RESPONSE_TEXT, service.getText());
 	}
 
 	@Test
 	@Request(url = "404")
 	public void requestTest2(Response resp) {
-		assertEquals("Response status should be 404", 404, resp.getStatus());
+		assertEquals(404, resp.getStatus());
 	}
 
 }

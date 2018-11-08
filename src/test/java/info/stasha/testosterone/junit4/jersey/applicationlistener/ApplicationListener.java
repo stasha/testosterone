@@ -1,4 +1,4 @@
-package info.stasha.testosterone.jersey.applicationlistener;
+package info.stasha.testosterone.junit4.jersey.applicationlistener;
 
 import org.glassfish.jersey.server.monitoring.ApplicationEvent;
 import org.glassfish.jersey.server.monitoring.ApplicationEventListener;

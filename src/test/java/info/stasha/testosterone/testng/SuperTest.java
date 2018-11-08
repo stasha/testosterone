@@ -1,4 +1,4 @@
-package info.stasha.testosterone.junit5;
+package info.stasha.testosterone.testng;
 
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.annotation.Request;
@@ -8,62 +8,61 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.testng.Assert.assertEquals;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
+import org.testng.annotations.Test;
 
-/**
- *
- * @author stasha
- */
 @Configuration(serverStarts = Configuration.ServerStarts.PER_CLASS)
-public class JUnit5SuperTest implements Testosterone {
-	
+public class SuperTest implements Testosterone {
+
 	@Override
 	public void configure(AbstractBinder binder) {
 		binder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
 	}
+	
 
 	@Context
-	protected Service service;
+	private Service service;
 
-	@BeforeAll
+	@BeforeClass
 	static void setUpBeforeClass() throws Exception {
 		System.out.println("beforeAll");
 	}
 
-	@AfterAll
+	@AfterClass
 	static void tearDownAfterClass() throws Exception {
 		System.out.println("afterAll");
-	}
-
-	@BeforeEach
-	public void setUp() throws Exception {
-		System.out.println("BeforeEach");
-	}
-
-	@AfterEach
-	public void tearDown() throws Exception {
-		System.out.println("AfterEach");
 	}
 
 	@Test
 	public void classInjectionTest() {
 		assertEquals(Service.RESPONSE_TEXT, service.getText());
 	}
-
+	
 	@Test
-	public void methodInjectionTest(@Context Service service) {
+	public void classInjectionTest2() {
+		assertEquals(Service.RESPONSE_TEXT, service.getText());
+	}
+	
+	@Test
+	public void classInjectionTest3() {
 		assertEquals(Service.RESPONSE_TEXT, service.getText());
 	}
 
 	@Test
+	@Parameters("*")
+	public void methodInjectionTest(@Optional @Context Service service) {
+		assertEquals(Service.RESPONSE_TEXT, service.getText());
+	}
+
+	@Test
+	@Parameters("*")
 	@Request(url = "404")
-	public void requestTest(Response resp) {
+	public void requestTest(@Optional Response resp) {
 		assertEquals(404, resp.getStatus());
 	}
-	
+
 }

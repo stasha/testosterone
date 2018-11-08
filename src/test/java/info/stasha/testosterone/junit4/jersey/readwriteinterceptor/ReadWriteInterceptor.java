@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package info.stasha.testosterone.jersey.readwriteinterceptor;
+package info.stasha.testosterone.junit4.jersey.readwriteinterceptor;
 
 import java.io.IOException;
 import javax.ws.rs.WebApplicationException;

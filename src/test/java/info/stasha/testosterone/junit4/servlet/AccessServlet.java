@@ -1,4 +1,4 @@
-package info.stasha.testosterone.servlet;
+package info.stasha.testosterone.junit4.servlet;
 
 import java.io.IOException;
 import javax.servlet.ServletException;

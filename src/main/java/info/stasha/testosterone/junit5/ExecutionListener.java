@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.support.descriptor.ClassSource;
+import org.junit.platform.engine.support.descriptor.MethodSource;
 import org.junit.platform.launcher.TestExecutionListener;
 import org.junit.platform.launcher.TestIdentifier;
 
@@ -31,40 +32,23 @@ public class ExecutionListener implements TestExecutionListener {
 	 */
 	private Class<?> getClass(TestIdentifier ti) {
 		TestSource ts = ti.getSource().orElse(null);
-		if (ts != null && ts instanceof ClassSource) {
-			Class<?> cls = ((ClassSource) ts).getJavaClass();
+		if (ts != null) {
+			Class<?> cls = null;
+			if (ts instanceof ClassSource) {
+				cls = ((ClassSource) ts).getJavaClass();
+			} else if (ts instanceof MethodSource) {
+				try {
+					cls = Class.forName(((MethodSource) ts).getClassName());
+				} catch (ClassNotFoundException ex) {
+					Logger.getLogger(ExecutionListener.class.getName()).log(Level.SEVERE, null, ex);
+				}
+			}
 			if (Testosterone.class.isAssignableFrom(cls)) {
-				return Instrument.testClass(
-						cls,
-						new BeforeEachAnnotation(),
-						new AfterEachAnnotation(),
-						new BeforeAllAnnotation(),
-						new AfterAllAnnotation()
-				);
+				return Instrument.testClass(cls);
 			}
 		}
 
 		return null;
-	}
-
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @param testIdentifier
-	 * @param testExecutionResult
-	 */
-	@Override
-	public void executionFinished(TestIdentifier testIdentifier, TestExecutionResult testExecutionResult) {
-		TestExecutionListener.super.executionFinished(testIdentifier, testExecutionResult);
-
-		Class<?> cls = getClass(testIdentifier);
-		if (testIdentifier.isContainer() && cls != null) {
-			try {
-				Interceptors.Intercept.AfterClass.afterClass(cls);
-			} catch (Exception ex) {
-				Logger.getLogger(ExecutionListener.class.getName()).log(Level.SEVERE, null, ex);
-			}
-		}
 	}
 
 	/**
@@ -76,14 +60,26 @@ public class ExecutionListener implements TestExecutionListener {
 	public void executionStarted(TestIdentifier testIdentifier) {
 		Class<?> cls = getClass(testIdentifier);
 		if (testIdentifier.isContainer() && cls != null) {
-			try {
-				Interceptors.Intercept.BeforeClass.beforeClass(cls);
-			} catch (Exception ex) {
-				Logger.getLogger(ExecutionListener.class.getName()).log(Level.SEVERE, null, ex);
-			}
+			Interceptors.Intercept.BeforeClass.beforeClass(cls);
+		} else if (testIdentifier.isTest()) {
+			Interceptors.Intercept.Before.before(cls);
 		}
-		TestExecutionListener.super.executionStarted(testIdentifier);
+	}
 
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @param testIdentifier
+	 * @param testExecutionResult
+	 */
+	@Override
+	public void executionFinished(TestIdentifier testIdentifier, TestExecutionResult testExecutionResult) {
+		Class<?> cls = getClass(testIdentifier);
+		if (testIdentifier.isContainer() && cls != null) {
+			Interceptors.Intercept.AfterClass.afterClass(cls);
+		} else if (testIdentifier.isTest()) {
+			Interceptors.Intercept.After.after(cls);
+		}
 	}
 
 }

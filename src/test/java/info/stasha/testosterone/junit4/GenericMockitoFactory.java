@@ -1,4 +1,4 @@
-package info.stasha.testosterone;
+package info.stasha.testosterone.junit4;
 
 import org.glassfish.hk2.api.Factory;
 import org.mockito.Mockito;

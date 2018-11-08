@@ -1,4 +1,4 @@
-package info.stasha.testosterone.jersey.requestfilter;
+package info.stasha.testosterone.junit4.jersey.requestfilter;
 
 import java.io.IOException;
 import javax.ws.rs.container.ContainerRequestContext;

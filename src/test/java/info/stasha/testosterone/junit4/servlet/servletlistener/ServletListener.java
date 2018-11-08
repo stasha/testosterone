@@ -1,4 +1,4 @@
-package info.stasha.testosterone.servlet.servletlistener;
+package info.stasha.testosterone.junit4.servlet.servletlistener;
 
 import javax.servlet.ServletContextAttributeEvent;
 import javax.servlet.ServletContextAttributeListener;

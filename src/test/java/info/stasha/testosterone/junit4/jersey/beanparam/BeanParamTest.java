@@ -1,9 +1,9 @@
-package info.stasha.testosterone.jersey.beanparam;
+package info.stasha.testosterone.junit4.jersey.beanparam;
 
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.junit4.TestosteroneRunner;
 import org.junit.Test;
-import info.stasha.testosterone.jersey.service.User;
+import info.stasha.testosterone.junit4.jersey.service.User;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package info.stasha.testosterone.servlet.servletfilter;
+package info.stasha.testosterone.junit4.servlet.servletfilter;
 
 import java.io.IOException;
 import javax.servlet.Filter;

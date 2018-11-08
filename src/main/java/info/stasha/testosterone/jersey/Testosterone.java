@@ -15,7 +15,7 @@ import info.stasha.testosterone.ConfigFactory;
  * @author stasha
  */
 public interface Testosterone {
-
+	
 	/**
 	 * Returns testosterone configuration factory.
 	 *

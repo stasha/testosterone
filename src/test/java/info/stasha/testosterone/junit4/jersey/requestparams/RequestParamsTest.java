@@ -1,4 +1,4 @@
-package info.stasha.testosterone.jersey.requestparams;
+package info.stasha.testosterone.junit4.jersey.requestparams;
 
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.junit4.TestosteroneRunner;

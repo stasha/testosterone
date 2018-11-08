@@ -1,9 +1,9 @@
-package info.stasha.testosterone.servlet.servletlistener;
+package info.stasha.testosterone.junit4.servlet.servletlistener;
 
-import info.stasha.testosterone.servlet.*;
 import info.stasha.testosterone.annotation.Request;
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.junit4.TestosteroneRunner;
+import info.stasha.testosterone.servlet.ServletContainerConfig;
 import java.io.IOException;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletException;
