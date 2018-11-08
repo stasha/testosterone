@@ -8,7 +8,6 @@ import org.junit.jupiter.api.extension.TestInstanceFactoryContext;
 import org.junit.jupiter.api.extension.TestInstantiationException;
 
 import info.stasha.testosterone.Instrument;
-import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.junit5.Testosterone.ContextInjectParameterResolver;
 import info.stasha.testosterone.junit5.Testosterone.TestosteroneFactory;
 import javax.inject.Inject;
