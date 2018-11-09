@@ -21,7 +21,7 @@ public class ExecutionListener implements ITestListener {
 	 */
 	@Override
 	public void onStart(ITestContext itc) {
-		Class<?> clazz = Instrument.getInstrumentedClass(itc.getAllTestMethods()[0].getRealClass());
+		Class<? extends Testosterone> clazz = Instrument.getInstrumentedClass(itc.getAllTestMethods()[0].getRealClass());
 		Interceptors.Intercept.BeforeClass.beforeClass(clazz);
 	}
 
@@ -32,7 +32,7 @@ public class ExecutionListener implements ITestListener {
 	 */
 	@Override
 	public void onFinish(ITestContext itc) {
-		Class<?> clazz = Instrument.getInstrumentedClass(itc.getAllTestMethods()[0].getRealClass());
+		Class<? extends Testosterone> clazz = Instrument.getInstrumentedClass(itc.getAllTestMethods()[0].getRealClass());
 		Interceptors.Intercept.AfterClass.afterClass(clazz);
 	}
 

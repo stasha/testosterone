@@ -30,7 +30,7 @@ import net.bytebuddy.matcher.ElementMatchers;
  */
 public class Instrument {
 
-	private static final Map<Class<?>, Class<?>> CLASSES = new HashMap<>();
+	private static final Map<Class<? extends Testosterone>, Class<? extends Testosterone>> CLASSES = new HashMap<>();
 
 	/**
 	 * Returns already instrumented class.
@@ -38,7 +38,7 @@ public class Instrument {
 	 * @param clazz
 	 * @return
 	 */
-	public static Class<?> getInstrumentedClass(Class<?> clazz) {
+	public static Class<? extends Testosterone> getInstrumentedClass(Class<? extends Testosterone> clazz) {
 		return CLASSES.get(clazz);
 	}
 
@@ -66,7 +66,7 @@ public class Instrument {
 	 * @param clazz
 	 * @return
 	 */
-	public static Class<?> testClass(Class<?> clazz, Annotation afterClassAnnotation) {
+	public static Class<? extends Testosterone> testClass(Class<? extends Testosterone> clazz, Annotation afterClassAnnotation) {
 
 		if (!Testosterone.class.isAssignableFrom(clazz)) {
 			return clazz;
@@ -74,7 +74,7 @@ public class Instrument {
 
 		if (!CLASSES.containsKey(clazz)) {
 
-			Class<?> cls = new ByteBuddy()
+			Class<? extends Testosterone> cls = new ByteBuddy()
 					.subclass(clazz)
 					.name(clazz.getName() + "_")
 					//

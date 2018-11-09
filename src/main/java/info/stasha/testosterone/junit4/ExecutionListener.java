@@ -2,6 +2,7 @@ package info.stasha.testosterone.junit4;
 
 import info.stasha.testosterone.Instrument;
 import info.stasha.testosterone.Interceptors;
+import info.stasha.testosterone.jersey.Testosterone;
 import org.junit.runner.Description;
 import org.junit.runner.Result;
 import org.junit.runner.notification.RunListener;
@@ -14,7 +15,7 @@ import org.junit.runner.notification.RunListener;
 public class ExecutionListener extends RunListener {
 
 	// HACK BECAUSE TESTRUNFINISHED DOES NOT WORK
-	private static Class<?> clazz;
+	private static Class<? extends Testosterone> clazz;
 
 	/**
 	 * {@inheritDoc }
@@ -24,7 +25,7 @@ public class ExecutionListener extends RunListener {
 	 */
 	@Override
 	public void testRunStarted(Description description) throws Exception {
-		Class<?> cls = Instrument.testClass(description.getChildren().get(0).getTestClass(), new AfterClassAnnotation());
+		Class<? extends Testosterone> cls = Instrument.testClass((Class<? extends Testosterone>) description.getChildren().get(0).getTestClass(), new AfterClassAnnotation());
 		if (clazz != null && clazz != cls) {
 			// HACK BECAUSE TESTRUNFINISHED DOES NOT WORK
 			Interceptors.Intercept.AfterClass.afterClass(clazz);

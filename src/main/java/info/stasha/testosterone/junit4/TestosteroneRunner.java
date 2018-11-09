@@ -21,8 +21,8 @@ import org.junit.runners.model.Statement;
  */
 public class TestosteroneRunner extends BlockJUnit4ClassRunner {
 
-	protected Class<?> testClass;
-	protected Class<?> cls;
+	protected Class<? extends Testosterone> testClass;
+	protected Class<? extends Testosterone> cls;
 
 	public static class Invoker extends Statement {
 
@@ -47,7 +47,7 @@ public class TestosteroneRunner extends BlockJUnit4ClassRunner {
 
 	}
 
-	public TestosteroneRunner(Class<?> clazz) throws Throwable {
+	public TestosteroneRunner(Class<? extends Testosterone> clazz) throws Throwable {
 		super(Instrument.testClass(clazz, new AfterClassAnnotation()));
 		this.testClass = clazz;
 		cls = Instrument.getInstrumentedClass(clazz);

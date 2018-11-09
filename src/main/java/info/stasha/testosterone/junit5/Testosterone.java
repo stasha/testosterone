@@ -47,7 +47,7 @@ public interface Testosterone extends info.stasha.testosterone.jersey.Testostero
 		public Object createTestInstance(TestInstanceFactoryContext factoryContext, ExtensionContext extensionContext)
 				throws TestInstantiationException {
 			try {
-				return Instrument.testClass(factoryContext.getTestClass(), new AfterAllAnnotation()).newInstance();
+				return Instrument.testClass((Class<? extends Testosterone>) factoryContext.getTestClass(), new AfterAllAnnotation()).newInstance();
 			} catch (InstantiationException | IllegalAccessException ex) {
 				throw new RuntimeException(ex);
 			}
@@ -59,7 +59,7 @@ public interface Testosterone extends info.stasha.testosterone.jersey.Testostero
 	 */
 	public static class ContextInjectParameterResolver implements ParameterResolver {
 
-		private Class<?> cls;
+		private Class<? extends Testosterone> cls;
 
 		/**
 		 * {@inheritDoc }
@@ -85,7 +85,7 @@ public interface Testosterone extends info.stasha.testosterone.jersey.Testostero
 		@Override
 		public boolean supportsParameter(ParameterContext pc, ExtensionContext ec) throws ParameterResolutionException {
 			if (pc.getParameter().getType() == Response.class || pc.isAnnotated(Context.class) || pc.isAnnotated(Inject.class)) {
-				cls = pc.getParameter().getType();
+				cls = (Class<? extends Testosterone>) pc.getParameter().getType();
 				return true;
 			}
 			return false;

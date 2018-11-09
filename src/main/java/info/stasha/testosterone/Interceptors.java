@@ -23,9 +23,9 @@ import net.bytebuddy.implementation.bind.annotation.This;
  */
 public class Interceptors {
 
-	public static List<Method> getMethodsAnnotatedWith(final Class<?> type, final String className) {
+	public static List<Method> getMethodsAnnotatedWith(final Class<? extends Testosterone> type, final String className) {
 		final List<Method> methods = new ArrayList<>();
-		Class<?> klass = type;
+		Class<? extends Testosterone> klass = type;
 		final List<Method> allMethods = new ArrayList<>(Arrays.asList(klass.getDeclaredMethods()));
 		for (final Method method : allMethods) {
 			if (method.getName().startsWith(className)) {
@@ -73,7 +73,7 @@ public class Interceptors {
 			}
 		}
 
-		public static Testosterone getTestosterone(Class<?> clazz) {
+		public static Testosterone getTestosterone(Class<? extends Testosterone> clazz) {
 			Testosterone t = null;
 			try {
 				Setup setup = ConfigFactory.SETUP.get(clazz.getName());
@@ -92,10 +92,10 @@ public class Interceptors {
 
 			@RuntimeType
 			public static void beforeClass(@Origin Method method) throws Exception {
-				beforeClass(method.getDeclaringClass());
+				beforeClass((Class<? extends Testosterone>) method.getDeclaringClass());
 			}
 
-			public static void beforeClass(Class<?> clazz) {
+			public static void beforeClass(Class<? extends Testosterone> clazz) {
 				Testosterone t = getTestosterone(clazz);
 				if (t.getSetup().isSuite()
 						|| t.getServerConfig().getServerStarts() == Configuration.ServerStarts.PER_CLASS
@@ -121,10 +121,10 @@ public class Interceptors {
 
 			@RuntimeType
 			public static void afterClass(@Origin Method method) throws Exception {
-				afterClass(method.getDeclaringClass());
+				afterClass((Class<? extends Testosterone>) method.getDeclaringClass());
 			}
 
-			public static void afterClass(Class<?> clazz) {
+			public static void afterClass(Class<? extends Testosterone> clazz) {
 
 				Testosterone t = getTestosterone(clazz);
 				if (t.getSetup().isSuite()
@@ -173,7 +173,7 @@ public class Interceptors {
 				zuper.call();
 			}
 
-			public static void before(Class<?> clazz) {
+			public static void before(Class<? extends Testosterone> clazz) {
 				before(getTestosterone(clazz));
 			}
 		}
@@ -207,7 +207,7 @@ public class Interceptors {
 				zuper.call();
 			}
 
-			public static void after(Class<?> clazz) {
+			public static void after(Class<? extends Testosterone> clazz) {
 				after(getTestosterone(clazz));
 			}
 		}

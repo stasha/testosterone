@@ -30,7 +30,7 @@ public class ExecutionListener implements TestExecutionListener {
 	 * @param ti
 	 * @return
 	 */
-	private Class<?> getClass(TestIdentifier ti) {
+	private Class<? extends Testosterone> getClass(TestIdentifier ti) {
 		TestSource ts = ti.getSource().orElse(null);
 		if (ts != null) {
 			Class<?> cls = null;
@@ -44,7 +44,7 @@ public class ExecutionListener implements TestExecutionListener {
 				}
 			}
 			if (Testosterone.class.isAssignableFrom(cls)) {
-				return Instrument.testClass(cls, new AfterAllAnnotation());
+				return (Class<? extends Testosterone>) Instrument.testClass((Class<? extends Testosterone>) cls, new AfterAllAnnotation());
 			}
 		}
 
@@ -58,7 +58,7 @@ public class ExecutionListener implements TestExecutionListener {
 	 */
 	@Override
 	public void executionStarted(TestIdentifier testIdentifier) {
-		Class<?> cls = getClass(testIdentifier);
+		Class<? extends Testosterone> cls = getClass(testIdentifier);
 		if (testIdentifier.isContainer() && cls != null) {
 			Interceptors.Intercept.BeforeClass.beforeClass(cls);
 		} else if (testIdentifier.isTest()) {
@@ -74,7 +74,7 @@ public class ExecutionListener implements TestExecutionListener {
 	 */
 	@Override
 	public void executionFinished(TestIdentifier testIdentifier, TestExecutionResult testExecutionResult) {
-		Class<?> cls = getClass(testIdentifier);
+		Class<? extends Testosterone> cls = getClass(testIdentifier);
 		if (testIdentifier.isContainer() && cls != null) {
 			Interceptors.Intercept.AfterClass.afterClass(cls);
 		} else if (testIdentifier.isTest()) {

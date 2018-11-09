@@ -29,7 +29,8 @@ public interface Testosterone extends info.stasha.testosterone.jersey.Testostero
 		@Override
 		public Object newInstance(Class<?> cls) {
 			try {
-				return Instrument.testClass(cls, new AfterClassAnnotation()).newInstance();
+				return Instrument.testClass((Class<? extends Testosterone>) cls, 
+						new AfterClassAnnotation()).newInstance();
 			} catch (Throwable ex) {
 				Logger.getLogger(TestObjectFactory.class.getName()).log(Level.SEVERE, null, ex);
 			}

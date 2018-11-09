@@ -1,5 +1,6 @@
 package info.stasha.testosterone.junit4;
 
+import info.stasha.testosterone.jersey.Testosterone;
 import org.glassfish.hk2.api.Factory;
 import org.mockito.Mockito;
 
@@ -18,7 +19,7 @@ public class GenericMockitoFactory {
 		MOCK
 	}
 
-	private static Factory newInstance(Class<?> obj, Type mode) {
+	private static Factory newInstance(Class<? extends Testosterone> obj, Type mode) {
 
 		return new Factory() {
 			@Override
@@ -44,15 +45,15 @@ public class GenericMockitoFactory {
 		};
 	}
 
-	public static Factory get(Class<?> obj) {
+	public static Factory get(Class<? extends Testosterone> obj) {
 		return newInstance(obj, Type.INSTANCE);
 	}
 
-	public static Factory spy(Class<?> obj) {
+	public static Factory spy(Class<? extends Testosterone> obj) {
 		return newInstance(obj, Type.SPY);
 	}
 
-	public static Factory mock(Class<?> obj) {
+	public static Factory mock(Class<? extends Testosterone> obj) {
 		return newInstance(obj, Type.MOCK);
 	}
 
