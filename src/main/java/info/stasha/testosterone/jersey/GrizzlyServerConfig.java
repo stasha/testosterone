@@ -117,34 +117,12 @@ public class GrizzlyServerConfig implements ServerConfig {
 	/**
 	 * {@inheritDoc }
 	 *
-	 * @return
-	 */
-	@Override
-	public List<Throwable> getExpectedExceptions() {
-		return expectedException;
-	}
-
-	/**
-	 * {@inheritDoc }
-	 *
 	 * @throws Throwable
 	 */
 	@Override
 	public void throwErrorMessage() throws Throwable {
 		if (getMessages().size() > 0) {
 			throw getMessages().iterator().next();
-		}
-	}
-
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @throws Throwable
-	 */
-	@Override
-	public void throwExpectedException() throws Throwable {
-		if (getExpectedExceptions().size() > 0) {
-			throw getExpectedExceptions().iterator().next();
 		}
 	}
 

@@ -3,7 +3,6 @@ package info.stasha.testosterone;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
-import java.util.List;
 import java.util.Set;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
@@ -36,14 +35,6 @@ public interface ServerConfig {
 	 * @return
 	 */
 	Client client();
-
-	/**
-	 * List of expected exceptions that will be thrown while invoking JUnit
-	 * test.
-	 *
-	 * @return
-	 */
-	List<Throwable> getExpectedExceptions();
 
 	/**
 	 * Error messages produced by failed tests.
@@ -200,12 +191,5 @@ public interface ServerConfig {
 	 * @throws Throwable
 	 */
 	void throwErrorMessage() throws Throwable;
-
-	/**
-	 * Throws expected exception expected by JUnit framework.
-	 *
-	 * @throws Throwable
-	 */
-	void throwExpectedException() throws Throwable;
 
 }

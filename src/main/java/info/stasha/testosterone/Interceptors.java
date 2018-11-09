@@ -259,15 +259,9 @@ public class Interceptors {
 						// if any, throw errors produced by test method
 						config.throwErrorMessage();
 
-						// if any, throw expection produced by test method
-						config.throwExpectedException();
-
 					} finally {
 						// clear junit errors
 						config.getMessages().clear();
-
-						// clear expected exceptions
-						config.getExpectedExceptions().clear();
 					}
 
 				} else {
@@ -292,13 +286,9 @@ public class Interceptors {
 							ex = ex.getCause();
 						}
 
-						if (ex instanceof AssertionError) {
-							// storing error to messages so they can be thrown in main JUnit thread
-							config.getMessages().add(ex);
-						} else {
-							// storing expected exception so it can be later thrown in main JUnit thread
-							config.getExpectedExceptions().add(ex);
-						}
+						// storing error to messages so they can be thrown in main JUnit thread
+						config.getMessages().add(ex);
+
 					}
 				}
 
