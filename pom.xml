@@ -52,12 +52,15 @@
 	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	<maven.compiler.source>1.8</maven.compiler.source>
 	<maven.compiler.target>1.8</maven.compiler.target>
+	
+	<slf4j.version>1.7.25</slf4j.version>
 	<jersey.version>2.27</jersey.version>
 	<byte-buddy.version>1.9.2</byte-buddy.version>
 	<mockito.version>2.23.0</mockito.version>
 	<generex.version>1.0.2</generex.version>
 	<jetty.version>9.4.12.v20180830</jetty.version>
 	<commons-lang.version>3.8.1</commons-lang.version>
+	<h2.version>1.4.197</h2.version>
 	
 	<surefire-plugin.version>2.22.1</surefire-plugin.version>
 	<junit.version>4.12</junit.version><!-- supported versions of JUnit are 4.5 or higher -->
@@ -72,14 +75,8 @@
 	<!-- requered by testosterone -->
 	<dependency>
 	    <groupId>org.slf4j</groupId>
-	    <artifactId>slf4j-api</artifactId>
-	    <version>1.7.25</version>
-	</dependency>
-
-	<dependency>
-	    <groupId>org.slf4j</groupId>
 	    <artifactId>slf4j-simple</artifactId>
-	    <version>1.7.25</version>
+	    <version>${slf4j.version}</version>
 	</dependency>
 
 	<dependency>
@@ -121,7 +118,7 @@
 	<dependency>
 	    <groupId>com.h2database</groupId>
 	    <artifactId>h2</artifactId>
-	    <version>1.4.197</version>
+	    <version>${h2.version}</version>
 	</dependency>
 		
 	<!-- provided dependencies -->
