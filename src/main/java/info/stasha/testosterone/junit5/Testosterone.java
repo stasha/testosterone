@@ -47,7 +47,7 @@ public interface Testosterone extends info.stasha.testosterone.jersey.Testostero
 		public Object createTestInstance(TestInstanceFactoryContext factoryContext, ExtensionContext extensionContext)
 				throws TestInstantiationException {
 			try {
-				return Instrument.testClass(factoryContext.getTestClass()).newInstance();
+				return Instrument.testClass(factoryContext.getTestClass(), new AfterAllAnnotation()).newInstance();
 			} catch (InstantiationException | IllegalAccessException ex) {
 				throw new RuntimeException(ex);
 			}

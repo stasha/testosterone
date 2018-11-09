@@ -1,5 +1,6 @@
 package info.stasha.testosterone;
 
+import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.jersey.Testosterone;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -22,7 +23,7 @@ public interface ConfigFactory {
 	 *
 	 * @return
 	 */
-	ServerConfig newConfiguration();
+	ServerConfig newServerConfig();
 
 	/**
 	 * Returns configuration for passed Testosterone object. If configuration
@@ -31,7 +32,14 @@ public interface ConfigFactory {
 	 * @param obj
 	 * @return
 	 */
-	ServerConfig getConfiguration(Testosterone obj);
+	ServerConfig getServerConfig(Testosterone obj);
+
+	/**
+	 * Returns a db configuration.
+	 *
+	 * @return
+	 */
+	DbConfig getDbConfig();
 
 	/**
 	 * Returns Setup object. If setup does not exist, than it is created and
@@ -53,6 +61,8 @@ public interface ConfigFactory {
 	/**
 	 * Returns TestExecutor instance.
 	 *
+	 * @param method
+	 * @param target
 	 * @return
 	 */
 	default TestExecutor getTestExecutor(Method method, Object target) {

@@ -9,6 +9,7 @@ import javax.ws.rs.Path;
 import info.stasha.testosterone.annotation.DontIntercept;
 import info.stasha.testosterone.jersey.GetAnnotation;
 import info.stasha.testosterone.jersey.PathAnnotation;
+import info.stasha.testosterone.jersey.PostConstructAnnotation;
 import info.stasha.testosterone.jersey.Testosterone;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
@@ -45,15 +46,10 @@ public class Instrument {
 	 * Returns new instrumented class that extends test class. It adds
 	 * methods:<br>
 	 * __created__ - invoked when test class is created<br>
-	 * __beforeClass__ - invoked when JUnit calls @BeforeClass<br>
-	 * __afterClass__ - invoked when JUnit calls @AfterClass<br>
-	 * __before__ - invoked when JUnit calls @Before<br>
-	 * __after__ - invoked when JUnit calls @After.<br>
-	 * <p>
-	 * New methods are annotated with corresponding annotation.</p>
-	 * <p>
+	 * __afterClass__ - invoked when JUnit calls @AfterClass. 
+	 * This is just a hack because JUnit4 doesn't fire testRunFinished event.<br>
+	 *<p>
 	 * Methods annotated with @Test annotation are also annotated with @Path and
-	 *
 	 * @GET annotations. In case @Path annotation is present, then nor @Path nor
 	 * @GET annotations are added.
 	 * </p>
@@ -70,7 +66,7 @@ public class Instrument {
 	 * @param clazz
 	 * @return
 	 */
-	public static Class<?> testClass(Class<?> clazz) {
+	public static Class<?> testClass(Class<?> clazz, Annotation afterClassAnnotation) {
 
 		if (!Testosterone.class.isAssignableFrom(clazz)) {
 			return clazz;
@@ -84,6 +80,10 @@ public class Instrument {
 					//
 					.defineMethod("__created__", void.class, Visibility.PUBLIC)
 					.intercept(MethodDelegation.to(Interceptors.Intercept.class))
+					//
+					.defineMethod("__afterClass__", void.class, Visibility.PUBLIC, Ownership.STATIC)
+					.intercept(MethodDelegation.to(Interceptors.Intercept.AfterClass.class))
+					.annotateMethod(afterClassAnnotation)
 					//
 					.constructor(ElementMatchers.isDefaultConstructor())
 					.intercept(SuperMethodCall.INSTANCE.andThen(
@@ -100,12 +100,17 @@ public class Instrument {
 					.attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
 					.annotateMethod(new PathAnnotation())
 					.annotateMethod(new GetAnnotation())
+					
 					//
 					.method(isAnnotatedWith(Path.class)
 							.and(not(isAnnotatedWith(DontIntercept.class)))
 					)
 					.intercept(MethodDelegation.to(Interceptors.Intercept.PathAndTest.class))
 					.attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
+					//
+					.defineMethod("__postconstruct__", void.class, Visibility.PUBLIC)
+					.intercept(MethodDelegation.to(Interceptors.Intercept.PostConstruct.class))
+					.annotateMethod(new PostConstructAnnotation())
 					//
 					.make()
 					.load(clazz.getClassLoader())

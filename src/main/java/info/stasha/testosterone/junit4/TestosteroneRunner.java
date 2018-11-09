@@ -48,9 +48,9 @@ public class TestosteroneRunner extends BlockJUnit4ClassRunner {
 	}
 
 	public TestosteroneRunner(Class<?> clazz) throws Throwable {
-		super(Instrument.testClass(clazz));
+		super(Instrument.testClass(clazz, new AfterClassAnnotation()));
 		this.testClass = clazz;
-		cls = Instrument.testClass(clazz);
+		cls = Instrument.getInstrumentedClass(clazz);
 	}
 
 	@Override

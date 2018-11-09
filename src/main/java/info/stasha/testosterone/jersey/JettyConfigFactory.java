@@ -3,7 +3,7 @@ package info.stasha.testosterone.jersey;
 import info.stasha.testosterone.ServerConfig;
 
 /**
- * Factory that creates Jetty configuration.
+ * Factory for creating Jetty server configuration.
  *
  * @author stasha
  */
@@ -15,7 +15,7 @@ public class JettyConfigFactory extends JerseyConfigFactory {
 	 * @return
 	 */
 	@Override
-	public ServerConfig newConfiguration() {
+	public ServerConfig newServerConfig() {
 		return new JettyServerConfig();
 	}
 

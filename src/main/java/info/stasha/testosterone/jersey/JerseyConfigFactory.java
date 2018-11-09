@@ -6,16 +6,19 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import info.stasha.testosterone.ServerConfig;
 import info.stasha.testosterone.ConfigFactory;
+import info.stasha.testosterone.db.DbConfig;
+import info.stasha.testosterone.db.H2Config;
 
 /**
- * Factory for creating Jersey configuration.
+ * Factory for creating Jersey server configuration.
  *
  * @author stasha
  */
 public class JerseyConfigFactory implements ConfigFactory {
 
 	/**
-	 * Returns key used for storing setups.
+	 * Returns key used for storing setups.<br>
+	 * The key is based on Testosterone class name.
 	 *
 	 * @param obj
 	 * @return
@@ -30,7 +33,7 @@ public class JerseyConfigFactory implements ConfigFactory {
 	 * @return
 	 */
 	@Override
-	public ServerConfig newConfiguration() {
+	public ServerConfig newServerConfig() {
 		return new GrizzlyServerConfig();
 	}
 
@@ -41,8 +44,18 @@ public class JerseyConfigFactory implements ConfigFactory {
 	 * @return
 	 */
 	@Override
-	public ServerConfig getConfiguration(Testosterone obj) {
-		return getSetup(obj).getConfiguration();
+	public ServerConfig getServerConfig(Testosterone obj) {
+		return getSetup(obj).getServerConfig();
+	}
+
+	/**
+	 * Returns DbConfig instance.
+	 *
+	 * @return
+	 */
+	@Override
+	public DbConfig getDbConfig() {
+		return new H2Config();
 	}
 
 	/**
@@ -64,17 +77,24 @@ public class JerseyConfigFactory implements ConfigFactory {
 						}
 					}
 				}
-				ServerConfig config;
+				ConfigFactory configFactory;
+				ServerConfig serverConfig;
 				if (ca != null) {
-					config = (ServerConfig) ca.configuration().newInstance();
-					config.setBaseUri(ca.baseUri());
-					config.setPort(ca.port());
-					config.setServerStarts(ca.serverStarts());
+					configFactory = ca.configuration().newInstance();
+
+					serverConfig = configFactory.newServerConfig();
+					serverConfig.setBaseUri(ca.baseUri());
+					serverConfig.setPort(ca.port());
+					serverConfig.setServerStarts(ca.serverStarts());
 				} else {
-					config = newConfiguration();
+					configFactory = new JettyConfigFactory();
+					serverConfig = configFactory.newServerConfig();
 				}
 
-				SETUP.put(getKey(obj), new Setup(obj, config, false));
+				Setup setup = new Setup(obj, serverConfig);
+				setup.setDbConfig(new H2Config());
+
+				SETUP.put(getKey(obj), setup);
 
 			} catch (InstantiationException | IllegalAccessException ex) {
 				Logger.getLogger(Testosterone.class.getName()).log(Level.SEVERE, null, ex);

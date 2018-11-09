@@ -62,6 +62,17 @@ public class Interceptors {
 		public static void constructor(@This Testosterone orig) {
 		}
 
+		/**
+		 * @PostConstruct interceptor
+		 */
+		public static class PostConstruct {
+
+			@RuntimeType
+			public static void postConstruct(@This Testosterone orig) throws Exception {
+				orig.getSetup().afterServerStart(orig);
+			}
+		}
+
 		public static Testosterone getTestosterone(Class<?> clazz) {
 			Testosterone t = null;
 			try {
@@ -87,8 +98,8 @@ public class Interceptors {
 			public static void beforeClass(Class<?> clazz) {
 				Testosterone t = getTestosterone(clazz);
 				if (t.getSetup().isSuite()
-						|| t.getConfiguration().getServerStarts() == Configuration.ServerStarts.PER_CLASS
-						|| (t.getSetup().getParent() == null && t.getConfiguration().getServerStarts() == Configuration.ServerStarts.PARENT_CONFIGURATION)) {
+						|| t.getServerConfig().getServerStarts() == Configuration.ServerStarts.PER_CLASS
+						|| (t.getSetup().getParent() == null && t.getServerConfig().getServerStarts() == Configuration.ServerStarts.PARENT_CONFIGURATION)) {
 					try {
 						t.start();
 					} catch (Exception ex) {
@@ -112,8 +123,8 @@ public class Interceptors {
 
 				Testosterone t = getTestosterone(clazz);
 				if (t.getSetup().isSuite()
-						|| t.getConfiguration().getServerStarts() == Configuration.ServerStarts.PER_CLASS
-						|| (t.getSetup().getParent() == null && t.getConfiguration().getServerStarts() == Configuration.ServerStarts.PARENT_CONFIGURATION)) {
+						|| t.getServerConfig().getServerStarts() == Configuration.ServerStarts.PER_CLASS
+						|| (t.getSetup().getParent() == null && t.getServerConfig().getServerStarts() == Configuration.ServerStarts.PARENT_CONFIGURATION)) {
 					try {
 						t.stop();
 					} catch (Exception ex) {
@@ -136,7 +147,7 @@ public class Interceptors {
 			 */
 			@RuntimeType
 			public static void before(@This Testosterone orig) {
-				if (orig.getConfiguration().getServerStarts() == Configuration.ServerStarts.PER_TEST) {
+				if (orig.getServerConfig().getServerStarts() == Configuration.ServerStarts.PER_TEST) {
 					try {
 						orig.start();
 					} catch (Exception ex) {
@@ -170,7 +181,7 @@ public class Interceptors {
 			 */
 			@RuntimeType
 			public static void after(@This Testosterone orig) {
-				if (orig.getConfiguration().getServerStarts() == Configuration.ServerStarts.PER_TEST) {
+				if (orig.getServerConfig().getServerStarts() == Configuration.ServerStarts.PER_TEST) {
 					try {
 						orig.stop();
 					} catch (Exception ex) {
@@ -210,7 +221,7 @@ public class Interceptors {
 			@RuntimeType
 			public static Object test(@SuperCall Callable<?> zuper, @AllArguments Object[] args, @Origin Method method, @This Testosterone orig) throws Throwable {
 
-				ServerConfig config = orig.getConfiguration();
+				ServerConfig config = orig.getServerConfig();
 				Testosterone testingObject = config.getTestObject();
 				Testosterone resourceObject = config.getResourceObject();
 

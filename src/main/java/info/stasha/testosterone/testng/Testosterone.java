@@ -8,6 +8,7 @@ import org.testng.ITestObjectFactory;
 import org.testng.annotations.ObjectFactory;
 
 /**
+ * TestNG Testosterone
  *
  * @author stasha
  */
@@ -18,12 +19,17 @@ public interface Testosterone extends info.stasha.testosterone.jersey.Testostero
 		return new TestObjectFactory();
 	}
 
+	/**
+	 * Factory for creating new test class instances.
+	 *
+	 * @return
+	 */
 	public static class TestObjectFactory implements IObjectFactory2 {
 
 		@Override
 		public Object newInstance(Class<?> cls) {
 			try {
-				return Instrument.testClass(cls).newInstance();
+				return Instrument.testClass(cls, new AfterClassAnnotation()).newInstance();
 			} catch (Throwable ex) {
 				Logger.getLogger(TestObjectFactory.class.getName()).log(Level.SEVERE, null, ex);
 			}

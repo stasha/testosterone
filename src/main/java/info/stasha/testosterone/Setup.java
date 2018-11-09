@@ -1,38 +1,52 @@
 package info.stasha.testosterone;
 
+import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.jersey.Testosterone;
+import javax.ws.rs.core.Context;
+import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.jersey.server.monitoring.ApplicationEvent;
+import org.glassfish.jersey.server.monitoring.ApplicationEventListener;
+import org.glassfish.jersey.server.monitoring.RequestEvent;
+import org.glassfish.jersey.server.monitoring.RequestEventListener;
+import org.jvnet.hk2.annotations.Service;
 
 /**
- * Container holding different "metadata" belonging to single Testosterone
+ * Container holding different "metadata" belonging to single test class
  * instance.
  *
  * @author stasha
  */
-public class Setup {
+@Service
+public class Setup implements ApplicationEventListener {
 
-	private Setup parent;
-	private final boolean suite;
-	private final Testosterone testosterone;
-	private final ServerConfig configuration;
-	private TestExecutorImpl executor;
+	@Context
+	private ServiceLocator locator;
+
+	protected Setup parent;
+	protected boolean suite;
+	protected final Testosterone testosterone;
+	protected final ServerConfig serverConfig;
+	protected DbConfig dbConfig;
+	protected boolean beforeServerStart;
+	protected boolean afterServerStart;
+	protected boolean beforeServerStop;
+	protected boolean afterServerStop;
 
 	/**
 	 * Creates TestosteroneSetup.
 	 *
 	 * @param testosterone
-	 * @param configuration
-	 * @param isSuite
+	 * @param serverConfig
 	 */
-	public Setup(Testosterone testosterone, ServerConfig configuration, boolean isSuite) {
+	public Setup(Testosterone testosterone, ServerConfig serverConfig) {
 		if (testosterone == null) {
 			throw new IllegalArgumentException("Testosterone instance can't be null");
 		}
-		if (configuration == null) {
+		if (serverConfig == null) {
 			throw new IllegalArgumentException("Configuration instance can't be null");
 		}
 		this.testosterone = testosterone;
-		this.configuration = configuration;
-		this.suite = isSuite;
+		this.serverConfig = serverConfig;
 	}
 
 	/**
@@ -45,12 +59,30 @@ public class Setup {
 	}
 
 	/**
-	 * Returns configuration used by testosterone test class.
+	 * Returns serverConfig used by testosterone test class.
 	 *
 	 * @return
 	 */
-	public ServerConfig getConfiguration() {
-		return configuration;
+	public ServerConfig getServerConfig() {
+		return serverConfig;
+	}
+
+	/**
+	 * Returns DB configuration.
+	 *
+	 * @return
+	 */
+	public DbConfig getDbConfig() {
+		return dbConfig;
+	}
+
+	/**
+	 * Sets DB configuration.
+	 *
+	 * @param dbConfig
+	 */
+	public void setDbConfig(DbConfig dbConfig) {
+		this.dbConfig = dbConfig;
 	}
 
 	/**
@@ -78,6 +110,130 @@ public class Setup {
 	 */
 	public boolean isSuite() {
 		return suite;
+	}
+
+	/**
+	 * Invokes beforeServerStart on passed object.
+	 *
+	 * @param orig
+	 * @throws Exception
+	 */
+	public void beforeServerStart(Testosterone orig) throws Exception {
+		if (!this.beforeServerStart) {
+			this.beforeServerStart = true;
+			orig.beforeServerStart();
+		}
+	}
+
+	/**
+	 * Invokes afterServerStart on passed object.
+	 *
+	 * @param orig
+	 * @throws Exception
+	 */
+	public void afterServerStart(Testosterone orig) throws Exception {
+		if (!this.afterServerStart) {
+			this.afterServerStart = true;
+			orig.afterServerStart();
+		}
+	}
+
+	/**
+	 * Invokes beforeServerStop on passed object.
+	 *
+	 * @param orig
+	 * @throws Exception
+	 */
+	public void beforeServerStop(Testosterone orig) throws Exception {
+		if (!this.beforeServerStop) {
+			this.beforeServerStop = true;
+			orig.beforeServerStop();
+		}
+	}
+
+	/**
+	 * Invokes afterServerStop on passed object.
+	 *
+	 * @param orig
+	 * @throws Exception
+	 */
+	public void afterServerStop(Testosterone orig) throws Exception {
+		if (!this.afterServerStop) {
+			this.afterServerStop = true;
+			orig.afterServerStop();
+		}
+	}
+
+	/**
+	 * Returns if beforeServerStart was invoked.
+	 *
+	 * @return
+	 */
+	public boolean isBeforeServerStart() {
+		return beforeServerStart;
+	}
+
+	/**
+	 * Returns if afterServerStart was invoked.
+	 *
+	 * @return
+	 */
+	public boolean isAfterServerStart() {
+		return afterServerStart;
+	}
+
+	/**
+	 * Returns if beforeServerStop was invoked.
+	 *
+	 * @return
+	 */
+	public boolean isBeforeServerStop() {
+		return beforeServerStop;
+	}
+
+	/**
+	 * Returns if afterServerStop was invoked.
+	 *
+	 * @return
+	 */
+	public boolean isAfterServerStop() {
+		return afterServerStop;
+	}
+
+	/**
+	 * Clears all start/stop flags
+	 */
+	public void clearFlags() {
+		this.beforeServerStart = false;
+		this.afterServerStart = false;
+		this.beforeServerStop = false;
+		this.afterServerStop = false;
+	}
+
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @param ae
+	 */
+	@Override
+	public void onEvent(ApplicationEvent ae) {
+		if (locator != null
+				&& this.testosterone != null
+				&& ae.getType() != ApplicationEvent.Type.INITIALIZATION_START) {
+			
+			locator.inject(this.testosterone);
+		}
+	}
+
+	/**
+	 * {@inheritDoc }
+	 *
+	 * @param re
+	 * @return
+	 */
+	@Override
+	public RequestEventListener onRequest(RequestEvent re) {
+		return null;
 	}
 
 }

@@ -5,7 +5,8 @@
  */
 package info.stasha.testosterone.annotation;
 
-import info.stasha.testosterone.jersey.JettyServerConfig;
+import info.stasha.testosterone.ConfigFactory;
+import info.stasha.testosterone.jersey.JettyConfigFactory;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -55,7 +56,7 @@ public @interface Configuration {
 	 *
 	 * @return
 	 */
-	Class<?> configuration() default JettyServerConfig.class;
+	Class<? extends ConfigFactory> configuration() default JettyConfigFactory.class;
 
 	/**
 	 * Server base uri.

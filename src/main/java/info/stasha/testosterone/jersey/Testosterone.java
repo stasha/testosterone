@@ -7,6 +7,13 @@ import org.glassfish.jersey.server.ResourceConfig;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
 import info.stasha.testosterone.ServerConfig;
 import info.stasha.testosterone.ConfigFactory;
+import info.stasha.testosterone.annotation.Configuration;
+import info.stasha.testosterone.db.H2ConnectionFactory;
+import java.sql.Connection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.inject.Singleton;
+import org.glassfish.jersey.process.internal.RequestScoped;
 
 /**
  * Interface that should be implemented by every JUnit4 test class that needs
@@ -15,13 +22,22 @@ import info.stasha.testosterone.ConfigFactory;
  * @author stasha
  */
 public interface Testosterone {
-	
+
 	/**
 	 * Returns testosterone configuration factory.
 	 *
 	 * @return
 	 */
 	default ConfigFactory getConfigFactory() {
+		Configuration conf = Testosterone.this.getClass().getAnnotation(Configuration.class);
+		if (conf != null && conf.configuration() != null) {
+			try {
+				return conf.configuration().newInstance();
+			} catch (InstantiationException | IllegalAccessException ex) {
+				Logger.getLogger(Testosterone.class.getName()).log(Level.SEVERE, null, ex);
+			}
+		}
+
 		return new JettyConfigFactory();
 	}
 
@@ -39,8 +55,8 @@ public interface Testosterone {
 	 *
 	 * @return
 	 */
-	default ServerConfig getConfiguration() {
-		return getSetup().getConfiguration();
+	default ServerConfig getServerConfig() {
+		return getSetup().getServerConfig();
 	}
 
 	/**
@@ -49,7 +65,7 @@ public interface Testosterone {
 	 * @return
 	 */
 	default WebTarget target() {
-		return getConfiguration().target();
+		return getServerConfig().target();
 	}
 
 	/**
@@ -78,10 +94,21 @@ public interface Testosterone {
 		config.getResourceConfig().register(new AbstractBinder() {
 			@Override
 			protected void configure() {
+				//
+				this.bindFactory(H2ConnectionFactory.class, Singleton.class)
+						.to(Connection.class)
+						.in(RequestScoped.class)
+						.proxy(true)
+						.proxyForSameScope(false);
+
 				// invokes method for configuring AbstractBinder
 				Testosterone.this.configure(this);
 			}
 		});
+		// registering setup so it can listen for application events
+		config.getResourceConfig().register(getSetup());
+		// registering db config so db is started/stopped with jersey application
+		config.getResourceConfig().register(getSetup().getDbConfig());
 		// initializes configuration
 		config.initConfiguration(this);
 	}
@@ -92,16 +119,17 @@ public interface Testosterone {
 	 * @throws Exception
 	 */
 	default void start() throws Exception {
-		if (!getConfiguration().isRunning()) {
+		if (!getServerConfig().isRunning()) {
 			System.out.println("");
 			// initializes configuration
-			initConfiguration(getConfiguration());
+			initConfiguration(getServerConfig());
 			// runs before server start method
-			beforeServerStart();
+			getSetup().beforeServerStart(this);
 			// starts server
-			getConfiguration().start();
-			// runs after server start method
-			afterServerStart();
+			getServerConfig().start();
+			// after server start is called by __postconstruct__ method 
+			// from instrumentation
+//			afterServerStart();
 		}
 	}
 
@@ -111,13 +139,15 @@ public interface Testosterone {
 	 * @throws Exception
 	 */
 	default void stop() throws Exception {
-		if (getConfiguration().isRunning()) {
+		if (getServerConfig().isRunning()) {
 			// runs before server stop method
-			beforeServerStop();
+			getSetup().beforeServerStop(this);
 			// stops server
-			getConfiguration().stop();
+			getServerConfig().stop();
 			// runs after server stop method
-			afterServerStop();
+			getSetup().afterServerStop(this);
+			getSetup().clearFlags();
+
 			System.out.println("");
 		}
 	}
@@ -162,31 +192,40 @@ public interface Testosterone {
 
 	/**
 	 * Override this method if you need to do stuff before server starts.
+	 *
+	 * @throws java.lang.Exception
 	 */
-	default void beforeServerStart() {
+	default void beforeServerStart() throws Exception {
 
 	}
 
 	/**
 	 * Override this method if you need to do stuff immediately after server
-	 * starts.
+	 * starts.<br>
+	 * Note that in this point object is fully constructed including injections.
+	 *
+	 * @throws java.lang.Exception
 	 */
-	default void afterServerStart() {
+	default void afterServerStart() throws Exception {
 
 	}
 
 	/**
 	 * Override this method if you need to do stuff before server stops.
+	 *
+	 * @throws java.lang.Exception
 	 */
-	default void beforeServerStop() {
+	default void beforeServerStop() throws Exception {
 
 	}
 
 	/**
 	 * Override this method if you need to do stuff immediately after server
 	 * stops.
+	 *
+	 * @throws java.lang.Exception
 	 */
-	default void afterServerStop() {
+	default void afterServerStop() throws Exception {
 
 	}
 

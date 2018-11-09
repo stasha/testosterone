@@ -44,7 +44,7 @@ public class ExecutionListener implements TestExecutionListener {
 				}
 			}
 			if (Testosterone.class.isAssignableFrom(cls)) {
-				return Instrument.testClass(cls);
+				return Instrument.testClass(cls, new AfterAllAnnotation());
 			}
 		}
 
