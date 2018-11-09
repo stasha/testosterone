@@ -41,7 +41,7 @@ public interface ServerConfig {
 	 *
 	 * @return
 	 */
-	Set<Throwable> getMessages();
+	Set<Throwable> getExceptions();
 
 	/**
 	 * Returns ResourceConfig instance.
@@ -190,6 +190,6 @@ public interface ServerConfig {
 	 *
 	 * @throws Throwable
 	 */
-	void throwErrorMessage() throws Throwable;
+	void throwExceptions() throws Throwable;
 
 }

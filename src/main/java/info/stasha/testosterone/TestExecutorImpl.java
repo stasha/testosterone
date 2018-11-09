@@ -210,7 +210,7 @@ public class TestExecutorImpl implements TestExecutor {
 							throw new Error(EXECUTION_ERROR_MESSAGE + " " + ex.getMessage());
 						}
 					} catch (Error ex) {
-						if (target.getServerConfig().getMessages().isEmpty()) {
+						if (target.getServerConfig().getExceptions().isEmpty()) {
 							System.out.println(ex.getMessage());
 							throw new Error(ex.getMessage());
 						}

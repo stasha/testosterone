@@ -32,7 +32,7 @@ public class GrizzlyServerConfig implements ServerConfig {
 	protected int port = 9999;
 	protected ServerStarts serverStarts = ServerStarts.PARENT_CONFIGURATION;
 
-	protected final Set<Throwable> messages = new LinkedHashSet<>();
+	protected final Set<Throwable> exceptions = new LinkedHashSet<>();
 	protected final List<Throwable> expectedException = new ArrayList<>();
 	protected ServletContainerConfig servletContainerConfig = new ServletContainerConfig();
 
@@ -110,8 +110,8 @@ public class GrizzlyServerConfig implements ServerConfig {
 	 * @return
 	 */
 	@Override
-	public Set<Throwable> getMessages() {
-		return messages;
+	public Set<Throwable> getExceptions() {
+		return exceptions;
 	}
 
 	/**
@@ -120,9 +120,9 @@ public class GrizzlyServerConfig implements ServerConfig {
 	 * @throws Throwable
 	 */
 	@Override
-	public void throwErrorMessage() throws Throwable {
-		if (getMessages().size() > 0) {
-			throw getMessages().iterator().next();
+	public void throwExceptions() throws Throwable {
+		if (getExceptions().size() > 0) {
+			throw getExceptions().iterator().next();
 		}
 	}
 

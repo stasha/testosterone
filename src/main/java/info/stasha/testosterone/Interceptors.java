@@ -257,11 +257,11 @@ public class Interceptors {
 						resourceObject.getConfigFactory().getTestExecutor(resourceMethod, resourceObject).execute();
 
 						// if any, throw errors produced by test method
-						config.throwErrorMessage();
+						config.throwExceptions();
 
 					} finally {
 						// clear junit errors
-						config.getMessages().clear();
+						config.getExceptions().clear();
 					}
 
 				} else {
@@ -287,7 +287,7 @@ public class Interceptors {
 						}
 
 						// storing error to messages so they can be thrown in main JUnit thread
-						config.getMessages().add(ex);
+						config.getExceptions().add(ex);
 
 					}
 				}
