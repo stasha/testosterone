@@ -2,10 +2,13 @@ package info.stasha.testosterone;
 
 import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.jersey.Testosterone;
+import java.io.IOException;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Context;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.server.monitoring.ApplicationEvent;
-import org.glassfish.jersey.server.monitoring.ApplicationEventListener;
 import org.glassfish.jersey.server.monitoring.RequestEvent;
 import org.glassfish.jersey.server.monitoring.RequestEventListener;
 import org.jvnet.hk2.annotations.Service;
@@ -17,7 +20,7 @@ import org.jvnet.hk2.annotations.Service;
  * @author stasha
  */
 @Service
-public class Setup implements ApplicationEventListener {
+public class Setup implements ContainerResponseFilter {
 
 	@Context
 	private ServiceLocator locator;
@@ -210,30 +213,11 @@ public class Setup implements ApplicationEventListener {
 		this.afterServerStop = false;
 	}
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @param ae
-	 */
 	@Override
-	public void onEvent(ApplicationEvent ae) {
-		if (locator != null
-				&& this.testosterone != null
-				&& ae.getType() != ApplicationEvent.Type.INITIALIZATION_START) {
-			
-			locator.inject(this.testosterone);
+	public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
+		if (locator != null && testosterone != null) {
+			locator.inject(testosterone);
 		}
-	}
-
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @param re
-	 * @return
-	 */
-	@Override
-	public RequestEventListener onRequest(RequestEvent re) {
-		return null;
 	}
 
 }

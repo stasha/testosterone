@@ -103,6 +103,11 @@ public class Interceptors {
 					try {
 						t.start();
 					} catch (Exception ex) {
+						try {
+							t.stop();
+						} catch (Exception ex1) {
+							Logger.getLogger(Interceptors.class.getName()).log(Level.SEVERE, null, ex1);
+						}
 						Logger.getLogger(Interceptors.class.getName()).log(Level.SEVERE, null, ex);
 					}
 				}
@@ -151,6 +156,11 @@ public class Interceptors {
 					try {
 						orig.start();
 					} catch (Exception ex) {
+						try {
+							orig.stop();
+						} catch (Exception ex1) {
+							Logger.getLogger(Interceptors.class.getName()).log(Level.SEVERE, null, ex1);
+						}
 						Logger.getLogger(Interceptors.class.getName()).log(Level.SEVERE, null, ex);
 					}
 				}
