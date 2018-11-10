@@ -4,11 +4,11 @@ import info.stasha.testosterone.Setup;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.ServerConfig;
 import info.stasha.testosterone.ConfigFactory;
+import info.stasha.testosterone.Utils;
 import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.db.H2Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.event.Level;
 
 /**
  * Factory for creating Jersey server configuration.
@@ -72,17 +72,10 @@ public class JerseyConfigFactory implements ConfigFactory {
 		if (!SETUP.containsKey(getKey(obj))) {
 			LOGGER.info("Creating new Setup for {}.", getKey(obj));
 			try {
-				Configuration ca = obj.getClass().getAnnotation(Configuration.class);
-				if (ca == null) {
-					//TODO: fix this so it searches all superclasses not just first one
-					for (Class<?> cls : obj.getClass().getSuperclass().getInterfaces()) {
-						if (cls.isAnnotationPresent(Configuration.class)) {
-							ca = cls.getAnnotation(Configuration.class);
-						}
-					}
-				}
 				ConfigFactory configFactory;
 				ServerConfig serverConfig;
+
+				Configuration ca = (Configuration) Utils.getAnnotation(obj, Configuration.class);
 				if (ca != null) {
 					configFactory = ca.configuration().newInstance();
 					LOGGER.info("Creating new ConfigFactory {} specified in @Configuration.", configFactory.getClass().getName());

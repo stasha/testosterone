@@ -7,6 +7,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
 import info.stasha.testosterone.ServerConfig;
 import info.stasha.testosterone.ConfigFactory;
+import info.stasha.testosterone.Utils;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.db.H2ConnectionFactory;
 import java.sql.Connection;
@@ -22,7 +23,7 @@ import org.slf4j.LoggerFactory;
  * @author stasha
  */
 public interface Testosterone {
-	
+
 	static final Logger LOGGER = LoggerFactory.getLogger(Testosterone.class);
 
 	/**
@@ -130,9 +131,13 @@ public interface Testosterone {
 			getSetup().beforeServerStart(this);
 			// starts server
 			getServerConfig().start();
-			// after server start is called by __postconstruct__ method 
-			// from instrumentation
-//			afterServerStart();
+
+			// Invoke afterServerStart only if resource is singleton.
+			// If there is no Singleton annotation, afterServerStart is 
+			// invoked by @PostConstruct interceptor
+			if (Utils.isAnnotationPresent(this, Singleton.class)) {
+				getSetup().afterServerStart(this);
+			}
 		}
 	}
 

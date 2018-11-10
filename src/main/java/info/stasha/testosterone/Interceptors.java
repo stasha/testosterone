@@ -61,12 +61,10 @@ public class Interceptors {
 	 * @param clazz
 	 */
 	public static void beforeClass(Class<? extends Testosterone> clazz) {
-		Testosterone t = Utils.getTestosterone(clazz);
-		if (t.getSetup().isSuite()
-				|| t.getServerConfig().getServerStarts() == StartServer.PER_CLASS
-				|| (t.getSetup().getParent() == null && t.getServerConfig().getServerStarts() == StartServer.BY_PARENT)) {
-			LOGGER.info("Starting server configured with: {}", t.getServerConfig().getServerStarts());
-			start(t);
+		StartServer s = Utils.getServerStarts(clazz);
+		if (s == StartServer.BY_PARENT || s == StartServer.PER_CLASS) {
+			LOGGER.info("Starting server configured with: {}", s);
+			start(Utils.getTestosterone(clazz));
 		}
 	}
 
@@ -76,15 +74,10 @@ public class Interceptors {
 	 * @param clazz
 	 */
 	public static void afterClass(Class<? extends Testosterone> clazz) {
-		Testosterone t = Utils.getTestosterone(clazz);
-		if (t.getSetup().isSuite()
-				|| t.getServerConfig().getServerStarts() == StartServer.PER_CLASS
-				|| (t.getSetup().getParent() == null && t.getServerConfig().getServerStarts() == StartServer.BY_PARENT)) {
-
-			if (t.getServerConfig().isRunning()) {
-				LOGGER.info("Stopping server configured with: {}", t.getServerConfig().getServerStarts());
-				stop(t);
-			}
+		StartServer s = Utils.getServerStarts(clazz);
+		if (s == StartServer.BY_PARENT || s == StartServer.PER_CLASS) {
+			LOGGER.info("Stopping server configured with: {}", s);
+			stop(Utils.getTestosterone(clazz));
 		}
 	}
 
@@ -104,7 +97,7 @@ public class Interceptors {
 	 */
 	public static void before(@This Testosterone orig) {
 		if (orig.getServerConfig().getServerStarts() == StartServer.PER_TEST) {
-			LOGGER.info("Starting server configured with: {}", orig.getServerConfig().getServerStarts());
+			LOGGER.info("Starting server {} configuration", orig.getServerConfig().getServerStarts());
 			start(orig);
 		}
 	}
@@ -125,7 +118,7 @@ public class Interceptors {
 	 */
 	public static void after(@This Testosterone orig) {
 		if (orig.getServerConfig().getServerStarts() == StartServer.PER_TEST) {
-			LOGGER.info("Stopping server configured with: {}", orig.getServerConfig().getServerStarts());
+			LOGGER.info("Stopping server {} configuration", orig.getServerConfig().getServerStarts());
 			stop(orig);
 		}
 	}

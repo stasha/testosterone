@@ -1,5 +1,6 @@
 package info.stasha.testosterone;
 
+import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.jersey.Testosterone;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -62,6 +63,88 @@ public class Utils {
 			throw new RuntimeException(ex);
 		}
 		return t;
+	}
+
+	/**
+	 * Returns Annotation from class, super class or implemented interfaces.
+	 *
+	 * @param o
+	 * @param annotation
+	 * @return
+	 */
+	public static Annotation getAnnotation(Object o, Class<? extends Annotation> annotation) {
+		return getAnnotation(o.getClass(), annotation);
+	}
+
+	/**
+	 * Returns Annotation from class, super class or implemented interfaces.
+	 *
+	 * @param clazz
+	 * @param annotation
+	 * @return
+	 */
+	public static Annotation getAnnotation(Class<?> clazz, Class<? extends Annotation> annotation) {
+
+		while (clazz != null) {
+			for (Annotation a : clazz.getDeclaredAnnotations()) {
+				if (a.annotationType().equals(annotation)) {
+					return a;
+				}
+			}
+
+			for (Class<?> interfaze : clazz.getInterfaces()) {
+				for (Annotation a : interfaze.getDeclaredAnnotations()) {
+					if (a.annotationType().equals(annotation)) {
+						return a;
+					}
+				}
+			}
+
+			clazz = clazz.getSuperclass();
+		}
+		return null;
+	}
+
+	/**
+	 * Returns true/false if annotation is present on specified object.
+	 *
+	 * @param o
+	 * @param annotation
+	 * @return
+	 */
+	public static boolean isAnnotationPresent(Object o, Class<? extends Annotation> annotation) {
+		return getAnnotation(o, annotation) != null;
+	}
+
+	/**
+	 * Returns true/false if annotation is present on specified class
+	 *
+	 * @param clazz
+	 * @param annotation
+	 * @return
+	 */
+	public static boolean isAnnotationPresent(Class<?> clazz, Class<? extends Annotation> annotation) {
+		return getAnnotation(clazz, annotation) != null;
+	}
+
+	/**
+	 * Returns when server should start.
+	 *
+	 * @param clazz
+	 * @return
+	 */
+	public static StartServer getServerStarts(Class<? extends Testosterone> clazz) {
+		Setup setup = ConfigFactory.SETUP.get(clazz.getName());
+		Testosterone t = setup != null ? setup.getTestosterone() : null;
+
+		if (t == null) {
+			Configuration config = clazz.getAnnotation(Configuration.class
+			);
+			if (config != null) {
+				return config.serverStarts();
+			}
+		}
+		return StartServer.BY_PARENT;
 	}
 
 	/**

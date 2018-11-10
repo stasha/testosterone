@@ -18,6 +18,8 @@ import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import info.stasha.testosterone.ServerConfig;
 import info.stasha.testosterone.StartServer;
+import info.stasha.testosterone.Utils;
+import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * @author stasha
  */
 public class GrizzlyServerConfig implements ServerConfig {
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(GrizzlyServerConfig.class);
 
 	protected String baseUri = "http://localhost/";
@@ -310,7 +312,11 @@ public class GrizzlyServerConfig implements ServerConfig {
 	@Override
 	public void initConfiguration(Testosterone obj) {
 		this.resourceObject = obj;
-		this.resourceConfig.register(obj.getClass());
+		if (Utils.isAnnotationPresent(obj, Singleton.class)) {
+			this.resourceConfig.register(obj);
+		} else {
+			this.resourceConfig.register(obj.getClass());
+		}
 
 		init();
 	}
