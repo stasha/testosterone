@@ -103,7 +103,7 @@ public class H2Config implements DbConfig, ApplicationEventListener {
 	 */
 	@Override
 	public void start() throws Exception {
-		LOGGER.error("Starting H2 DB.");
+		LOGGER.info("Starting H2 DB.");
 		getDataSource();
 	}
 
@@ -114,7 +114,7 @@ public class H2Config implements DbConfig, ApplicationEventListener {
 	 */
 	@Override
 	public void stop() throws Exception {
-		LOGGER.error("Stopping H2 DB.");
+		LOGGER.info("Stopping H2 DB.");
 		getConnection().prepareStatement("shutdown").execute();
 		this.connectionPool.dispose();
 		this.dataSource = null;
