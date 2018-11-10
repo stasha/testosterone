@@ -9,6 +9,8 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.Context;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.jvnet.hk2.annotations.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Container holding different "metadata" belonging to single test class
@@ -18,6 +20,8 @@ import org.jvnet.hk2.annotations.Service;
  */
 @Service
 public class Setup implements ContainerResponseFilter {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(Setup.class);
 
 	@Context
 	private ServiceLocator locator;
@@ -121,6 +125,7 @@ public class Setup implements ContainerResponseFilter {
 	public void beforeServerStart(Testosterone orig) throws Exception {
 		if (!this.beforeServerStart) {
 			this.beforeServerStart = true;
+			LOGGER.info("Invoking beforeServerStart.");
 			orig.beforeServerStart();
 		}
 	}
@@ -134,6 +139,7 @@ public class Setup implements ContainerResponseFilter {
 	public void afterServerStart(Testosterone orig) throws Exception {
 		if (!this.afterServerStart) {
 			this.afterServerStart = true;
+			LOGGER.info("Invoking afterServerStart.");
 			orig.afterServerStart();
 		}
 	}
@@ -147,6 +153,7 @@ public class Setup implements ContainerResponseFilter {
 	public void beforeServerStop(Testosterone orig) throws Exception {
 		if (!this.beforeServerStop) {
 			this.beforeServerStop = true;
+			LOGGER.info("Invoking beforeServerStop.");
 			orig.beforeServerStop();
 		}
 	}
@@ -160,6 +167,7 @@ public class Setup implements ContainerResponseFilter {
 	public void afterServerStop(Testosterone orig) throws Exception {
 		if (!this.afterServerStop) {
 			this.afterServerStop = true;
+			LOGGER.info("Invoking afterServerStop.");
 			orig.afterServerStop();
 		}
 	}
@@ -204,6 +212,7 @@ public class Setup implements ContainerResponseFilter {
 	 * Clears all start/stop flags
 	 */
 	public void clearFlags() {
+		LOGGER.debug("Clearing all flags.");
 		this.beforeServerStart = false;
 		this.afterServerStart = false;
 		this.beforeServerStop = false;

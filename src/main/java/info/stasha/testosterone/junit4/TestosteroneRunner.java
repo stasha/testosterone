@@ -13,6 +13,8 @@ import info.stasha.testosterone.jersey.Testosterone;
 import org.junit.runner.notification.RunListener;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test runner for running JerseyRequestTests.
@@ -20,6 +22,8 @@ import org.junit.runners.model.Statement;
  * @author stasha
  */
 public class TestosteroneRunner extends BlockJUnit4ClassRunner {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(TestosteroneRunner.class);
 
 	protected Class<? extends Testosterone> testClass;
 	protected Class<? extends Testosterone> cls;
@@ -40,7 +44,7 @@ public class TestosteroneRunner extends BlockJUnit4ClassRunner {
 			try {
 				method.invokeExplosively(target, new Object[method.getMethod().getParameterCount()]);
 			} catch (IllegalArgumentException ex) {
-				System.out.println("Failed to invoke from runner");
+				LOGGER.error("Failed to invoke test {}.", method.getName());
 				throw ex;
 			}
 		}
@@ -76,14 +80,14 @@ public class TestosteroneRunner extends BlockJUnit4ClassRunner {
 	protected Description describeChild(FrameworkMethod method) {
 		return Description.createTestDescription(this.testClass, testName(method), method.getAnnotations());
 	}
-	
+
 	@Override
 	public void run(RunNotifier notifier) {
 		RunListener l = new ExecutionListener();
-        notifier.addListener(l);
-        notifier.fireTestRunStarted(getDescription());
-        super.run(notifier);
+		notifier.addListener(l);
+		notifier.fireTestRunStarted(getDescription());
+		super.run(notifier);
 		notifier.removeListener(l);
-    }
+	}
 
 }

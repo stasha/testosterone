@@ -1,8 +1,7 @@
 package info.stasha.testosterone.jersey;
 
 import info.stasha.testosterone.servlet.ServletContainerConfig;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.EventListener;
 import javax.servlet.Filter;
 import javax.servlet.Servlet;
 import org.eclipse.jetty.server.Server;
@@ -10,6 +9,8 @@ import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.servlet.ServletContainer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Configuration for running Jersey app within Jetty server.
@@ -18,7 +19,8 @@ import org.glassfish.jersey.servlet.ServletContainer;
  */
 public class JettyServerConfig extends GrizzlyServerConfig {
 
-	protected final ServletContainerConfig servletContainerConfig = new ServletContainerConfig();
+	private static final Logger LOGGER = LoggerFactory.getLogger(JettyServerConfig.class);
+
 	protected Server server;
 
 	/**
@@ -61,38 +63,48 @@ public class JettyServerConfig extends GrizzlyServerConfig {
 
 		// registering context params
 		servletContainerConfig.getContextParams().forEach((t, u) -> {
+			LOGGER.debug("Setting initial context param {}:{}", t, u);
 			context.setInitParameter(t, u);
 		});
 
 		// registering servlet listeners
 		servletContainerConfig.getListeners().forEach((t) -> {
+			EventListener listener;
 			if (t.getListener() == null) {
 				try {
-					context.addEventListener(t.getClazz().newInstance());
+					listener = t.getClazz().newInstance();
 				} catch (InstantiationException | IllegalAccessException ex) {
-					Logger.getLogger(JettyServerConfig.class.getName()).log(Level.SEVERE, null, ex);
+					LOGGER.error("Failed to create new listener.", ex);
+					throw new RuntimeException(ex);
 				}
 			} else {
-				context.addEventListener(t.getListener());
+				listener = t.getListener();
 			}
+
+			LOGGER.debug("Adding event listener {} to servlet container.", listener.getClass().getName());
+			context.addEventListener(listener);
 		});
 
 		// registering servlet filters
 		servletContainerConfig.getFilters().forEach((t) -> {
 			try {
 				FilterHolder fh = new FilterHolder();
+				Filter filter;
 				if (t.getFilter() == null) {
-					fh.setFilter((Filter) t.getClazz().newInstance());
+					filter = (Filter) t.getClazz().newInstance();
 				} else {
-					fh.setFilter(t.getFilter());
+					filter = t.getFilter();
 				}
+
+				LOGGER.debug("Adding filter {} to servlet container.", t.toString());
+				fh.setFilter(filter);
 				fh.setInitParameters(t.getInitParams());
 
 				for (String urlPattern : t.getUrlPattern()) {
 					context.addFilter(fh, urlPattern, t.getDispatchers());
 				}
 			} catch (InstantiationException | IllegalAccessException ex) {
-				Logger.getLogger(JettyServerConfig.class.getName()).log(Level.SEVERE, null, ex);
+				LOGGER.error("Failed to create new filter.", ex);
 				throw new RuntimeException(ex);
 			}
 		});
@@ -101,11 +113,15 @@ public class JettyServerConfig extends GrizzlyServerConfig {
 		servletContainerConfig.getServlets().forEach((t) -> {
 			try {
 				ServletHolder sh = new ServletHolder();
+				Servlet servlet;
 				if (t.getServlet() == null) {
-					sh.setServlet((Servlet) t.getClazz().newInstance());
+					servlet = (Servlet) t.getClazz().newInstance();
 				} else {
-					sh.setServlet(t.getServlet());
+					servlet = t.getServlet();
 				}
+
+				LOGGER.debug("Adding servlet {} to servlet container.", t.toString());
+				sh.setServlet(servlet);
 				sh.setInitOrder(t.getInitOrder());
 
 				sh.setInitParameters(t.getInitParams());
@@ -113,12 +129,13 @@ public class JettyServerConfig extends GrizzlyServerConfig {
 					context.addServlet(sh, urlPattern);
 				}
 			} catch (InstantiationException | IllegalAccessException ex) {
-				Logger.getLogger(JettyServerConfig.class.getName()).log(Level.SEVERE, null, ex);
+				LOGGER.error("Failed to create new servlet.", ex);
 				throw new RuntimeException(ex);
 			}
 		});
 
 		// registering Jersey servlet
+		LOGGER.debug("Adding jersey servlet with path: {} to servlet container.", servletContainerConfig.getJerseyServletPath());
 		ServletHolder holder = new ServletHolder();
 		holder.setServlet(new ServletContainer(this.resourceConfig));
 		holder.setInitOrder(1);
@@ -137,10 +154,11 @@ public class JettyServerConfig extends GrizzlyServerConfig {
 
 		if (server != null && !server.isRunning()) {
 			try {
-				System.out.println("Starting server: " + getBaseUri() + " for test: " + this.getResourceObject().getClass().getName());
+				LOGGER.info("Starting server at: {} for test {}", getBaseUri(), this.getResourceObject().getClass().getName());
 				server.start();
 			} catch (java.net.BindException ex) {
-				throw new RuntimeException("Server failed to start for resource: " + getResourceObject(), ex);
+				LOGGER.error("Server failed to start.", ex);
+				throw new RuntimeException(ex);
 			}
 		}
 	}
@@ -154,9 +172,13 @@ public class JettyServerConfig extends GrizzlyServerConfig {
 	public void stop() throws Exception {
 		cleanUp();
 		if (server != null && server.isRunning()) {
-			System.out.println("");
-			System.out.println("Stopping server " + getBaseUri() + " for test: " + this.getResourceObject().getClass().getName());
-			server.stop();
+			LOGGER.info("Stopping server at: {} for test {}", getBaseUri(), this.getResourceObject().getClass().getName());
+			try {
+				server.stop();
+			} catch (Exception ex) {
+				LOGGER.error("Server failed to stop.", ex);
+				throw new RuntimeException(ex);
+			}
 		}
 	}
 

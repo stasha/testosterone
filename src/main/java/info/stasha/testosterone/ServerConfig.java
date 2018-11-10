@@ -1,6 +1,5 @@
 package info.stasha.testosterone;
 
-import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
 import java.util.Set;
@@ -148,14 +147,14 @@ public interface ServerConfig {
 	 *
 	 * @return
 	 */
-	Configuration.ServerStarts getServerStarts();
+	StartServer getServerStarts();
 
 	/**
 	 * Sets when server should start.
 	 *
 	 * @param serverStarts
 	 */
-	void setServerStarts(Configuration.ServerStarts serverStarts);
+	void setServerStarts(StartServer serverStarts);
 
 	/**
 	 * Starts server.

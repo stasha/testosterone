@@ -22,7 +22,7 @@ public class ExecutionListener implements ITestListener {
 	@Override
 	public void onStart(ITestContext itc) {
 		Class<? extends Testosterone> clazz = Instrument.getInstrumentedClass(itc.getAllTestMethods()[0].getRealClass());
-		Interceptors.Intercept.BeforeClass.beforeClass(clazz);
+		Interceptors.beforeClass(clazz);
 	}
 
 	/**
@@ -33,7 +33,7 @@ public class ExecutionListener implements ITestListener {
 	@Override
 	public void onFinish(ITestContext itc) {
 		Class<? extends Testosterone> clazz = Instrument.getInstrumentedClass(itc.getAllTestMethods()[0].getRealClass());
-		Interceptors.Intercept.AfterClass.afterClass(clazz);
+		Interceptors.afterClass(clazz);
 	}
 
 	/**
@@ -43,7 +43,7 @@ public class ExecutionListener implements ITestListener {
 	 */
 	@Override
 	public void onTestStart(ITestResult itr) {
-		Interceptors.Intercept.Before.before((Testosterone) itr.getInstance());
+		Interceptors.before((Testosterone) itr.getInstance());
 	}
 
 	/**
@@ -53,7 +53,7 @@ public class ExecutionListener implements ITestListener {
 	 */
 	@Override
 	public void onTestSuccess(ITestResult itr) {
-		Interceptors.Intercept.After.after((Testosterone) itr.getInstance());
+		Interceptors.after((Testosterone) itr.getInstance());
 	}
 
 	/**
@@ -63,7 +63,7 @@ public class ExecutionListener implements ITestListener {
 	 */
 	@Override
 	public void onTestFailure(ITestResult itr) {
-		Interceptors.Intercept.After.after((Testosterone) itr.getInstance());
+		Interceptors.after((Testosterone) itr.getInstance());
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class ExecutionListener implements ITestListener {
 	 */
 	@Override
 	public void onTestFailedButWithinSuccessPercentage(ITestResult itr) {
-		Interceptors.Intercept.After.after((Testosterone) itr.getInstance());
+		Interceptors.after((Testosterone) itr.getInstance());
 //		System.out.println(itr);
 	}
 

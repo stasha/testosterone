@@ -2,8 +2,6 @@ package info.stasha.testosterone.db;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sql.DataSource;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.jersey.server.monitoring.ApplicationEvent;
@@ -15,6 +13,8 @@ import org.glassfish.jersey.server.monitoring.RequestEventListener;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.h2.jdbcx.JdbcDataSource;
 import org.jvnet.hk2.annotations.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * H2 DbConfig implementation.
@@ -23,6 +23,8 @@ import org.jvnet.hk2.annotations.Service;
  */
 @Service
 public class H2Config implements DbConfig, ApplicationEventListener {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(H2Config.class);
 
 	protected String testDbName;
 	protected DataSource dataSource;
@@ -43,6 +45,7 @@ public class H2Config implements DbConfig, ApplicationEventListener {
 			ds.setPassword("sa");
 			dataSource = ds;
 			connectionPool = JdbcConnectionPool.create(ds);
+			LOGGER.info("Created new datasource {}", ds.toString());
 		}
 		return dataSource;
 	}
@@ -57,7 +60,7 @@ public class H2Config implements DbConfig, ApplicationEventListener {
 		try {
 			return connectionPool.getConnection();
 		} catch (SQLException ex) {
-			Logger.getLogger(H2Config.class.getName()).log(Level.SEVERE, null, ex);
+			LOGGER.error("Failed to obtain new connection from connection pool.");
 			throw new RuntimeException(ex);
 		}
 	}
@@ -72,8 +75,6 @@ public class H2Config implements DbConfig, ApplicationEventListener {
 		getDataSource();
 		return H2ConnectionFactory.class;
 	}
-	
-	
 
 	/**
 	 * {@inheritDoc }
@@ -102,6 +103,7 @@ public class H2Config implements DbConfig, ApplicationEventListener {
 	 */
 	@Override
 	public void start() throws Exception {
+		LOGGER.error("Starting H2 DB.");
 		getDataSource();
 	}
 
@@ -112,6 +114,7 @@ public class H2Config implements DbConfig, ApplicationEventListener {
 	 */
 	@Override
 	public void stop() throws Exception {
+		LOGGER.error("Stopping H2 DB.");
 		getConnection().prepareStatement("shutdown").execute();
 		this.connectionPool.dispose();
 		this.dataSource = null;
@@ -119,15 +122,20 @@ public class H2Config implements DbConfig, ApplicationEventListener {
 
 	@Override
 	public void onEvent(ApplicationEvent ae) {
-		try {
-			if (ae.getType() == INITIALIZATION_START) {
+		if (ae.getType() == INITIALIZATION_START) {
+			try {
 				start();
-			} else if (ae.getType() == DESTROY_FINISHED) {
-				stop();
+			} catch (Exception ex) {
+				LOGGER.error("Failed to start H2 DB");
+				throw new RuntimeException(ex);
 			}
-		} catch (Exception ex) {
-			Logger.getLogger(H2Config.class.getName()).log(Level.SEVERE, null, ex);
-			throw new RuntimeException(ex);
+		} else if (ae.getType() == DESTROY_FINISHED) {
+			try {
+				stop();
+			} catch (Exception ex) {
+				LOGGER.error("Failed to stop H2 DB");
+				throw new RuntimeException(ex);
+			}
 		}
 	}
 

@@ -187,4 +187,9 @@ public class Servlet {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "Servlet{" + "clazz=" + clazz + ", servlet=" + servlet + ", loadOnStartup=" + loadOnStartup + ", initOrder=" + initOrder + ", urlPattern=" + urlPattern + ", initParams=" + initParams + '}';
+	}
+
 }

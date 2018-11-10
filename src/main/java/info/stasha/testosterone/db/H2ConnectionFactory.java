@@ -2,11 +2,11 @@ package info.stasha.testosterone.db;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ws.rs.core.Context;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.jersey.server.CloseableService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Connection factory used for creating new connections when injecting ingo
@@ -18,6 +18,8 @@ import org.glassfish.jersey.server.CloseableService;
  */
 public class H2ConnectionFactory implements Factory<Connection> {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(H2ConnectionFactory.class);
+
 	@Context
 	private CloseableService cs;
 
@@ -28,14 +30,16 @@ public class H2ConnectionFactory implements Factory<Connection> {
 	public Connection provide() {
 
 		Connection conn = config.getConnection();
+		LOGGER.info("Creating new connection {}.", conn.toString());
 
 		cs.add(() -> {
 			try {
 				if (conn != null && !conn.isClosed()) {
 					conn.close();
+					LOGGER.info("Connection {} was successfully closed.", conn.toString());
 				}
 			} catch (SQLException ex) {
-				Logger.getLogger(H2ConnectionFactory.class.getName()).log(Level.SEVERE, null, ex);
+				LOGGER.error("Failed to close connection {}.", conn);
 				throw new RuntimeException(ex);
 			}
 		});

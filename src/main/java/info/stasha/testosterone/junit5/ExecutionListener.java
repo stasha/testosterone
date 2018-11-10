@@ -2,14 +2,14 @@ package info.stasha.testosterone.junit5;
 
 import info.stasha.testosterone.Instrument;
 import info.stasha.testosterone.Interceptors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.support.descriptor.ClassSource;
 import org.junit.platform.engine.support.descriptor.MethodSource;
 import org.junit.platform.launcher.TestExecutionListener;
 import org.junit.platform.launcher.TestIdentifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * JUnit5 test execution listener.<br>
@@ -24,6 +24,8 @@ import org.junit.platform.launcher.TestIdentifier;
  */
 public class ExecutionListener implements TestExecutionListener {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionListener.class);
+
 	/**
 	 * If available, returns instrumented test class.
 	 *
@@ -37,10 +39,12 @@ public class ExecutionListener implements TestExecutionListener {
 			if (ts instanceof ClassSource) {
 				cls = ((ClassSource) ts).getJavaClass();
 			} else if (ts instanceof MethodSource) {
+				String className = ((MethodSource) ts).getClassName();
 				try {
-					cls = Class.forName(((MethodSource) ts).getClassName());
+					cls = Class.forName(className);
 				} catch (ClassNotFoundException ex) {
-					Logger.getLogger(ExecutionListener.class.getName()).log(Level.SEVERE, null, ex);
+					LOGGER.error("Failed to load class: " + className, ex);
+					throw new RuntimeException(ex);
 				}
 			}
 			if (Testosterone.class.isAssignableFrom(cls)) {
@@ -60,9 +64,9 @@ public class ExecutionListener implements TestExecutionListener {
 	public void executionStarted(TestIdentifier testIdentifier) {
 		Class<? extends Testosterone> cls = getClass(testIdentifier);
 		if (testIdentifier.isContainer() && cls != null) {
-			Interceptors.Intercept.BeforeClass.beforeClass(cls);
+			Interceptors.beforeClass(cls);
 		} else if (testIdentifier.isTest()) {
-			Interceptors.Intercept.Before.before(cls);
+			Interceptors.before(cls);
 		}
 	}
 
@@ -76,9 +80,9 @@ public class ExecutionListener implements TestExecutionListener {
 	public void executionFinished(TestIdentifier testIdentifier, TestExecutionResult testExecutionResult) {
 		Class<? extends Testosterone> cls = getClass(testIdentifier);
 		if (testIdentifier.isContainer() && cls != null) {
-			Interceptors.Intercept.AfterClass.afterClass(cls);
+			Interceptors.afterClass(cls);
 		} else if (testIdentifier.isTest()) {
-			Interceptors.Intercept.After.after(cls);
+			Interceptors.after(cls);
 		}
 	}
 

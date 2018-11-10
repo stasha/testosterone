@@ -10,10 +10,10 @@ import info.stasha.testosterone.ConfigFactory;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.db.H2ConnectionFactory;
 import java.sql.Connection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.inject.Singleton;
 import org.glassfish.jersey.process.internal.RequestScoped;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Interface that should be implemented by every JUnit4 test class that needs
@@ -22,6 +22,8 @@ import org.glassfish.jersey.process.internal.RequestScoped;
  * @author stasha
  */
 public interface Testosterone {
+	
+	static final Logger LOGGER = LoggerFactory.getLogger(Testosterone.class);
 
 	/**
 	 * Returns testosterone configuration factory.
@@ -32,12 +34,14 @@ public interface Testosterone {
 		Configuration conf = Testosterone.this.getClass().getAnnotation(Configuration.class);
 		if (conf != null && conf.configuration() != null) {
 			try {
+//				LOGGER.info("Creating ConfigFactory {} from @Configuration annotation.", conf.configuration().getName());
 				return conf.configuration().newInstance();
 			} catch (InstantiationException | IllegalAccessException ex) {
-				Logger.getLogger(Testosterone.class.getName()).log(Level.SEVERE, null, ex);
+				LOGGER.error("Failed to create configuration from @Configuration annotation.");
 			}
 		}
 
+//		LOGGER.info("Creating default JettyConfigFactory");
 		return new JettyConfigFactory();
 	}
 
@@ -120,7 +124,6 @@ public interface Testosterone {
 	 */
 	default void start() throws Exception {
 		if (!getServerConfig().isRunning()) {
-			System.out.println("");
 			// initializes configuration
 			initConfiguration(getServerConfig());
 			// runs before server start method

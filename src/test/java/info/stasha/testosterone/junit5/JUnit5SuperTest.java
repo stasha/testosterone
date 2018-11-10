@@ -1,5 +1,6 @@
 package info.stasha.testosterone.junit5;
 
+import info.stasha.testosterone.StartServer;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.annotation.Request;
 import info.stasha.testosterone.junit4.jersey.service.Service;
@@ -19,7 +20,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author stasha
  */
-@Configuration(serverStarts = Configuration.ServerStarts.PER_CLASS)
+@Configuration(serverStarts = StartServer.PER_CLASS)
 public class JUnit5SuperTest implements Testosterone {
 	
 	@Override

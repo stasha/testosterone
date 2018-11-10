@@ -1,5 +1,6 @@
 package info.stasha.testosterone.junit5;
 
+import info.stasha.testosterone.StartServer;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.annotation.Request;
 import info.stasha.testosterone.junit4.jersey.service.Service;
@@ -17,7 +18,7 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Configuration(serverStarts = Configuration.ServerStarts.PER_CLASS)
+@Configuration(serverStarts = StartServer.PER_CLASS)
 public class JUnit5Test implements Testosterone {
 
 	@Override

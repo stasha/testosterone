@@ -2,13 +2,11 @@ package info.stasha.testosterone;
 
 import info.stasha.testosterone.annotation.Request;
 import com.mifmif.common.regex.Generex;
-import static info.stasha.testosterone.Interceptors.getMethodsAnnotatedWith;
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.annotation.RequestAnnotation;
 import info.stasha.testosterone.annotation.Requests;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.List;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
@@ -21,6 +19,8 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import org.glassfish.jersey.message.internal.MessageBodyProviderNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class responsible for invoking test method.
@@ -28,6 +28,8 @@ import org.glassfish.jersey.message.internal.MessageBodyProviderNotFoundExceptio
  * @author stasha
  */
 public class TestExecutorImpl implements TestExecutor {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(TestExecutorImpl.class);
 
 	private static final String EXECUTION_ERROR_MESSAGE = "Test failed with message: ";
 
@@ -59,9 +61,7 @@ public class TestExecutorImpl implements TestExecutor {
 			path = p.value();
 		}
 
-		System.out.println("");
-		System.out.println("Running: " + target.getClass().getName() + ":" + method.getName() + " - at path: " + path);
-		System.out.println("");
+		LOGGER.info("Running: {}:{} at path {}", target.getClass().getName(), method.getName(), path);
 
 		GET get = method.getAnnotation(GET.class);
 		POST post = method.getAnnotation(POST.class);
@@ -76,7 +76,7 @@ public class TestExecutorImpl implements TestExecutor {
 		Requests requestsAnnotation = method.getAnnotation(Requests.class);
 
 		if (requestAnnotatoin != null && requestsAnnotation != null) {
-			throw new IllegalStateException("You can use @Requests and @Request annotations on the same method: "
+			throw new IllegalStateException("@Requests and @Request annotations can't be used on same method: "
 					+ method.getName());
 		}
 
@@ -185,24 +185,14 @@ public class TestExecutorImpl implements TestExecutor {
 					for (Class<?> param : method.getParameterTypes()) {
 						if (param.equals(Response.class)) {
 							hasResponseParam = true;
-							List<Method> me = getMethodsAnnotatedWith(target.getClass(), method.getName() + "$accessor$");
-
-							me.get(0).setAccessible(true);
-							try {
-								me.get(0).invoke(target, resp);
-							} catch (IllegalArgumentException ex) {
-								System.out.println("Failed to invoke from invoker");
-								throw ex;
-							}
-//							method.invoke(target, resp);
+							Utils.invokeOriginalMethod(method, target, new Object[]{resp});
 						}
 					}
 
 					try {
 						try {
-//							System.out.println("-----");
-							System.out.println(resp);
-//							System.out.println("-----");
+							LOGGER.info("Response by executing {}:{}", target.getClass().getName(), method.getName());
+							LOGGER.info(resp.toString());
 							if (!hasResponseParam && resp.getStatus() > 400) {
 								throw new Error(EXECUTION_ERROR_MESSAGE + " " + resp);
 							}
@@ -211,7 +201,7 @@ public class TestExecutorImpl implements TestExecutor {
 						}
 					} catch (Error ex) {
 						if (target.getServerConfig().getExceptions().isEmpty()) {
-							System.out.println(ex.getMessage());
+							LOGGER.error("Response failed.", ex);
 							throw new Error(ex.getMessage());
 						}
 					}

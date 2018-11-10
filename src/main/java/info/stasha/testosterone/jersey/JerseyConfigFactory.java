@@ -2,12 +2,13 @@ package info.stasha.testosterone.jersey;
 
 import info.stasha.testosterone.Setup;
 import info.stasha.testosterone.annotation.Configuration;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import info.stasha.testosterone.ServerConfig;
 import info.stasha.testosterone.ConfigFactory;
 import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.db.H2Config;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
 /**
  * Factory for creating Jersey server configuration.
@@ -15,6 +16,8 @@ import info.stasha.testosterone.db.H2Config;
  * @author stasha
  */
 public class JerseyConfigFactory implements ConfigFactory {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(JerseyConfigFactory.class);
 
 	/**
 	 * Returns key used for storing setups.<br>
@@ -67,6 +70,7 @@ public class JerseyConfigFactory implements ConfigFactory {
 	@Override
 	public Setup getSetup(Testosterone obj) {
 		if (!SETUP.containsKey(getKey(obj))) {
+			LOGGER.info("Creating new Setup for {}.", getKey(obj));
 			try {
 				Configuration ca = obj.getClass().getAnnotation(Configuration.class);
 				if (ca == null) {
@@ -81,12 +85,14 @@ public class JerseyConfigFactory implements ConfigFactory {
 				ServerConfig serverConfig;
 				if (ca != null) {
 					configFactory = ca.configuration().newInstance();
+					LOGGER.info("Creating new ConfigFactory {} specified in @Configuration.", configFactory.getClass().getName());
 
 					serverConfig = configFactory.newServerConfig();
 					serverConfig.setBaseUri(ca.baseUri());
 					serverConfig.setPort(ca.port());
 					serverConfig.setServerStarts(ca.serverStarts());
 				} else {
+					LOGGER.info("Creating default JettyConfigFactory.");
 					configFactory = new JettyConfigFactory();
 					serverConfig = configFactory.newServerConfig();
 				}
@@ -97,7 +103,7 @@ public class JerseyConfigFactory implements ConfigFactory {
 				SETUP.put(getKey(obj), setup);
 
 			} catch (InstantiationException | IllegalAccessException ex) {
-				Logger.getLogger(Testosterone.class.getName()).log(Level.SEVERE, null, ex);
+				LOGGER.error("Failed to create Setup for class {}", getKey(obj));
 				throw new RuntimeException(ex);
 			}
 		}

@@ -13,6 +13,7 @@
                 <activatedProfile>testng</activatedProfile>
                 <activatedProfile>junit5</activatedProfile>
                 <activatedProfile>junit4</activatedProfile>
+                
             </activatedProfiles>
         </action>
     </actions>

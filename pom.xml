@@ -220,6 +220,9 @@
 			<version>${surefire-plugin.version}</version>
 			<configuration>
 			    <failIfNoTests>false</failIfNoTests>
+<!--			    <systemPropertyVariables>
+				<org.slf4j.simpleLogger.defaultLogLevel>trace</org.slf4j.simpleLogger.defaultLogLevel>
+			    </systemPropertyVariables>-->
 			</configuration>
 			<dependencies>
 			    <dependency>

@@ -1,6 +1,5 @@
 package info.stasha.testosterone.jersey;
 
-import info.stasha.testosterone.annotation.Configuration.ServerStarts;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -9,8 +8,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -20,6 +17,9 @@ import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import info.stasha.testosterone.ServerConfig;
+import info.stasha.testosterone.StartServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for configuring Jersey
@@ -27,10 +27,12 @@ import info.stasha.testosterone.ServerConfig;
  * @author stasha
  */
 public class GrizzlyServerConfig implements ServerConfig {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(GrizzlyServerConfig.class);
 
 	protected String baseUri = "http://localhost/";
 	protected int port = 9999;
-	protected ServerStarts serverStarts = ServerStarts.PARENT_CONFIGURATION;
+	protected StartServer serverStarts = StartServer.BY_PARENT;
 
 	protected final Set<Throwable> exceptions = new LinkedHashSet<>();
 	protected final List<Throwable> expectedException = new ArrayList<>();
@@ -322,7 +324,7 @@ public class GrizzlyServerConfig implements ServerConfig {
 			createServer();
 
 		} catch (Exception ex) {
-			Logger.getLogger(JettyServerConfig.class.getName()).log(Level.SEVERE, null, ex);
+			LOGGER.error("Failed to create server.", ex);
 		}
 	}
 
@@ -352,7 +354,7 @@ public class GrizzlyServerConfig implements ServerConfig {
 	 * @param serverStarts
 	 */
 	@Override
-	public void setServerStarts(ServerStarts serverStarts) {
+	public void setServerStarts(StartServer serverStarts) {
 		this.serverStarts = serverStarts;
 	}
 
@@ -382,7 +384,7 @@ public class GrizzlyServerConfig implements ServerConfig {
 	 * @return
 	 */
 	@Override
-	public ServerStarts getServerStarts() {
+	public StartServer getServerStarts() {
 		return this.serverStarts;
 	}
 

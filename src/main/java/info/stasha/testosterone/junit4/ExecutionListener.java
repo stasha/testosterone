@@ -28,10 +28,10 @@ public class ExecutionListener extends RunListener {
 		Class<? extends Testosterone> cls = Instrument.testClass((Class<? extends Testosterone>) description.getChildren().get(0).getTestClass(), new AfterClassAnnotation());
 		if (clazz != null && clazz != cls) {
 			// HACK BECAUSE TESTRUNFINISHED DOES NOT WORK
-			Interceptors.Intercept.AfterClass.afterClass(clazz);
+			Interceptors.afterClass(clazz);
 		}
 		clazz = cls;
-		Interceptors.Intercept.BeforeClass.beforeClass(clazz);
+		Interceptors.beforeClass(clazz);
 	}
 
 	/**
@@ -45,7 +45,7 @@ public class ExecutionListener extends RunListener {
 	 */
 	@Override
 	public void testRunFinished(Result description) throws Exception {
-		Interceptors.Intercept.AfterClass.afterClass(clazz);
+		Interceptors.afterClass(clazz);
 	}
 
 	/**
@@ -55,7 +55,7 @@ public class ExecutionListener extends RunListener {
 	 * @throws Exception
 	 */
 	public void testRunFinished(Description description) throws Exception {
-		Interceptors.Intercept.AfterClass.afterClass(clazz);
+		Interceptors.afterClass(clazz);
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class ExecutionListener extends RunListener {
 	 */
 	@Override
 	public void testStarted(Description description) throws Exception {
-		Interceptors.Intercept.Before.before(clazz);
+		Interceptors.before(clazz);
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class ExecutionListener extends RunListener {
 	 */
 	@Override
 	public void testFinished(Description description) throws Exception {
-		Interceptors.Intercept.After.after(clazz);
+		Interceptors.after(clazz);
 	}
 
 }

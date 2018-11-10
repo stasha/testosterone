@@ -170,4 +170,9 @@ public class Filter {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "Filter{" + "clazz=" + clazz + ", filter=" + filter + ", urlPattern=" + urlPattern + ", initParams=" + initParams + ", dispatchers=" + dispatchers + '}';
+	}
+
 }
