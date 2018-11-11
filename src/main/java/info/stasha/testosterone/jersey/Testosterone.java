@@ -114,6 +114,7 @@ public interface Testosterone {
 		config.getResourceConfig().register(getSetup());
 		// registering db config so db is started/stopped with jersey application
 		config.getResourceConfig().register(getSetup().getDbConfig());
+//        config.getResourceConfig().getApplication().getProperties().put("com.sun.jersey.api.json.POJOMappingFeature", true);
 		// initializes configuration
 		config.initConfiguration(this);
 	}

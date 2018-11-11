@@ -1,6 +1,5 @@
 package info.stasha.testosterone.junit4;
 
-import info.stasha.testosterone.jersey.Testosterone;
 import org.glassfish.hk2.api.Factory;
 import org.mockito.Mockito;
 
@@ -13,48 +12,77 @@ import org.mockito.Mockito;
  */
 public class GenericMockitoFactory {
 
-	private enum Type {
-		INSTANCE,
-		SPY,
-		MOCK
-	}
+    private enum Type {
+        INSTANCE,
+        SPY,
+        MOCK
+    }
 
-	private static Factory newInstance(Class<? extends Testosterone> obj, Type mode) {
+    private static Factory newInstance(Class<?> obj, Type mode) {
 
-		return new Factory() {
-			@Override
-			public Object provide() {
-				try {
-					switch (mode) {
-						case SPY:
-							return Mockito.spy(obj.cast(obj.newInstance()));
-						case MOCK:
-							return Mockito.mock(obj);
-						default:
-							return obj.newInstance();
-					}
-				} catch (InstantiationException | IllegalAccessException ex) {
-					throw new RuntimeException(ex);
-				}
-			}
+        return new Factory() {
+            @Override
+            public Object provide() {
+                try {
+                    switch (mode) {
+                        case SPY:
+                            return Mockito.spy(obj.cast(obj.newInstance()));
+                        case MOCK:
+                            return Mockito.mock(obj);
+                        default:
+                            return obj.newInstance();
+                    }
+                } catch (InstantiationException | IllegalAccessException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
 
-			@Override
-			public void dispose(Object instance) {
-				// do nothing
-			}
-		};
-	}
+            @Override
+            public void dispose(Object instance) {
+                // do nothing
+            }
+        };
+    }
 
-	public static Factory get(Class<? extends Testosterone> obj) {
-		return newInstance(obj, Type.INSTANCE);
-	}
+    private static Factory newInstance(Object obj, Type mode) {
 
-	public static Factory spy(Class<? extends Testosterone> obj) {
-		return newInstance(obj, Type.SPY);
-	}
+        return new Factory() {
+            @Override
+            public Object provide() {
+                switch (mode) {
+                    case SPY:
+                        return Mockito.spy(obj);
+                    default:
+                        return obj;
+                }
 
-	public static Factory mock(Class<? extends Testosterone> obj) {
-		return newInstance(obj, Type.MOCK);
-	}
+            }
+
+            @Override
+            public void dispose(Object instance) {
+                // do nothing
+            }
+        };
+    }
+
+    public static Factory get(Class<?> obj) {
+        return newInstance(obj, Type.INSTANCE);
+    }
+
+    public static Factory spy(Class<?> obj) {
+        return newInstance(obj, Type.SPY);
+    }
+
+    public static Factory mock(Class<?> obj) {
+        return newInstance(obj, Type.MOCK);
+    }
+
+    public static Factory spy(Object obj) {
+        return newInstance(obj, Type.SPY);
+    }
+
+    public static Factory mock(Object obj) {
+        return newInstance(obj, Type.MOCK);
+    }
 
 }

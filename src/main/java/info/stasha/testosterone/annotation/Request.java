@@ -1,6 +1,7 @@
 package info.stasha.testosterone.annotation;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -11,42 +12,57 @@ import javax.ws.rs.HttpMethod;
  *
  * @author stasha
  */
+@Inherited
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
 public @interface Request {
 
-	/**
-	 * Number of times request should be invoked
-	 *
-	 * @return
-	 */
-	int repeat() default 1;
+    /**
+     * Number of times request should be invoked
+     *
+     * @return
+     */
+    int repeat() default 1;
 
-	/**
-	 * Excludes request invocation from specified repeats.
-	 *
-	 * @return
-	 */
-	int[] excludeFromRepeat() default {};
+    /**
+     * Excludes request invocation from specified repeats.
+     *
+     * @return
+     */
+    int[] excludeFromRepeat() default {};
 
-	/**
-	 * Url where to send request
-	 *
-	 * @return
-	 */
-	String url() default "";
+    /**
+     * Url where to send request
+     *
+     * @return
+     */
+    String url() default "";
 
-	/**
-	 * Request method
-	 *
-	 * @return
-	 */
-	String method() default HttpMethod.GET;
+    /**
+     * Request method
+     *
+     * @return
+     */
+    String method() default HttpMethod.GET;
 
-	/**
-	 * Header parameters that will be used when invoking test method
-	 *
-	 * @return
-	 */
-	String[] headerParams() default {};
+    /**
+     * Header parameters that will be used when invoking test method
+     *
+     * @return
+     */
+    String[] headerParams() default {};
+
+    /**
+     * Method name containing logic for asserting status code.
+     *
+     * @return
+     */
+    int[] expectedStatus() default {};
+
+    /**
+     * Field or method name where entity will be looked up.
+     *
+     * @return
+     */
+    String entity() default "";
 }
