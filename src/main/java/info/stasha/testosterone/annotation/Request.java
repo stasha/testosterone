@@ -14,7 +14,7 @@ import javax.ws.rs.HttpMethod;
  */
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
+@Target({ElementType.METHOD, ElementType.PARAMETER})
 public @interface Request {
 
     /**
@@ -32,7 +32,8 @@ public @interface Request {
     int[] excludeFromRepeat() default {};
 
     /**
-     * Url where to send request
+     * Url where to send request. If url is not provided, then annotated method
+     * will be invoked.
      *
      * @return
      */

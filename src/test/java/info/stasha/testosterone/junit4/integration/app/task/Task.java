@@ -1,9 +1,5 @@
 package info.stasha.testosterone.junit4.integration.app.task;
 
-import info.stasha.testosterone.junit4.integration.app.Validation;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.PathParam;
 
 /**
@@ -13,18 +9,9 @@ import javax.ws.rs.PathParam;
 public class Task {
 
     @PathParam("id")
-    @NotNull(groups = {Validation.Read.class, Validation.Update.class, Validation.Delete.class})
     private Long id;
-
-//    @FormParam("title")
-    @Size(min = 3, max = 20, groups = {Validation.Create.class, Validation.Update.class})
     private String title;
-
-//    @FormParam("description")
-    @Size(min = 3, max = 20, groups = {Validation.Create.class, Validation.Update.class})
     private String description;
-
-//    @FormParam("done")
     private Boolean done;
 
     public Task() {
@@ -35,6 +22,13 @@ public class Task {
     }
 
     public Task(String title, String description, Boolean done) {
+        this.title = title;
+        this.description = description;
+        this.done = done;
+    }
+
+    public Task(Long id, String title, String description, Boolean done) {
+        this.id = id;
         this.title = title;
         this.description = description;
         this.done = done;

@@ -8,7 +8,7 @@ import info.stasha.testosterone.junit4.integration.app.task.Task;
 import info.stasha.testosterone.junit4.integration.app.task.TaskResource;
 import info.stasha.testosterone.junit4.integration.app.task.service.TaskService;
 import javax.inject.Singleton;
-import javax.ws.rs.HttpMethod;
+import static javax.ws.rs.HttpMethod.*;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -30,11 +30,8 @@ public class TaskResourceTest implements Testosterone {
 
     protected final TaskResource taskResource = Mockito.spy(new TaskResource());
     protected final TaskService mockedTaskService = Mockito.spy(TaskService.class);
-    protected final Task task = new Task("Title", "Description", false).setId(3L);
+    protected final Task task = new Task(3L, "Title", "Description", false);
     public Entity taskEntity = Entity.json(task);
-
-    @Context
-    protected TaskService taskService;
 
     @Override
     public void configure(ResourceConfig config) {
@@ -50,33 +47,41 @@ public class TaskResourceTest implements Testosterone {
         return Mockito.verify(mock, times(invocations));
     }
 
+    @Context
+    protected TaskService taskService;
+
     @Test
-    @Request(url = "task", method = HttpMethod.GET, expectedStatus = {200, 204})
+    @Request(url = "task", method = GET, expectedStatus = {200, 204})
     public void getAllTasks(Response resp) throws Exception {
+        verify(taskResource, 1).getAllTasks();
         verify(taskService, 1).getAllTasks();
     }
 
     @Test
-    @Request(url = "task", method = HttpMethod.POST, entity = "taskEntity", expectedStatus = {200, 204})
+    @Request(url = "task", method = POST, entity = "taskEntity", expectedStatus = {200, 204})
     public void createTask(Response resp) throws Exception {
+        verify(taskResource, 1).createTask(Matchers.refEq(task));
         verify(taskService, 1).createTask(Matchers.refEq(task));
     }
 
     @Test
-    @Request(url = "task/1", method = HttpMethod.GET, expectedStatus = {200, 204})
+    @Request(url = "task/1", method = GET, expectedStatus = {200, 204})
     public void getTask(Response resp) throws Exception {
+        verify(taskResource, 1).getTask(any(Task.class));
         verify(taskService, 1).getTask(any(Task.class));
     }
 
     @Test
-    @Request(url = "task/1", method = HttpMethod.PUT, entity = "taskEntity", expectedStatus = {200, 204})
+    @Request(url = "task/1", method = PUT, entity = "taskEntity", expectedStatus = {200, 204})
     public void updateTask(Response resp) throws Exception {
+        verify(taskResource, 1).updateTask(Matchers.refEq(task));
         verify(taskService, 1).updateTask(Matchers.refEq(task));
     }
 
     @Test
-    @Request(url = "task/1", method = HttpMethod.DELETE, expectedStatus = {200, 204})
+    @Request(url = "task/1", method = DELETE, expectedStatus = {200, 204})
     public void deleteTask(Response resp) throws Exception {
+        verify(taskResource, 1).deleteTask(any(Task.class));
         verify(taskService, 1).deleteTask(any(Task.class));
     }
 

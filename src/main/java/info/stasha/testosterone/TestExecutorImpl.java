@@ -7,6 +7,7 @@ import info.stasha.testosterone.annotation.RequestAnnotation;
 import info.stasha.testosterone.annotation.Requests;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +20,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
@@ -94,6 +96,11 @@ public class TestExecutorImpl implements TestExecutor {
                     throw new IllegalStateException("@Requests annotation may not be empty.");
                 }
             } else if (requestAnnotatoin != null) {
+                if(requestAnnotatoin.url().isEmpty()){
+                    RequestAnnotation ra = new RequestAnnotation(requestAnnotatoin);
+                    ra.setUrl(path);
+                    requestAnnotatoin = ra;
+                }
                 reqs = new Request[]{requestAnnotatoin};
             } else {
                 reqs = new Request[]{new RequestAnnotation(path)};
@@ -157,10 +164,6 @@ public class TestExecutorImpl implements TestExecutor {
                         }
                     }
 
-                    for (String headerParam : requestAnnotatoin.headerParams()) {
-                        throw new UnsupportedOperationException("Header params in @Request annotation are not yet supported");
-                    }
-
                     Response resp;
 
                     Entity entity = Entity.json(null);
@@ -179,32 +182,46 @@ public class TestExecutorImpl implements TestExecutor {
                         }
                     }
 
-                    switch (requestMethod) {
-                        case HttpMethod.POST:
-                            resp = webTarget.request().post(entity);
-                            break;
-                        case HttpMethod.PUT:
-                            resp = webTarget.request().put(entity);
-                            break;
-                        case HttpMethod.DELETE:
-                            resp = webTarget.request().delete();
-                            break;
-                        case HttpMethod.HEAD:
-                            resp = webTarget.request().head();
-                            break;
-                        case HttpMethod.OPTIONS:
-                            resp = webTarget.request().options();
-                            break;
-                        default:
-                            resp = webTarget.request().get();
+                    Invocation.Builder builder = webTarget.request();
+
+                    for (String headerParam : requestAnnotatoin.headerParams()) {
+                        String[] keyValue = headerParam.split(",");
+                        builder = builder.header(keyValue[0].trim(), keyValue[1].trim());
                     }
 
-                    boolean hasResponseParam = false;
+                    switch (requestMethod) {
+                        case HttpMethod.POST:
+                            resp = builder.post(entity);
+                            break;
+                        case HttpMethod.PUT:
+                            resp = builder.put(entity);
+                            break;
+                        case HttpMethod.DELETE:
+                            resp = builder.delete();
+                            break;
+                        case HttpMethod.HEAD:
+                            resp = builder.head();
+                            break;
+                        case HttpMethod.OPTIONS:
+                            resp = builder.options();
+                            break;
+                        default:
+                            resp = builder.get();
+                    }
+
+                    List<Object> params = new ArrayList<>();
                     for (Class<?> param : method.getParameterTypes()) {
                         if (param.equals(Response.class)) {
-                            hasResponseParam = true;
-                            Utils.invokeOriginalMethod(method, target, new Object[]{resp});
+                            params.add(resp);
+                        } else if (param.equals(Request.class)) {
+                            params.add(r);
+                        } else if (param.equals(WebTarget.class)) {
+                            params.add(webTarget);
                         }
+                    }
+
+                    if (params.size() > 0) {
+                        Utils.invokeOriginalMethod(method, target, params.toArray());
                     }
 
                     // asserting response status if it was set on request

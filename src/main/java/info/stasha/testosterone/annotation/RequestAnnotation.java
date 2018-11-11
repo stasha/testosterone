@@ -24,6 +24,16 @@ public class RequestAnnotation implements Request {
     public RequestAnnotation() {
     }
 
+    public RequestAnnotation(Request request) {
+        this.entity = request.entity();
+        this.excludeFromRepeat = request.excludeFromRepeat();
+        this.expectedStatus = request.expectedStatus();
+        this.headerParams = request.headerParams();
+        this.method = request.method();
+        this.repeat = request.repeat();
+        this.url = request.url();
+    }
+
     /**
      * Creates RequestAnnotation with default url.
      *
