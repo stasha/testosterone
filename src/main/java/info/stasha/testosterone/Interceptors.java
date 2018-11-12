@@ -199,11 +199,10 @@ public class Interceptors {
                             resourceObject.getConfigFactory().getTestExecutor(resourceMethod, resourceObject).execute();
 
                         } catch (InvocationTargetException ex) {
-                            if (ex.getCause() instanceof AssertionError) {
-                                throw ex.getCause();
-                            }
+                            throw ex.getCause();
                         } catch (Exception ex) {
                             LOGGER.error("Failed to execute test " + invoking, ex);
+                            throw ex.getCause();
                         }
                         // if any, throw errors produced by test before
                         config.throwExceptions();

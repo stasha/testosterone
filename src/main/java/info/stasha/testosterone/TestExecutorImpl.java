@@ -75,7 +75,7 @@ public class TestExecutorImpl implements TestExecutor {
         OPTIONS options = method.getAnnotation(OPTIONS.class);
 
         String requestMethod = HttpMethod.GET;
-
+        
         Request requestAnnotatoin = method.getAnnotation(Request.class);
         Requests requestsAnnotation = method.getAnnotation(Requests.class);
 
@@ -96,7 +96,7 @@ public class TestExecutorImpl implements TestExecutor {
                     throw new IllegalStateException("@Requests annotation may not be empty.");
                 }
             } else if (requestAnnotatoin != null) {
-                if(requestAnnotatoin.url().isEmpty()){
+                if (requestAnnotatoin.url().isEmpty()) {
                     RequestAnnotation ra = new RequestAnnotation(requestAnnotatoin);
                     ra.setUrl(path);
                     requestAnnotatoin = ra;
@@ -209,6 +209,16 @@ public class TestExecutorImpl implements TestExecutor {
                             resp = builder.get();
                     }
 
+                    LOGGER.info(resp.toString());
+
+                    // asserting response status if it was set on request
+                    String s = Arrays.toString(requestAnnotatoin.expectedStatus()).replace(",", " or ");
+                    List<Integer> list = Arrays.stream(requestAnnotatoin.expectedStatus()).boxed().collect(Collectors.toList());
+                    if (r.expectedStatus().length > 0 && !list.contains(resp.getStatus())) {
+                        target.getServerConfig().getExceptions()
+                                .add(new AssertionError("Response status code should be " + s + ". Expecting " + s + " but was [" + resp.getStatus() + "]"));
+                    }
+
                     List<Object> params = new ArrayList<>();
                     for (Class<?> param : method.getParameterTypes()) {
                         if (param.equals(Response.class)) {
@@ -222,14 +232,6 @@ public class TestExecutorImpl implements TestExecutor {
 
                     if (params.size() > 0) {
                         Utils.invokeOriginalMethod(method, target, params.toArray());
-                    }
-
-                    // asserting response status if it was set on request
-                    String s = Arrays.toString(r.expectedStatus()).replace(",", " or ");
-                    List<Integer> list = Arrays.stream(r.expectedStatus()).boxed().collect(Collectors.toList());
-                    if (r.expectedStatus().length > 0 && !list.contains(resp.getStatus())) {
-                        target.getServerConfig().getExceptions()
-                                .add(new AssertionError("Response status code should be " + s + ". Expecting " + s + " but was [" + resp.getStatus() + "]"));
                     }
 
                 }

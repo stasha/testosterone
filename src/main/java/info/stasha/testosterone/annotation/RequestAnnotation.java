@@ -1,6 +1,7 @@
 package info.stasha.testosterone.annotation;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
 import javax.ws.rs.HttpMethod;
 
 /**
@@ -11,11 +12,11 @@ import javax.ws.rs.HttpMethod;
 public class RequestAnnotation implements Request {
 
     private int repeat = 1;
-    private int[] excludeFromRepeat = new int[]{};
+    private int[] excludeFromRepeat = {};
     private String url;
-    private String[] headerParams = new String[]{};
+    private String[] headerParams = {};
     private String method = HttpMethod.GET;
-    private int[] expectedStatus = new int[]{};
+    private int[] expectedStatus = {};
     private String entity = "";
 
     /**
@@ -179,6 +180,11 @@ public class RequestAnnotation implements Request {
     @Override
     public String entity() {
         return this.entity;
+    }
+
+    @Override
+    public String toString() {
+        return "RequestAnnotation{" + "repeat=" + repeat + ", excludeFromRepeat=" + Arrays.toString(excludeFromRepeat) + ", url=" + url + ", headerParams=" + Arrays.toString(headerParams) + ", method=" + method + ", expectedStatus=" + Arrays.toString(expectedStatus) + ", entity=" + entity + '}';
     }
 
 }

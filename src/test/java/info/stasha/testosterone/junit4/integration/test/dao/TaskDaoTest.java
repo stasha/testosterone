@@ -67,7 +67,7 @@ public class TaskDaoTest implements Testosterone {
         taskDao.createTask(new Task("Create Task Test 4", "Testing TaskDao 2", Boolean.FALSE));
 
         List<Task> tasks = taskDao.getAllTasks();
-        assertEquals("Task list should contain 1 task", 4, tasks.size());
+        assertEquals("Task list should contain 4 tasks", 4, tasks.size());
     }
 
     @Test
