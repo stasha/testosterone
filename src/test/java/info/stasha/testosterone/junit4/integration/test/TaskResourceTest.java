@@ -1,19 +1,21 @@
 package info.stasha.testosterone.junit4.integration.test;
 
 import info.stasha.testosterone.annotation.Request;
+import info.stasha.testosterone.jersey.MockingAbstractBinder;
+import info.stasha.testosterone.jersey.MockingResourceConfig;
 import info.stasha.testosterone.jersey.Testosterone;
-import info.stasha.testosterone.junit4.GenericMockitoFactory;
 import info.stasha.testosterone.junit4.TestosteroneRunner;
 import info.stasha.testosterone.junit4.integration.app.task.Task;
 import info.stasha.testosterone.junit4.integration.app.task.TaskResource;
 import info.stasha.testosterone.junit4.integration.app.task.service.TaskService;
-import javax.inject.Singleton;
+import info.stasha.testosterone.junit4.integration.app.task.service.TaskServiceFactory;
+import info.stasha.testosterone.junit4.integration.app.task.service.TaskServiceImpl;
 import static javax.ws.rs.HttpMethod.*;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.process.internal.RequestScoped;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.ArgumentMatchers.any;
@@ -25,30 +27,30 @@ import static org.mockito.Mockito.times;
  *
  * @author stasha
  */
+@Ignore
 @RunWith(TestosteroneRunner.class)
 public class TaskResourceTest implements Testosterone {
 
-    protected final TaskResource taskResource = Mockito.spy(new TaskResource());
-    protected final TaskService mockedTaskService = Mockito.spy(TaskService.class);
+    protected TaskResource taskResource;
     protected final Task task = new Task(3L, "Title", "Description", false);
     public Entity taskEntity = Entity.json(task);
 
+    @Context
+    protected TaskService taskService;
+
     @Override
-    public void configure(ResourceConfig config) {
-        config.register(taskResource);
+    public void configureMocks(MockingResourceConfig config) {
+        taskResource = config.registerSpy(TaskResource.class);
     }
 
     @Override
-    public void configure(AbstractBinder binder) {
-        binder.bindFactory(GenericMockitoFactory.mock(mockedTaskService)).to(TaskService.class).in(Singleton.class);
+    public void configureMocks(MockingAbstractBinder binder) {
+        binder.bindSpyFactory(TaskServiceFactory.class, TaskServiceImpl.class).to(TaskService.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
     }
 
     public <T> T verify(T mock, int invocations) {
         return Mockito.verify(mock, times(invocations));
     }
-
-    @Context
-    protected TaskService taskService;
 
     @Test
     @Request(url = "task", method = GET, expectedStatus = {200, 204})

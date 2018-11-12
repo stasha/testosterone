@@ -1,13 +1,15 @@
 package info.stasha.testosterone.junit4.integration.test.service;
 
+import info.stasha.testosterone.jersey.MockingAbstractBinder;
 import info.stasha.testosterone.jersey.Testosterone;
-import info.stasha.testosterone.junit4.GenericMockitoFactory;
 import info.stasha.testosterone.junit4.TestosteroneRunner;
 import info.stasha.testosterone.junit4.integration.app.task.Task;
 import info.stasha.testosterone.junit4.integration.app.task.dao.TaskDao;
+import info.stasha.testosterone.junit4.integration.app.task.dao.TaskDaoFactory;
 import info.stasha.testosterone.junit4.integration.app.task.dao.TaskDaoImpl;
 import info.stasha.testosterone.junit4.integration.app.task.service.TaskService;
 import info.stasha.testosterone.junit4.integration.app.task.service.TaskServiceFactory;
+import javax.inject.Singleton;
 import javax.ws.rs.core.Context;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
@@ -34,7 +36,15 @@ public class TaskServiceTest implements Testosterone {
     @Override
     public void configure(AbstractBinder binder) {
         binder.bindFactory(TaskServiceFactory.class).to(TaskService.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
-        binder.bindFactory(GenericMockitoFactory.mock(TaskDaoImpl.class)).to(TaskDao.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
+    }
+
+    @Override
+    public void configureMocks(MockingAbstractBinder binder) {
+        binder.bindSpyFactory(TaskDaoFactory.class, TaskDaoImpl.class).to(TaskDao.class).in(Singleton.class);
+    }
+
+    public <T> T verify(T mock, int invocations) {
+        return Mockito.verify(mock, times(invocations));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -50,7 +60,7 @@ public class TaskServiceTest implements Testosterone {
     @Test
     public void createTest3() throws Exception {
         taskService.createTask(task.setId(null));
-        Mockito.verify(taskDao, times(1)).createTask(task);
+        verify(taskDao, 1).createTask(task.setId(null));
     }
 
     @Test(expected = IllegalArgumentException.class)

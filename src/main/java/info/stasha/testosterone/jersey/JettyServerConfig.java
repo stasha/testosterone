@@ -134,13 +134,23 @@ public class JettyServerConfig extends GrizzlyServerConfig {
             }
         });
 
+        addRestServlet(context);
+
+    }
+
+    /**
+     * Registers Jersey servlet.
+     *
+     * @param context
+     */
+    protected void addRestServlet(ServletContextHandler context) {
         // registering Jersey servlet
         LOGGER.debug("Adding jersey servlet with path: {} to servlet container.", servletContainerConfig.getJerseyServletPath());
         ServletHolder holder = new ServletHolder();
         holder.setServlet(new ServletContainer(this.resourceConfig));
         holder.setInitOrder(1);
+//        holder.setInitParameter("com.sun.jersey.api.json.POJOMappingFeature", "true");
         context.addServlet(holder, servletContainerConfig.getJerseyServletPath());
-        holder.setInitParameter("com.sun.jersey.api.json.POJOMappingFeature", "true");
 
     }
 

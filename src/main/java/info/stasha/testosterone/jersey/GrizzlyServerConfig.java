@@ -19,6 +19,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import info.stasha.testosterone.ServerConfig;
 import info.stasha.testosterone.StartServer;
 import info.stasha.testosterone.Utils;
+import info.stasha.testosterone.servlet.MockingServletContainerConfig;
 import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,378 +31,378 @@ import org.slf4j.LoggerFactory;
  */
 public class GrizzlyServerConfig implements ServerConfig {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(GrizzlyServerConfig.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GrizzlyServerConfig.class);
 
-	protected String baseUri = "http://localhost/";
-	protected int port = 9999;
-	protected StartServer serverStarts = StartServer.BY_PARENT;
+    protected String baseUri = "http://localhost/";
+    protected int port = 9999;
+    protected StartServer serverStarts = StartServer.BY_PARENT;
 
-	protected final Set<Throwable> exceptions = new LinkedHashSet<>();
-	protected final List<Throwable> expectedException = new ArrayList<>();
-	protected ServletContainerConfig servletContainerConfig = new ServletContainerConfig();
+    protected final Set<Throwable> exceptions = new LinkedHashSet<>();
+    protected final List<Throwable> expectedException = new ArrayList<>();
+    protected ServletContainerConfig servletContainerConfig = new MockingServletContainerConfig();
 
-	protected ResourceConfig resourceConfig;
-	protected final AtomicReference<Client> client = new AtomicReference<>(null);
+    protected ResourceConfig resourceConfig;
+    protected final AtomicReference<Client> client = new AtomicReference<>(null);
 
-	private HttpServer server;
-	protected Testosterone resourceObject;
-	protected Testosterone testObject;
-	protected String testThreadName;
+    private HttpServer server;
+    protected Testosterone resourceObject;
+    protected Testosterone testObject;
+    protected String testThreadName;
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @return
-	 */
-	@Override
-	public Testosterone getResourceObject() {
-		return resourceObject;
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public Testosterone getResourceObject() {
+        return resourceObject;
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @param resourceObject
-	 */
-	@Override
-	public void setResourceObject(Testosterone resourceObject) {
-		this.resourceObject = resourceObject;
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @param resourceObject
+     */
+    @Override
+    public void setResourceObject(Testosterone resourceObject) {
+        this.resourceObject = resourceObject;
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @return
-	 */
-	@Override
-	public Testosterone getTestObject() {
-		return testObject;
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public Testosterone getTestObject() {
+        return testObject;
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @return
-	 */
-	@Override
-	public String getTestThreadName() {
-		return testThreadName;
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public String getTestThreadName() {
+        return testThreadName;
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @param testThreadName
-	 */
-	@Override
-	public void setTestThreadName(String testThreadName) {
-		this.testThreadName = testThreadName;
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @param testThreadName
+     */
+    @Override
+    public void setTestThreadName(String testThreadName) {
+        this.testThreadName = testThreadName;
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @param testObject
-	 */
-	@Override
-	public void setTestObject(Testosterone testObject) {
-		this.testObject = testObject;
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @param testObject
+     */
+    @Override
+    public void setTestObject(Testosterone testObject) {
+        this.testObject = testObject;
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @return
-	 */
-	@Override
-	public Set<Throwable> getExceptions() {
-		return exceptions;
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public Set<Throwable> getExceptions() {
+        return exceptions;
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @throws Throwable
-	 */
-	@Override
-	public void throwExceptions() throws Throwable {
-		if (getExceptions().size() > 0) {
-			throw getExceptions().iterator().next();
-		}
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @throws Throwable
+     */
+    @Override
+    public void throwExceptions() throws Throwable {
+        if (getExceptions().size() > 0) {
+            throw getExceptions().iterator().next();
+        }
+    }
 
-	/**
-	 * Returns ResourceConfig.
-	 *
-	 * @return
-	 */
-	protected ResourceConfig configure() {
-		if (this.resourceConfig == null) {
-			this.resourceConfig = new ResourceConfig();
-		}
+    /**
+     * Returns ResourceConfig.
+     *
+     * @return
+     */
+    protected ResourceConfig configure() {
+        if (this.resourceConfig == null) {
+            this.resourceConfig = new MockingResourceConfig();
+        }
 
-		return this.resourceConfig;
-	}
+        return this.resourceConfig;
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @return
-	 */
-	@Override
-	public ServletContainerConfig getServletContainerConfig() {
-		return null;
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public ServletContainerConfig getServletContainerConfig() {
+        return null;
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @param servletContainerConfig
-	 */
-	@Override
-	public void setServletContainerConfig(ServletContainerConfig servletContainerConfig) {
-		this.servletContainerConfig = servletContainerConfig;
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @param servletContainerConfig
+     */
+    @Override
+    public void setServletContainerConfig(ServletContainerConfig servletContainerConfig) {
+        this.servletContainerConfig = servletContainerConfig;
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @return
-	 */
-	@Override
-	public boolean isRunning() {
-		return server != null && server.isStarted();
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public boolean isRunning() {
+        return server != null && server.isStarted();
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @return
-	 */
-	@Override
-	public Client client() {
-		if (client.get() == null) {
-			client.getAndSet(getClient());
-		}
-		return client.get();
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public Client client() {
+        if (client.get() == null) {
+            client.getAndSet(getClient());
+        }
+        return client.get();
+    }
 
-	protected Client getClient() {
-		ClientConfig clientConfig = new ClientConfig(this.resourceConfig);
-		return ClientBuilder.newClient(clientConfig);
-	}
+    protected Client getClient() {
+        ClientConfig clientConfig = new ClientConfig(this.resourceConfig);
+        return ClientBuilder.newClient(clientConfig);
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @return
-	 */
-	@Override
-	public WebTarget target() {
-		try {
-			return client().target(getBaseUri());
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			throw ex;
-		}
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public WebTarget target() {
+        try {
+            return client().target(getBaseUri());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw ex;
+        }
+    }
 
-	/**
-	 * Closes client.
-	 *
-	 * @param clients
-	 */
-	protected void closeClient(final Client... clients) {
-		if (clients == null || clients.length == 0) {
-			return;
-		}
+    /**
+     * Closes client.
+     *
+     * @param clients
+     */
+    protected void closeClient(final Client... clients) {
+        if (clients == null || clients.length == 0) {
+            return;
+        }
 
-		for (Client c : clients) {
-			if (c == null) {
-				continue;
-			}
-			try {
-				c.close();
-				client.getAndSet(null);
-			} catch (Throwable ex) {
-				ex.printStackTrace();
-				throw new RuntimeException(ex);
-			}
+        for (Client c : clients) {
+            if (c == null) {
+                continue;
+            }
+            try {
+                c.close();
+                client.getAndSet(null);
+            } catch (Throwable ex) {
+                ex.printStackTrace();
+                throw new RuntimeException(ex);
+            }
 
-		}
-	}
+        }
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @return
-	 */
-	@Override
-	public ResourceConfig getResourceConfig() {
-		return configure();
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public ResourceConfig getResourceConfig() {
+        return configure();
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @param resourceConfig
-	 */
-	@Override
-	public void setResourceConfig(ResourceConfig resourceConfig) {
-		this.resourceConfig = resourceConfig;
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @param resourceConfig
+     */
+    @Override
+    public void setResourceConfig(ResourceConfig resourceConfig) {
+        this.resourceConfig = resourceConfig;
+    }
 
-	/**
-	 * Creates server.
-	 *
-	 * @throws URISyntaxException
-	 */
-	protected void createServer() throws URISyntaxException {
-		server = GrizzlyHttpServerFactory.createHttpServer(new URI(getBaseUri()), configure());
-	}
+    /**
+     * Creates server.
+     *
+     * @throws URISyntaxException
+     */
+    protected void createServer() throws URISyntaxException {
+        server = GrizzlyHttpServerFactory.createHttpServer(new URI(getBaseUri()), configure());
+    }
 
-	/**
-	 * Prepares whatever :).
-	 */
-	protected void prepare() {
-		Client old = client.getAndSet(getClient());
-		closeClient(old);
-	}
+    /**
+     * Prepares whatever :).
+     */
+    protected void prepare() {
+        Client old = client.getAndSet(getClient());
+        closeClient(old);
+    }
 
-	/**
-	 * Cleans up configuration.
-	 */
-	protected void cleanUp() {
-		this.resourceConfig = null;
+    /**
+     * Cleans up configuration.
+     */
+    protected void cleanUp() {
+        this.resourceConfig = null;
 
-		closeClient(client.get());
-	}
+        closeClient(client.get());
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @throws Exception
-	 */
-	@Override
-	public void start() throws Exception {
-		prepare();
+    /**
+     * {@inheritDoc }
+     *
+     * @throws Exception
+     */
+    @Override
+    public void start() throws Exception {
+        prepare();
 
-		if (server != null && !server.isStarted()) {
-			server.start();
-		}
-	}
+        if (server != null && !server.isStarted()) {
+            server.start();
+        }
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @throws Exception
-	 */
-	@Override
-	public void stop() throws Exception {
-		if (server != null && server.isStarted()) {
-			server.stop();
-		}
-		cleanUp();
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @throws Exception
+     */
+    @Override
+    public void stop() throws Exception {
+        if (server != null && server.isStarted()) {
+            server.stop();
+        }
+        cleanUp();
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @param obj
-	 */
-	@Override
-	public void initConfiguration(Testosterone obj) {
-		this.resourceObject = obj;
-		if (Utils.isAnnotationPresent(obj, Singleton.class)) {
-			this.resourceConfig.register(obj);
-		} else {
-			this.resourceConfig.register(obj.getClass());
-		}
+    /**
+     * {@inheritDoc }
+     *
+     * @param obj
+     */
+    @Override
+    public void initConfiguration(Testosterone obj) {
+        this.resourceObject = obj;
+        if (Utils.isAnnotationPresent(obj, Singleton.class)) {
+            this.resourceConfig.register(obj);
+        } else {
+            this.resourceConfig.register(obj.getClass());
+        }
 
-		init();
-	}
+        init();
+    }
 
-	/**
-	 * {@inheritDoc }
-	 */
-	@Override
-	public void init() {
-		try {
-			createServer();
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public void init() {
+        try {
+            createServer();
 
-		} catch (Exception ex) {
-			LOGGER.error("Failed to create server.", ex);
-		}
-	}
+        } catch (Exception ex) {
+            LOGGER.error("Failed to create server.", ex);
+        }
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @param baseUri
-	 */
-	@Override
-	public void setBaseUri(String baseUri) {
-		this.baseUri = baseUri;
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @param baseUri
+     */
+    @Override
+    public void setBaseUri(String baseUri) {
+        this.baseUri = baseUri;
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @param port
-	 */
-	@Override
-	public void setPort(int port) {
-		this.port = port;
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @param port
+     */
+    @Override
+    public void setPort(int port) {
+        this.port = port;
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @param serverStarts
-	 */
-	@Override
-	public void setServerStarts(StartServer serverStarts) {
-		this.serverStarts = serverStarts;
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @param serverStarts
+     */
+    @Override
+    public void setServerStarts(StartServer serverStarts) {
+        this.serverStarts = serverStarts;
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @return
-	 */
-	@Override
-	public String getBaseUri() {
-		return UriBuilder.fromUri(this.baseUri).port(getPort()).build().toString();
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public String getBaseUri() {
+        return UriBuilder.fromUri(this.baseUri).port(getPort()).build().toString();
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @return
-	 */
-	@Override
-	public int getPort() {
-		return this.port;
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public int getPort() {
+        return this.port;
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @return
-	 */
-	@Override
-	public StartServer getServerStarts() {
-		return this.serverStarts;
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public StartServer getServerStarts() {
+        return this.serverStarts;
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @return
-	 */
-	@Override
-	public String toString() {
-		return "JerseyConfiguration{" + "testObject=" + testObject.getClass().getName() + '}';
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public String toString() {
+        return "JerseyConfiguration{" + "testObject=" + testObject.getClass().getName() + '}';
+    }
 
 }

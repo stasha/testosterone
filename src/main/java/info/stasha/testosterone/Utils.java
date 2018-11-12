@@ -68,34 +68,36 @@ public class Utils {
 	/**
 	 * Returns Annotation from class, super class or implemented interfaces.
 	 *
+     * @param <T>
 	 * @param o
 	 * @param annotation
 	 * @return
 	 */
-	public static Annotation getAnnotation(Object o, Class<? extends Annotation> annotation) {
+	public static <T> T getAnnotation(Object o, Class<? extends Annotation> annotation) {
 		return getAnnotation(o.getClass(), annotation);
 	}
 
 	/**
 	 * Returns Annotation from class, super class or implemented interfaces.
 	 *
+     * @param <T>
 	 * @param clazz
 	 * @param annotation
 	 * @return
 	 */
-	public static Annotation getAnnotation(Class<?> clazz, Class<? extends Annotation> annotation) {
+	public static <T> T getAnnotation(Class<?> clazz, Class<? extends Annotation> annotation) {
 
 		while (clazz != null) {
 			for (Annotation a : clazz.getDeclaredAnnotations()) {
 				if (a.annotationType().equals(annotation)) {
-					return a;
+					return (T) a;
 				}
 			}
 
 			for (Class<?> interfaze : clazz.getInterfaces()) {
 				for (Annotation a : interfaze.getDeclaredAnnotations()) {
 					if (a.annotationType().equals(annotation)) {
-						return a;
+						return (T) a;
 					}
 				}
 			}

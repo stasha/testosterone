@@ -18,36 +18,37 @@ import org.slf4j.LoggerFactory;
  */
 public class H2ConnectionFactory implements Factory<Connection> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(H2ConnectionFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(H2ConnectionFactory.class);
 
-	@Context
-	private CloseableService cs;
+    @Context
+    private CloseableService cs;
 
-	@Context
-	private H2Config config;
+    @Context
+    private H2Config config;
 
-	@Override
-	public Connection provide() {
+    @Override
+    public Connection provide() {
 
-		Connection conn = config.getConnection();
-		LOGGER.info("Creating new connection {}.", conn.toString());
+        Connection conn = config.getConnection();
+        LOGGER.info("Creating new connection {}.", conn.toString());
 
-		cs.add(() -> {
-			try {
-				if (conn != null && !conn.isClosed()) {
-					conn.close();
-					LOGGER.info("Connection {} was successfully closed.", conn.toString());
-				}
-			} catch (SQLException ex) {
-				LOGGER.error("Failed to close connection {}.", conn);
-				throw new RuntimeException(ex);
-			}
-		});
-		return conn;
-	}
+        cs.add(() -> {
+            dispose(conn);
+        });
+        return conn;
+    }
 
-	@Override
-	public void dispose(Connection t) {
-	}
+    @Override
+    public void dispose(Connection conn) {
+        try {
+            if (conn != null && !conn.isClosed()) {
+                conn.close();
+                LOGGER.info("Connection {} was successfully closed.", conn.toString());
+            }
+        } catch (SQLException ex) {
+            LOGGER.error("Failed to close connection {}.", conn);
+            throw new RuntimeException(ex);
+        }
+    }
 
 }
