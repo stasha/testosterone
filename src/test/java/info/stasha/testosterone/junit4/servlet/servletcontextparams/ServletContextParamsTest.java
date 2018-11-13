@@ -50,7 +50,7 @@ public class ServletContextParamsTest implements Testosterone, ServletContextLis
 	}
 
 	@Test
-	@Request(url = "/")
+	@Request(url = "/", expectedStatus = 404)
 	public void test(Response resp) throws ServletException, IOException {
 		assertEquals("Status should be 404", 404, resp.getStatus());
 	}

@@ -1,6 +1,8 @@
-package info.stasha.testosterone.jersey;
+package info.stasha.testosterone.jersey.inject;
 
 import info.stasha.testosterone.annotation.InjectTest;
+import info.stasha.testosterone.jersey.IntegrationContainer;
+import info.stasha.testosterone.jersey.Testosterone;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Context;
 import org.glassfish.hk2.api.Injectee;
@@ -9,12 +11,12 @@ import org.glassfish.hk2.api.ServiceHandle;
 import org.glassfish.hk2.api.ServiceLocator;
 
 /**
- * TODO: refactor this
+ * Injects testosterone testing object instance.
  *
  * @author stasha
  */
 public class TestInjectionResolver implements InjectionResolver<InjectTest> {
-    
+
     @Context
     ServiceLocator locator;
 

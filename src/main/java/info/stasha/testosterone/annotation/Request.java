@@ -61,6 +61,13 @@ public @interface Request {
     int[] expectedStatus() default {};
 
     /**
+     * Expected status should be between including specified status codes.
+     *
+     * @return
+     */
+    int[] expectedStatusBetween() default {100, 400};
+
+    /**
      * Field or method name where entity will be looked up.
      *
      * @return

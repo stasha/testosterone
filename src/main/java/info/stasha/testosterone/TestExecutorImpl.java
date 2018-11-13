@@ -75,11 +75,11 @@ public class TestExecutorImpl implements TestExecutor {
         OPTIONS options = method.getAnnotation(OPTIONS.class);
 
         String requestMethod = HttpMethod.GET;
-        
-        Request requestAnnotatoin = method.getAnnotation(Request.class);
+
+        Request requestAnnotation = method.getAnnotation(Request.class);
         Requests requestsAnnotation = method.getAnnotation(Requests.class);
 
-        if (requestAnnotatoin != null && requestsAnnotation != null) {
+        if (requestAnnotation != null && requestsAnnotation != null) {
             throw new IllegalStateException("@Requests and @Request annotations can't be used on same method: "
                     + method.getName());
         }
@@ -95,13 +95,13 @@ public class TestExecutorImpl implements TestExecutor {
                 if (reqs.length == 0) {
                     throw new IllegalStateException("@Requests annotation may not be empty.");
                 }
-            } else if (requestAnnotatoin != null) {
-                if (requestAnnotatoin.url().isEmpty()) {
-                    RequestAnnotation ra = new RequestAnnotation(requestAnnotatoin);
+            } else if (requestAnnotation != null) {
+                if (requestAnnotation.url().isEmpty()) {
+                    RequestAnnotation ra = new RequestAnnotation(requestAnnotation);
                     ra.setUrl(path);
-                    requestAnnotatoin = ra;
+                    requestAnnotation = ra;
                 }
-                reqs = new Request[]{requestAnnotatoin};
+                reqs = new Request[]{requestAnnotation};
             } else {
                 reqs = new Request[]{new RequestAnnotation(path)};
             }
@@ -112,10 +112,10 @@ public class TestExecutorImpl implements TestExecutor {
                     continue;
                 }
 
-                requestAnnotatoin = r;
+                requestAnnotation = r;
 
-                if (requestAnnotatoin.method() != null) {
-                    requestMethod = requestAnnotatoin.method();
+                if (requestAnnotation.method() != null) {
+                    requestMethod = requestAnnotation.method();
                 } else {
                     if (post != null) {
                         requestMethod = HttpMethod.POST;
@@ -132,8 +132,8 @@ public class TestExecutorImpl implements TestExecutor {
                     }
                 }
 
-                int requestRepeat = requestAnnotatoin.repeat() == 0 ? 1 : requestAnnotatoin.repeat();
-                String normalizedUrl = requestAnnotatoin.url();
+                int requestRepeat = requestAnnotation.repeat() == 0 ? 1 : requestAnnotation.repeat();
+                String normalizedUrl = requestAnnotation.url();
                 normalizedUrl = normalizedUrl
                         .replaceAll("\\?", "\\\\\\?")
                         .replaceAll("\\&", "\\\\\\&")
@@ -184,7 +184,7 @@ public class TestExecutorImpl implements TestExecutor {
 
                     Invocation.Builder builder = webTarget.request();
 
-                    for (String headerParam : requestAnnotatoin.headerParams()) {
+                    for (String headerParam : requestAnnotation.headerParams()) {
                         String[] keyValue = headerParam.split(",");
                         builder = builder.header(keyValue[0].trim(), keyValue[1].trim());
                     }
@@ -212,11 +212,19 @@ public class TestExecutorImpl implements TestExecutor {
                     LOGGER.info(resp.toString());
 
                     // asserting response status if it was set on request
-                    String s = Arrays.toString(requestAnnotatoin.expectedStatus()).replace(",", " or ");
-                    List<Integer> list = Arrays.stream(requestAnnotatoin.expectedStatus()).boxed().collect(Collectors.toList());
-                    if (r.expectedStatus().length > 0 && !list.contains(resp.getStatus())) {
+                    int status = resp.getStatus();
+                    String s = Arrays.toString(requestAnnotation.expectedStatus()).replace(",", " or ");
+                    List<Integer> expectedStatus = Arrays.stream(requestAnnotation.expectedStatus()).boxed().collect(Collectors.toList());
+                    if (r.expectedStatus().length > 0 && !expectedStatus.contains(status)) {
                         target.getServerConfig().getExceptions()
-                                .add(new AssertionError("Response status code should be " + s + ". Expecting " + s + " but was [" + resp.getStatus() + "]"));
+                                .add(new AssertionError("Response status code should be " + s + ". Expecting " + s + " but was [" + status + "]"));
+                    }
+
+                    int between[] = requestAnnotation.expectedStatusBetween();
+                    if ((r.expectedStatus().length == 0 && between.length > 0) && (status < between[0] || status > between[1])) {
+                        target.getServerConfig().getExceptions()
+                                .add(new AssertionError("Response status code should be between [" + between[0] +" and " + between[1] + 
+                                        "] but was [" + status + "]"));
                     }
 
                     List<Object> params = new ArrayList<>();

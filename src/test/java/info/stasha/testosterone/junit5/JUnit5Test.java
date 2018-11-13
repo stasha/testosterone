@@ -60,7 +60,7 @@ public class JUnit5Test implements Testosterone {
 	}
 
 	@Test
-	@Request(url = "404")
+	@Request(url = "404", expectedStatus = 404)
 	public void requestTest(Response resp) {
 		assertEquals(404, resp.getStatus());
 	}

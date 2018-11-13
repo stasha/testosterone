@@ -1,4 +1,4 @@
-package info.stasha.testosterone.jersey;
+package info.stasha.testosterone.jersey.inject;
 
 import info.stasha.testosterone.annotation.Value;
 import java.io.FileNotFoundException;

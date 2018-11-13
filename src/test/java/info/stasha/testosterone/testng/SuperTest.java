@@ -61,7 +61,7 @@ public class SuperTest implements Testosterone {
 
 	@Test
 	@Parameters("*")
-	@Request(url = "404")
+	@Request(url = "404", expectedStatus = 404)
 	public void requestTest(@Optional Response resp) {
 		assertEquals(404, resp.getStatus());
 	}

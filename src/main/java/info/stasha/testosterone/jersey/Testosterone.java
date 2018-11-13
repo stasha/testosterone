@@ -1,5 +1,7 @@
 package info.stasha.testosterone.jersey;
 
+import info.stasha.testosterone.jersey.inject.TestInjectionResolver;
+import info.stasha.testosterone.jersey.inject.ValueInjectionResolver;
 import info.stasha.testosterone.Setup;
 import javax.ws.rs.client.WebTarget;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -11,8 +13,13 @@ import info.stasha.testosterone.Utils;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.annotation.InjectTest;
 import info.stasha.testosterone.annotation.Integration;
+import info.stasha.testosterone.annotation.Spy;
+import info.stasha.testosterone.annotation.Mock;
 import info.stasha.testosterone.annotation.Value;
+import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.db.H2ConnectionFactory;
+import info.stasha.testosterone.jersey.inject.MockInjectionResolver;
+import info.stasha.testosterone.jersey.inject.SpyInjectionResolver;
 import info.stasha.testosterone.servlet.MockingServletContainerConfig;
 import java.sql.Connection;
 import java.util.Arrays;
@@ -105,8 +112,10 @@ public interface Testosterone {
     default void initConfiguration(ServerConfig config) {
         // configureMocks ResourceConfig
         configure(config.getResourceConfig());
-        // configureMocks Servlet container
+        // configure Servlet container
         configure(config.getServletContainerConfig());
+        // configure database 
+//        configure()
         // configureMocks AbstractBinder
         config.getResourceConfig().register(new AbstractBinder() {
             @Override
@@ -124,6 +133,12 @@ public interface Testosterone {
                         }).in(Singleton.class);
                 this.bind(TestInjectionResolver.class)
                         .to(new TypeLiteral<InjectionResolver<InjectTest>>() {
+                        }).in(Singleton.class);
+                this.bind(MockInjectionResolver.class)
+                        .to(new TypeLiteral<InjectionResolver<Mock>>() {
+                        }).in(Singleton.class);
+                this.bind(SpyInjectionResolver.class)
+                        .to(new TypeLiteral<InjectionResolver<Spy>>() {
                         }).in(Singleton.class);
 
                 // invokes method for configuring AbstractBinder
@@ -173,7 +188,7 @@ public interface Testosterone {
             // configureMocks MockingResourceConfig
             configureMocks((MockingResourceConfig) config.getResourceConfig());
             // configuring MockingServletContainerConfig
-            configure((MockingServletContainerConfig) config.getServletContainerConfig());
+            configureMocks((MockingServletContainerConfig) config.getServletContainerConfig());
             // configureMocks mocking abstract binder
             config.getResourceConfig().register(new MockingAbstractBinder() {
                 @Override
@@ -276,7 +291,7 @@ public interface Testosterone {
     }
 
     /**
-     * Override to configureMocks servlet container. Register servlets, filters,
+     * Override to configure servlet container. Register servlets, filters,
      * listeners and context params.
      *
      * @param config
@@ -286,12 +301,29 @@ public interface Testosterone {
     }
 
     /**
-     * Override to configureMocks servlet container. Register servlets, filters,
+     * Override to configure servlet container. Register servlets, filters,
      * listeners and context params.
      *
      * @param config
      */
-    default void configure(MockingServletContainerConfig config) {
+    default void configureMocks(MockingServletContainerConfig config) {
+
+    }
+
+    /**
+     * Override to configure database.
+     *
+     * @param config
+     */
+    default void configure(DbConfig config) {
+
+    }
+
+    /**
+     *
+     * @param config
+     */
+    default void configureMocks(DbConfig config) {
 
     }
 

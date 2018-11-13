@@ -57,7 +57,7 @@ public class JUnit5_2Test extends JUnit5SuperTest {
 	}
 
 	@Test
-	@Request(url = "404")
+	@Request(url = "404", expectedStatus = 404)
 	public void requestTest2(Response resp) {
 		assertEquals(404, resp.getStatus());
 	}

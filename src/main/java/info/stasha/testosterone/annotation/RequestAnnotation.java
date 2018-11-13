@@ -17,6 +17,7 @@ public class RequestAnnotation implements Request {
     private String[] headerParams = {};
     private String method = HttpMethod.GET;
     private int[] expectedStatus = {};
+    private int[] expectedStatusBetween = {200, 400};
     private String entity = "";
 
     /**
@@ -99,6 +100,15 @@ public class RequestAnnotation implements Request {
     }
 
     /**
+     * Sets expected status between two status numbers.
+     *
+     * @param expectedStatusBetween
+     */
+    public void setExpectedStatusBetween(int[] expectedStatusBetween) {
+        this.expectedStatusBetween = expectedStatusBetween;
+    }
+
+    /**
      * Sets field or method name where to look for entity.
      *
      * @param entity
@@ -177,6 +187,21 @@ public class RequestAnnotation implements Request {
         return this.expectedStatus;
     }
 
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public int[] expectedStatusBetween() {
+        return this.expectedStatusBetween;
+    }
+
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
     @Override
     public String entity() {
         return this.entity;

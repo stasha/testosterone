@@ -32,7 +32,7 @@ public class ServletTest implements Testosterone {
 	}
 
 	@Test
-	@Request(url = Resource.HELLO_WORLD_PATH)
+	@Request(url = Resource.HELLO_WORLD_PATH, expectedStatus = 405)
 	public void test(Response resp) throws ServletException, IOException {
 		Mockito.verify(servlet, times(1)).service(any(HttpServletRequest.class), any(HttpServletResponse.class));
 	}

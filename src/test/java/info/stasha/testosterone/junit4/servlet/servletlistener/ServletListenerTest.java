@@ -39,7 +39,7 @@ public class ServletListenerTest implements Testosterone {
 	}
 
 	@Test
-	@Request(url = "/")
+	@Request(url = "/", expectedStatus = 404)
 	public void test(Response resp) throws ServletException, IOException {
 		Mockito.verify(listener, times(1)).contextInitialized(any(ServletContextEvent.class));
 		Mockito.verify(listener, times(1)).requestInitialized(any(ServletRequestEvent.class));

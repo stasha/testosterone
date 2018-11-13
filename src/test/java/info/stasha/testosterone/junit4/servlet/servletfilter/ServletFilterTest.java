@@ -38,7 +38,7 @@ public class ServletFilterTest implements Testosterone {
 	}
 
 	@Test
-	@Request(url = "/")
+	@Request(url = "/", expectedStatus = 404)
 	public void test(Response resp) throws ServletException, IOException {
 		Mockito.verify(filter, times(1)).init(any(FilterConfig.class));
 		Mockito.verify(filter, times(1)).doFilter(
