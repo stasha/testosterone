@@ -70,6 +70,27 @@ public class Utils {
     }
 
     /**
+     * Returns all methods that are annotated with specified annotation.
+     *
+     * @param clazz
+     * @param annotation
+     * @return
+     */
+    public static List<Method> getAnnotatedMethods(Class<?> clazz, Class<? extends Annotation> annotation) {
+        List<Method> methods = new ArrayList<>();
+        while (clazz != null) {
+            for (Method method : clazz.getDeclaredMethods()) {
+                if (method.isAnnotationPresent(annotation)) {
+                    methods.add(method);
+                }
+            }
+
+            clazz = clazz.getSuperclass();
+        }
+        return methods;
+    }
+
+    /**
      * Returns Annotation from class, super class or implemented interfaces.
      *
      * @param <T>
@@ -294,7 +315,7 @@ public class Utils {
             Field modifiers = f.getClass().getDeclaredField("modifiers");
             modifiers.setAccessible(true);
             modifiers.setInt(f, f.getModifiers() & ~Modifier.FINAL);
-            
+
             Object value = f.get(source);
             f.set(dest, value);
         }

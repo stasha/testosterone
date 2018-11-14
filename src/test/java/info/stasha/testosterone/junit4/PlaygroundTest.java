@@ -5,16 +5,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
+ * Testing @Before and @After if they are in requested scope
  *
  * @author stasha
  */
 @RunWith(TestosteroneRunner.class)
 public class PlaygroundTest implements Testosterone {
 
-    
     @Test
-    public void setterValue() {
-       
+    public void test() {
+        System.out.println("test");
     }
 
 }

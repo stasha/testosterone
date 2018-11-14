@@ -9,7 +9,6 @@ import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.implementation.bind.annotation.SuperCall;
 import net.bytebuddy.implementation.bind.annotation.This;
-import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -171,8 +170,32 @@ public class Interceptors {
             @RuntimeType
             public static Void postConstruct(@This Testosterone orig) throws Exception, Throwable {
                 ExecutingTest et = orig.getSetup().getExecutingTest();
-                PathAndTest.test(null, et.getArguments(), et.getTestMethod(), et.getMainThreadTestosterone());
+                PathAndTest.test(null, null, et.getMainThreadTestMethod(), et.getManiThreadTest());
                 return null;
+            }
+        }
+
+        public static class Before {
+
+            /**
+             *
+             * @param method
+             * @param orig
+             */
+            public static void before(@SuperCall Callable<?> zuper, @Origin Method method, @This Testosterone orig) {
+                // do nothing
+            }
+        }
+
+        public static class After {
+
+            /**
+             *
+             * @param method
+             * @param orig
+             */
+            public static void after(@SuperCall Callable<?> zuper, @Origin Method method, @This Testosterone orig) {
+                // do nothing
             }
         }
 
@@ -257,6 +280,11 @@ public class Interceptors {
                     // if thread is not main JUnit thread, then it is http server thread
                     try {
                         LOGGER.info("Invoking {}", invoking);
+
+                        for (Method m : Utils.getAnnotatedMethods(orig.getClass(), org.junit.Before.class)) {
+                            Utils.invokeOriginalMethod(m, orig, new Object[]{});
+                        }
+
                         if (Utils.hasRequestAnnotation(method) && !orig.getSetup().isRequestsAlreadInvoked()) {
                             orig.getSetup().setRequestsAlreadInvoked(true);
                             et.executeRequests();
@@ -271,6 +299,10 @@ public class Interceptors {
                         // storing error to messages so they can be thrown in main JUnit thread
                         config.getExceptions().add(ex);
 
+                    } finally {
+                        for (Method m : Utils.getAnnotatedMethods(orig.getClass(), org.junit.After.class)) {
+                            Utils.invokeOriginalMethod(m, orig, new Object[]{});
+                        }
                     }
                 }
 

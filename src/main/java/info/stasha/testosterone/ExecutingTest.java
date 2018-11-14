@@ -11,26 +11,30 @@ import java.util.Arrays;
  */
 public class ExecutingTest implements TestExecutor {
 
-    private final Testosterone mainThreadTestosterone;
-    private final Testosterone serverThreadTestosterone;
-    private final Method testMethod;
-    private final Method origMethod;
+    private final Testosterone maniThreadTest;
+    private final Testosterone serverThreadTest;
+    private final Method mainThreadTestMethod;
+    private final Method originMainThreadTestMethod;
     private final Object[] arguments;
 
     /**
      * Creates new ExecutingTest instance.
      *
-     * @param testMethod
-     * @param serverThreadTestosterone
-     * @param mainThreadTestosterone
-     * @param origMethod
+     * @param mainThreadTest
+     * @param serverTrhreadTest
+     * @param mainThreadTestMethod
+     * @param originMainThreadTestMethod
      * @param arguments
      */
-    public ExecutingTest(Testosterone mainThreadTestosterone, Testosterone serverThreadTestosterone, Method testMethod, Method origMethod, Object[] arguments) {
-        this.mainThreadTestosterone = mainThreadTestosterone;
-        this.serverThreadTestosterone = serverThreadTestosterone;
-        this.testMethod = testMethod;
-        this.origMethod = origMethod;
+    public ExecutingTest(Testosterone mainThreadTest,
+            Testosterone serverTrhreadTest,
+            Method mainThreadTestMethod,
+            Method originMainThreadTestMethod,
+            Object[] arguments) {
+        this.maniThreadTest = mainThreadTest;
+        this.serverThreadTest = serverTrhreadTest;
+        this.mainThreadTestMethod = mainThreadTestMethod;
+        this.originMainThreadTestMethod = originMainThreadTestMethod;
         this.arguments = arguments;
     }
 
@@ -39,8 +43,8 @@ public class ExecutingTest implements TestExecutor {
      *
      * @return
      */
-    public Testosterone getMainThreadTestosterone() {
-        return mainThreadTestosterone;
+    public Testosterone getManiThreadTest() {
+        return maniThreadTest;
     }
 
     /**
@@ -48,8 +52,8 @@ public class ExecutingTest implements TestExecutor {
      *
      * @return
      */
-    public Testosterone getServerThreadTestosterone() {
-        return serverThreadTestosterone;
+    public Testosterone getServerThreadTest() {
+        return serverThreadTest;
     }
 
     /**
@@ -57,8 +61,8 @@ public class ExecutingTest implements TestExecutor {
      *
      * @return
      */
-    public Method getTestMethod() {
-        return testMethod;
+    public Method getMainThreadTestMethod() {
+        return mainThreadTestMethod;
     }
 
     /**
@@ -66,8 +70,8 @@ public class ExecutingTest implements TestExecutor {
      *
      * @return
      */
-    public Method getOrigMethod() {
-        return origMethod;
+    public Method getOriginMainThreadTestMethod() {
+        return originMainThreadTestMethod;
     }
 
     /**
@@ -86,7 +90,7 @@ public class ExecutingTest implements TestExecutor {
      */
     @Override
     public void executeTest() throws Throwable {
-        mainThreadTestosterone.getConfigFactory().getTestExecutor(testMethod, mainThreadTestosterone).executeTest();
+        maniThreadTest.getConfigFactory().getTestExecutor(mainThreadTestMethod, maniThreadTest).executeTest();
     }
 
     /**
@@ -97,7 +101,7 @@ public class ExecutingTest implements TestExecutor {
      */
     @Override
     public void executeRequests() throws Throwable {
-        mainThreadTestosterone.getConfigFactory().getTestExecutor(testMethod, mainThreadTestosterone).executeRequests();
+        maniThreadTest.getConfigFactory().getTestExecutor(mainThreadTestMethod, maniThreadTest).executeRequests();
     }
 
     /**
@@ -107,7 +111,7 @@ public class ExecutingTest implements TestExecutor {
      */
     @Override
     public String toString() {
-        return "ExecutingTest{" + "test=" + testMethod + ", testosterone=" + mainThreadTestosterone + ", origMethod=" + origMethod + ", arguments=" + Arrays.toString(arguments) + '}';
+        return "ExecutingTest{" + "test=" + mainThreadTestMethod + ", testosterone=" + maniThreadTest + ", origMethod=" + originMainThreadTestMethod + ", arguments=" + Arrays.toString(arguments) + '}';
     }
 
 }

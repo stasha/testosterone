@@ -15,7 +15,7 @@ import org.glassfish.hk2.api.ServiceLocator;
  *
  * @author stasha
  */
-public class TestInjectionResolver implements InjectionResolver<InjectTest> {
+public class InjectTestResolver implements InjectionResolver<InjectTest> {
 
     @Context
     ServiceLocator locator;

@@ -1,6 +1,6 @@
 package info.stasha.testosterone.jersey;
 
-import info.stasha.testosterone.jersey.inject.TestInjectionResolver;
+import info.stasha.testosterone.jersey.inject.InjectTestResolver;
 import info.stasha.testosterone.jersey.inject.ValueInjectionResolver;
 import info.stasha.testosterone.Setup;
 import javax.ws.rs.client.WebTarget;
@@ -154,7 +154,7 @@ public interface Testosterone {
                 this.bind(ValueInjectionResolver.class)
                         .to(new TypeLiteral<InjectionResolver<Value>>() {
                         }).in(Singleton.class);
-                this.bind(TestInjectionResolver.class)
+                this.bind(InjectTestResolver.class)
                         .to(new TypeLiteral<InjectionResolver<InjectTest>>() {
                         }).in(Singleton.class);
                 this.bind(MockInjectionResolver.class)

@@ -17,7 +17,6 @@ import java.util.Map;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.description.modifier.Ownership;
 import net.bytebuddy.description.modifier.Visibility;
-import net.bytebuddy.implementation.FixedValue;
 import net.bytebuddy.implementation.MethodCall;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.implementation.SuperMethodCall;
@@ -86,16 +85,10 @@ public class Instrument {
                     .method(
                             // junit4 annotations
                             isAnnotatedWith(named("org.junit.Test"))
-                                    .or(isAnnotatedWith(named("org.junit.Before")))
-                                    .or(isAnnotatedWith(named("org.junit.After")))
                                     // junit5 annotations
                                     .or(isAnnotatedWith(named("org.junit.jupiter.api.Test")))
-                                    .or(isAnnotatedWith(named("org.junit.jupiter.api.BeforeEach")))
-                                    .or(isAnnotatedWith(named("org.junit.jupiter.api.AfterEach")))
                                     // testng annotations
                                     .or(isAnnotatedWith(named("org.testng.annotations.Test")))
-                                    .or(isAnnotatedWith(named("org.testng.annotations.Before")))
-                                    .or(isAnnotatedWith(named("org.testng.annotations.After")))
                                     // jax-rs
                                     .and(not(isAnnotatedWith(Path.class)))
                                     // testosterone
@@ -111,6 +104,20 @@ public class Instrument {
                     )
                     .intercept(MethodDelegation.to(Interceptors.Intercept.PathAndTest.class))
                     .attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
+                    //
+                    .method(isAnnotatedWith(named("org.junit.Before"))
+                            .or(isAnnotatedWith(named("org.junit.jupiter.api.BeforeEach")))
+                            .or(isAnnotatedWith(named("org.testng.annotations.Before")))
+                    )
+                    .intercept(MethodDelegation.to(Interceptors.Intercept.Before.class))
+//                    .attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
+                    //
+                    .method(isAnnotatedWith(named("org.junit.After"))
+                            .or(isAnnotatedWith(named("org.junit.jupiter.api.AfterEach")))
+                            .or(isAnnotatedWith(named("org.testng.annotations.After")))
+                    )
+                    .intercept(MethodDelegation.to(Interceptors.Intercept.After.class))
+//                    .attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
                     //
                     .defineMethod("__postconstruct__", void.class, Visibility.PUBLIC)
                     .intercept(MethodDelegation.to(Interceptors.Intercept.PostConstruct.class))
