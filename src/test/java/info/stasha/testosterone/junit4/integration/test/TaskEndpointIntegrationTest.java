@@ -18,7 +18,6 @@ import javax.ws.rs.core.Response;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -26,7 +25,6 @@ import org.junit.runner.RunWith;
  *
  * @author stasha
  */
-@Ignore
 @Integration({
     TaskServiceTest.class,
     TaskDaoTest.class

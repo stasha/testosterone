@@ -15,21 +15,18 @@ import static javax.ws.rs.HttpMethod.*;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.ArgumentMatchers.any;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.times;
-import org.mockito.Spy;
 
 /**
  * Testing TaskResource with mocks.
  *
  * @author stasha
  */
-@Ignore
 @RunWith(TestosteroneRunner.class)
 public class TaskResourceTest implements Testosterone {
 
@@ -38,11 +35,10 @@ public class TaskResourceTest implements Testosterone {
     public Entity taskEntity = Entity.json(task);
     public Entity createTaskEntity = Entity.json(createTask);
 
+    private final TaskResource taskResource = Mockito.spy(new TaskResource());
+
     @Context
     protected TaskService taskService;
-
-    @Spy
-    private TaskResource taskResource = new TaskResource();
 
     @Override
     public void configureMocks(MockingResourceConfig config) {

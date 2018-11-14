@@ -9,6 +9,7 @@ import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.implementation.bind.annotation.SuperCall;
 import net.bytebuddy.implementation.bind.annotation.This;
+import org.glassfish.hk2.api.ServiceLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -230,7 +231,7 @@ public class Interceptors {
             public static Object test(@SuperCall Callable<?> zuper, @AllArguments Object[] args, @Origin Method method, @This Testosterone orig) throws Throwable {
 
                 String invoking = orig.getClass().getName() + ":" + method.getName();
-
+                ServiceLocator locator = orig.getSetup().getServiceLocator();
                 ServerConfig config = orig.getServerConfig();
                 Testosterone mainThreadTest = config.getMainThreadTestObject();
                 Testosterone requestThreadTest = config.getRequestThreadTestObject();
@@ -238,11 +239,11 @@ public class Interceptors {
                 // This before is always executed as first by JUnit framework.
                 // If there is no stored testingObject, we store it.
                 if (requestThreadTest == null) {
-                    Utils.copyFields(mainThreadTest, orig);
                     config.setRequestThreadTestObject(orig);
                     config.setTestThreadName(Thread.currentThread().getName());
                 }
 
+                Utils.copyFields(mainThreadTest, orig);
                 // Flag if this is the main thread in which JUnit test runs
                 boolean isMain = Thread.currentThread().getName().equals(config.getTestThreadName());
 
@@ -278,9 +279,10 @@ public class Interceptors {
 
                 } else {
                     // if thread is not main JUnit thread, then it is http server thread
+                    locator.inject(orig);
+
                     try {
                         LOGGER.info("Invoking {}", invoking);
-
                         for (Method m : Utils.getAnnotatedMethods(orig.getClass(), org.junit.Before.class)) {
                             Utils.invokeOriginalMethod(m, orig, new Object[]{});
                         }
@@ -289,6 +291,7 @@ public class Interceptors {
                             orig.getSetup().setRequestsAlreadInvoked(true);
                             et.executeRequests();
                         } else {
+//                            Utils.copyFields(mainThreadTest, orig);
                             return Utils.invokeOriginalMethod(resourceMethod, orig, args);
                         }
                     } catch (Throwable ex) {

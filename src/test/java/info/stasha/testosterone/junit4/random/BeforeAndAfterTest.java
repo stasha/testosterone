@@ -1,14 +1,15 @@
 package info.stasha.testosterone.junit4.random;
 
+import info.stasha.testosterone.annotation.Request;
 import info.stasha.testosterone.junit4.*;
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.junit4.jersey.service.Service;
 import info.stasha.testosterone.junit4.jersey.service.ServiceFactory;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.junit.After;
-import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,10 +34,14 @@ public class BeforeAndAfterTest implements Testosterone {
         binder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
     }
 
-    @AfterClass
-    public static void afterClass() {
-        assertEquals("Before count should equal", 2, beforeCount);
-        assertEquals("After count should equal", 2, afterCount);
+    @Override
+    public void afterServerStop() {
+        // There are two tests, 2x @Before/@After annotated methods and 
+        // one @Request annotated test method. @Request means 1 more test 
+        // instantiation which means all methods with @Before and @After will
+        // be invoked again, so in this case 2x each.
+        assertEquals("Before count should equal", 6, beforeCount);
+        assertEquals("After count should equal", 6, afterCount);
     }
 
     @Before
@@ -65,7 +70,14 @@ public class BeforeAndAfterTest implements Testosterone {
 
     @Test
     public void test() {
-        System.out.println("test");
+        assertEquals("Service should produce text", Service.RESPONSE_TEXT, service.getText());
+    }
+
+    @Test
+    @Request
+    public void test2(Response resp) {
+        assertEquals("Service should produce text", Service.RESPONSE_TEXT, service.getText());
+        System.out.println(resp);
     }
 
 }

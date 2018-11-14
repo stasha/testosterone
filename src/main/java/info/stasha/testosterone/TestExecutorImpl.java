@@ -5,7 +5,6 @@ import com.mifmif.common.regex.Generex;
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.annotation.RequestAnnotation;
 import info.stasha.testosterone.annotation.Requests;
-import info.stasha.testosterone.jersey.PathAnnotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -281,7 +280,7 @@ public class TestExecutorImpl implements TestExecutor {
                 if (params.size() > 0) {
                     try {
                         Utils.invokeOriginalMethod(method, target, params.toArray());
-                    } catch (IllegalAccessException | InvocationTargetException ex) {
+                    } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException ex) {
                         LOGGER.error("Failed to invoke original test method", ex.getCause());
                         throw new RuntimeException(ex.getCause());
                     }
