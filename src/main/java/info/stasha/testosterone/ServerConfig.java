@@ -61,7 +61,7 @@ public interface ServerConfig {
 	 *
 	 * @return
 	 */
-	Testosterone getResourceObject();
+	Testosterone getMainThreadTestObject();
 
 	/**
 	 * Sets resource object. This is test class created by Jersey on http
@@ -69,7 +69,7 @@ public interface ServerConfig {
 	 *
 	 * @param resourceObject
 	 */
-	void setResourceObject(Testosterone resourceObject);
+	void setMainThreadTestObject(Testosterone resourceObject);
 
 	/**
 	 * Returns servlet configuration object where context params, listeners,
@@ -91,14 +91,14 @@ public interface ServerConfig {
 	 *
 	 * @return
 	 */
-	Testosterone getTestObject();
+	Testosterone getRequestThreadTestObject();
 
 	/**
 	 * Sets test object created by JUnit when invoking test.
 	 *
 	 * @param testObject
 	 */
-	void setTestObject(Testosterone testObject);
+	void setRequestThreadTestObject(Testosterone testObject);
 
 	/**
 	 * Thread name where JUnit test is running.

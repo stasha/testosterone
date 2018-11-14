@@ -1,12 +1,17 @@
 package info.stasha.testosterone.jersey;
 
+import info.stasha.testosterone.Utils;
+import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.implementation.MethodDelegation;
+import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.implementation.bind.annotation.SuperCall;
+import net.bytebuddy.implementation.bind.annotation.This;
 import static net.bytebuddy.matcher.ElementMatchers.named;
 import org.glassfish.hk2.api.Factory;
+import static org.mockito.AdditionalAnswers.delegatesTo;
 import org.mockito.Mockito;
 
 /**
@@ -42,6 +47,47 @@ public class Mock {
             return (T) Mockito.spy(zuper.call());
         }
 
+    }
+
+    public static class MockProvider<T> {
+
+        @RuntimeType
+        public T provide(@SuperCall Callable<?> zuper, @Origin Method method, @This Factory factory) throws Exception {
+            return (T) Mockito.mock(zuper.call().getClass());
+        }
+    }
+
+    public static class SpyProvider<T> {
+
+        @RuntimeType
+        public T provide(@SuperCall Callable<?> zuper, @Origin Method method, @This Factory factory) throws Exception {
+//            return (T) zuper.call();
+            return (T) Mockito.spy(zuper.call());
+        }
+    }
+
+    public static Class<? extends Factory<Object>> mock(Class<? extends Factory<?>> clazz) {
+
+        return (Class<? extends Factory<Object>>) new ByteBuddy()
+                .subclass(clazz)
+                .name(clazz.getName() + "_")
+                .method(named("provide"))
+                .intercept(MethodDelegation.to(new MockProvider<>()))
+                .make()
+                .load(clazz.getClassLoader())
+                .getLoaded();
+    }
+
+    public static Class<? extends Factory<Object>> spy(Class<? extends Factory<?>> clazz) {
+
+        return (Class<? extends Factory<Object>>) new ByteBuddy()
+                .subclass(clazz)
+                .name(clazz.getName() + "_")
+                .method(named("provide"))
+                .intercept(MethodDelegation.to(new SpyProvider<>()))
+                .make()
+                .load(clazz.getClassLoader())
+                .getLoaded();
     }
 
     public static <T> Class<? extends Factory<T>> mockFactory(Class<? extends Factory<T>> clazz, Class<? extends T> obj) {

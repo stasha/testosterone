@@ -9,6 +9,7 @@ import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.implementation.bind.annotation.SuperCall;
 import net.bytebuddy.implementation.bind.annotation.This;
+import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,6 +129,28 @@ public class Interceptors {
      */
     public static class Intercept {
 
+        public static class Constructor {
+
+            /**
+             * Constructor interceptor
+             *
+             * @param orig
+             * @throws java.lang.IllegalAccessException
+             * @throws java.lang.reflect.InvocationTargetException
+             */
+            @RuntimeType
+            public static void constructor(@This Testosterone orig) throws IllegalAccessException, InvocationTargetException, IllegalArgumentException, NoSuchFieldException {
+                Setup setup = orig.getSetup();
+                ServerConfig sc = orig.getServerConfig();
+                if (sc.getTestThreadName() == null || Thread.currentThread().getName().equals(sc.getTestThreadName())) {
+//                    System.out.println("test thread");
+                } else {
+                    Testosterone test = sc.getMainThreadTestObject();
+                    Utils.copyFields(test, orig);
+                }
+            }
+        }
+
         /**
          * @PostConstruct interceptor
          */
@@ -137,6 +160,19 @@ public class Interceptors {
             public static void postConstruct(@This Testosterone orig) throws Exception {
                 LOGGER.info("Invoking @PostConstruct");
                 orig.getSetup().afterServerStart(orig);
+            }
+        }
+
+        /**
+         * @PostConstruct interceptor
+         */
+        public static class GenericTest {
+
+            @RuntimeType
+            public static Void postConstruct(@This Testosterone orig) throws Exception, Throwable {
+                ExecutingTest et = orig.getSetup().getExecutingTest();
+                PathAndTest.test(null, et.getArguments(), et.getTestMethod(), et.getMainThreadTestosterone());
+                return null;
             }
         }
 
@@ -173,13 +209,14 @@ public class Interceptors {
                 String invoking = orig.getClass().getName() + ":" + method.getName();
 
                 ServerConfig config = orig.getServerConfig();
-                Testosterone testingObject = config.getTestObject();
-                Testosterone resourceObject = config.getResourceObject();
+                Testosterone mainThreadTest = config.getMainThreadTestObject();
+                Testosterone requestThreadTest = config.getRequestThreadTestObject();
 
                 // This before is always executed as first by JUnit framework.
                 // If there is no stored testingObject, we store it.
-                if (testingObject == null) {
-                    config.setTestObject(orig);
+                if (requestThreadTest == null) {
+                    Utils.copyFields(mainThreadTest, orig);
+                    config.setRequestThreadTestObject(orig);
                     config.setTestThreadName(Thread.currentThread().getName());
                 }
 
@@ -187,17 +224,19 @@ public class Interceptors {
                 boolean isMain = Thread.currentThread().getName().equals(config.getTestThreadName());
 
                 // Jersey resource before that will be invoked
-                Method resourceMethod = resourceObject.getClass().getMethod(method.getName(), method.getParameterTypes());
+                Method resourceMethod = mainThreadTest.getClass().getMethod(method.getName(), method.getParameterTypes());
 
+                ExecutingTest et = orig.getSetup().getExecutingTest();
                 // If we are in main JUnit thread, invoke http request to test
                 if (isMain) {
                     LOGGER.info("Starting {}", invoking);
 
                     try {
                         try {
+                            et = new ExecutingTest(orig, mainThreadTest, resourceMethod, Utils.getMethodStartingWithName(mainThreadTest.getClass(), resourceMethod), args);
+                            orig.getSetup().setExecutingTest(et);
                             // Invoking http request to resource before on resource object
-                            resourceObject.getConfigFactory().getTestExecutor(resourceMethod, resourceObject).execute();
-
+                            et.executeTest();
                         } catch (InvocationTargetException ex) {
                             throw ex.getCause();
                         } catch (Exception ex) {
@@ -210,6 +249,7 @@ public class Interceptors {
                     } finally {
                         // clear junit errors
                         config.getExceptions().clear();
+                        orig.getSetup().setRequestsAlreadInvoked(false);
                         LOGGER.info("Ending test {}", invoking);
                     }
 
@@ -217,7 +257,12 @@ public class Interceptors {
                     // if thread is not main JUnit thread, then it is http server thread
                     try {
                         LOGGER.info("Invoking {}", invoking);
-                        return Utils.invokeOriginalMethod(resourceMethod, orig, args);
+                        if (Utils.hasRequestAnnotation(method) && !orig.getSetup().isRequestsAlreadInvoked()) {
+                            orig.getSetup().setRequestsAlreadInvoked(true);
+                            et.executeRequests();
+                        } else {
+                            return Utils.invokeOriginalMethod(resourceMethod, orig, args);
+                        }
                     } catch (Throwable ex) {
                         if (ex instanceof InvocationTargetException) {
                             ex = ex.getCause();

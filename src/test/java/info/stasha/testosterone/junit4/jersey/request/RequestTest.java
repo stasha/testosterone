@@ -20,6 +20,7 @@ import javax.ws.rs.core.Response;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.junit.AfterClass;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -35,6 +36,10 @@ import org.junit.runner.RunWith;
 @RunWith(TestosteroneRunner.class)
 public class RequestTest implements Testosterone {
 
+    public static boolean afterServerStartInvoed;
+    public static int afterServerStartCount = 0;
+    public static boolean customPathTestInvoked;
+
     @Override
     public void configure(ResourceConfig config) {
         config.register(Resource.class);
@@ -43,6 +48,26 @@ public class RequestTest implements Testosterone {
     @Override
     public void configure(AbstractBinder binder) {
         binder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
+    }
+
+    @Override
+    public void afterServerStart() throws Exception {
+        afterServerStartInvoed = true;
+        afterServerStartCount++;
+    }
+
+    @AfterClass
+    public static void afterClass() {
+        assertTrue("After server start should be called", afterServerStartInvoed);
+        assertEquals("After server start count should equal 1", 1, afterServerStartCount);
+        assertTrue("Custom path test should be invoked", customPathTestInvoked);
+    }
+
+    @Test
+    @GET
+    @Path("test")
+    public void customPathTest() {
+        customPathTestInvoked = true;
     }
 
     /**

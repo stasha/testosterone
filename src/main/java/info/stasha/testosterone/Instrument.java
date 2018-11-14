@@ -17,6 +17,8 @@ import java.util.Map;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.description.modifier.Ownership;
 import net.bytebuddy.description.modifier.Visibility;
+import net.bytebuddy.implementation.FixedValue;
+import net.bytebuddy.implementation.MethodCall;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.implementation.SuperMethodCall;
 import net.bytebuddy.implementation.attribute.MethodAttributeAppender;
@@ -70,32 +72,34 @@ public class Instrument {
             Class<? extends Testosterone> cls = new ByteBuddy()
                     .subclass(clazz)
                     .name(clazz.getName() + "_")
+                    .defineMethod("__created__", Void.class, Visibility.PUBLIC)
+                    .intercept(MethodDelegation.to(Interceptors.Intercept.Constructor.class))
+                    //
+                    .constructor(ElementMatchers.isDefaultConstructor())
+                    .intercept(SuperMethodCall.INSTANCE.andThen(MethodCall.invoke(named("__created__"))))
+                    .annotateType(new PathAnnotation(clazz))
                     //
                     .defineMethod("__afterClass__", void.class, Visibility.PUBLIC, Ownership.STATIC)
                     .intercept(MethodDelegation.to(Interceptors.Intercept.AfterClass.class))
                     .annotateMethod(afterClassAnnotation)
                     //
-                    .constructor(ElementMatchers.isDefaultConstructor())
-                    .intercept(SuperMethodCall.INSTANCE)
-                    .annotateType(new PathAnnotation(""))
-                    //
                     .method(
                             // junit4 annotations
                             isAnnotatedWith(named("org.junit.Test"))
-                            .or(isAnnotatedWith(named("org.junit.Before")))
-                            .or(isAnnotatedWith(named("org.junit.After")))
-                            // junit5 annotations
-                            .or(isAnnotatedWith(named("org.junit.jupiter.api.Test")))
-                            .or(isAnnotatedWith(named("org.junit.jupiter.api.BeforeEach")))
-                            .or(isAnnotatedWith(named("org.junit.jupiter.api.AfterEach")))
-                            // testng annotations
-                            .or(isAnnotatedWith(named("org.testng.annotations.Test")))
-                            .or(isAnnotatedWith(named("org.testng.annotations.Before")))
-                            .or(isAnnotatedWith(named("org.testng.annotations.After")))
-                            // jax-rs
-                            .and(not(isAnnotatedWith(Path.class)))
-                            // testosterone
-                            .and(not(isAnnotatedWith(DontIntercept.class)))
+                                    .or(isAnnotatedWith(named("org.junit.Before")))
+                                    .or(isAnnotatedWith(named("org.junit.After")))
+                                    // junit5 annotations
+                                    .or(isAnnotatedWith(named("org.junit.jupiter.api.Test")))
+                                    .or(isAnnotatedWith(named("org.junit.jupiter.api.BeforeEach")))
+                                    .or(isAnnotatedWith(named("org.junit.jupiter.api.AfterEach")))
+                                    // testng annotations
+                                    .or(isAnnotatedWith(named("org.testng.annotations.Test")))
+                                    .or(isAnnotatedWith(named("org.testng.annotations.Before")))
+                                    .or(isAnnotatedWith(named("org.testng.annotations.After")))
+                                    // jax-rs
+                                    .and(not(isAnnotatedWith(Path.class)))
+                                    // testosterone
+                                    .and(not(isAnnotatedWith(DontIntercept.class)))
                     )
                     .intercept(MethodDelegation.to(Interceptors.Intercept.PathAndTest.class))
                     .attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
@@ -112,11 +116,17 @@ public class Instrument {
                     .intercept(MethodDelegation.to(Interceptors.Intercept.PostConstruct.class))
                     .annotateMethod(new PostConstructAnnotation())
                     //
+                    .defineMethod("__generic__", Void.class, Visibility.PUBLIC)
+                    .intercept(MethodDelegation.to(Interceptors.Intercept.GenericTest.class))
+                    .annotateMethod(new PathAnnotation("__generic__"))
+                    //
                     .make()
                     .load(clazz.getClassLoader())
                     .getLoaded();
 
             CLASSES.put(clazz, cls);
+
+//            Utils.printClassData(cls);
         }
 
         return CLASSES.get(clazz);

@@ -1,11 +1,11 @@
 package info.stasha.testosterone.jersey.inject;
 
-import info.stasha.testosterone.annotation.Mock;
 import javax.ws.rs.core.Context;
 import org.glassfish.hk2.api.Injectee;
 import org.glassfish.hk2.api.InjectionResolver;
 import org.glassfish.hk2.api.ServiceHandle;
 import org.glassfish.hk2.api.ServiceLocator;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +24,8 @@ public class MockInjectionResolver implements InjectionResolver<Mock> {
     @Override
     public Object resolve(Injectee injectee, ServiceHandle<?> handle) {
         try {
-            return Mockito.mock(Class.forName(injectee.getRequiredType().getTypeName()));
+            Mock mock = injectee.getParent().getAnnotation(Mock.class);
+            return Mockito.mock(Class.forName(injectee.getRequiredType().getTypeName()), mock.answer());
         } catch (ClassNotFoundException ex) {
             LOGGER.error("Failed to load class " + injectee.getRequiredType().getTypeName(), ex);
             throw new RuntimeException(ex);

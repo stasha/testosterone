@@ -165,7 +165,7 @@ public class JettyServerConfig extends GrizzlyServerConfig {
 
         if (server != null && !server.isRunning()) {
             try {
-                LOGGER.info("Starting server at: {} for test {}", getBaseUri(), this.getResourceObject().getClass().getName());
+                LOGGER.info("Starting server at: {} for test {}", getBaseUri(), this.getMainThreadTestObject().getClass().getName());
                 server.start();
             } catch (java.net.BindException ex) {
                 LOGGER.error("Server failed to start.", ex);
@@ -183,7 +183,7 @@ public class JettyServerConfig extends GrizzlyServerConfig {
     public void stop() throws Exception {
         cleanUp();
         if (server != null && server.isRunning()) {
-            LOGGER.info("Stopping server at: {} for test {}", getBaseUri(), this.getResourceObject().getClass().getName());
+            LOGGER.info("Stopping server at: {} for test {}", getBaseUri(), this.getMainThreadTestObject().getClass().getName());
             try {
                 server.stop();
             } catch (Exception ex) {

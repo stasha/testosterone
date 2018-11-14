@@ -1,15 +1,18 @@
 package info.stasha.testosterone;
 
 import info.stasha.testosterone.annotation.Configuration;
+import info.stasha.testosterone.annotation.Request;
+import info.stasha.testosterone.annotation.Requests;
 import info.stasha.testosterone.jersey.Testosterone;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +36,7 @@ public class Utils {
             for (Annotation anon : method.getAnnotations()) {
                 System.out.println(anon.annotationType().getName());
                 for (Field field : anon.getClass().getDeclaredFields()) {
-                    System.out.println("   " + field.getName());
+//                    System.out.println("   " + field.getName());
                 }
             }
             System.out.println(method.getName());
@@ -192,10 +195,11 @@ public class Utils {
      *
      * @param clazz
      * @param methodName
+     * @param types
      * @return
      */
-    public static Method getOriginalMethod(Class<?> clazz, String methodName) {
-        return getMethodStartingWithName(clazz, methodName + "$accessor$");
+    private static Method getOriginalMethod(Class<?> clazz, String methodName, Class<?>[] types) {
+        return getMethodStartingWithName(clazz, methodName + "$accessor$", types);
     }
 
     /**
@@ -209,7 +213,7 @@ public class Utils {
      * @throws java.lang.reflect.InvocationTargetException
      */
     public static Object invokeOriginalMethod(Method method, Testosterone target, Object[] data) throws IllegalAccessException, InvocationTargetException {
-        Method me = Utils.getOriginalMethod(target.getClass(), method.getName());
+        Method me = Utils.getOriginalMethod(target.getClass(), method.getName(), method.getParameterTypes());
         try {
             me.setAccessible(true);
             return me.invoke(target, data);
@@ -220,15 +224,31 @@ public class Utils {
     }
 
     /**
-     * Returns first method found in {@link #getMethodsStartingWithName(java.lang.Class, java.lang.String)
-     * }.
+     * Returns methos starting with passed method name.
      *
      * @param clazz
      * @param methodNameStartingWith
      * @return
      */
-    public static Method getMethodStartingWithName(Class<?> clazz, String methodNameStartingWith) {
-        return getMethodsStartingWithName(clazz, methodNameStartingWith).get(0);
+    public static Method getMethodStartingWithName(Class<?> clazz, Method methodNameStartingWith) {
+        return getMethodStartingWithName(clazz, methodNameStartingWith.getName(), methodNameStartingWith.getParameterTypes());
+    }
+
+    /**
+     * Returns method starting with specified name.
+     *
+     * @param clazz
+     * @param methodNameStartingWith
+     * @param params
+     * @return
+     */
+    public static Method getMethodStartingWithName(Class<?> clazz, String methodNameStartingWith, Class<?>[] params) {
+        for (Method m : getMethodsStartingWithName(clazz, methodNameStartingWith)) {
+            if (Arrays.equals(m.getParameterTypes(), params)) {
+                return m;
+            }
+        }
+        return null;
     }
 
     /**
@@ -246,5 +266,37 @@ public class Utils {
             }
         }
         return methods;
+    }
+
+    /**
+     * Returns true/false if method has @Requests or @Request annotation
+     *
+     * @param method
+     * @return
+     */
+    public static boolean hasRequestAnnotation(Method method) {
+        return method.isAnnotationPresent(Requests.class) || method.isAnnotationPresent(Request.class);
+    }
+
+    /**
+     * Copies all fields from source object to destination object.
+     *
+     * @param source
+     * @param dest
+     */
+    public static void copyFields(Object source, Object dest) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException {
+        for (Field f : source.getClass().getSuperclass().getDeclaredFields()) {
+            System.out.println(f.getName());
+            if (f.getName().contains("$") || Modifier.isStatic(f.getModifiers())) {
+                continue;
+            }
+            f.setAccessible(true);
+            Field modifiers = f.getClass().getDeclaredField("modifiers");
+            modifiers.setAccessible(true);
+            modifiers.setInt(f, f.getModifiers() & ~Modifier.FINAL);
+            
+            Object value = f.get(source);
+            f.set(dest, value);
+        }
     }
 }

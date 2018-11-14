@@ -13,14 +13,13 @@ import info.stasha.testosterone.Utils;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.annotation.InjectTest;
 import info.stasha.testosterone.annotation.Integration;
-import info.stasha.testosterone.annotation.Spy;
-import info.stasha.testosterone.annotation.Mock;
 import info.stasha.testosterone.annotation.Value;
 import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.db.H2ConnectionFactory;
 import info.stasha.testosterone.jersey.inject.MockInjectionResolver;
 import info.stasha.testosterone.jersey.inject.SpyInjectionResolver;
 import info.stasha.testosterone.servlet.MockingServletContainerConfig;
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,6 +29,9 @@ import javax.inject.Singleton;
 import org.glassfish.hk2.api.InjectionResolver;
 import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.jersey.process.internal.RequestScoped;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,6 +112,27 @@ public interface Testosterone {
      * @param config
      */
     default void initConfiguration(ServerConfig config) {
+
+        System.out.println(this.getClass().getName());
+        for (Field f : this.getClass().getSuperclass().getDeclaredFields()) {
+            f.setAccessible(true);
+//            System.out.println(f.getName() + " : " + Arrays.toString(f.getAnnotations()));
+            Mock m = f.getAnnotation(Mock.class);
+            Spy s = f.getAnnotation(Spy.class);
+
+            try {
+                Object obj = f.get(this);
+                if (m != null && obj == null) {
+                    f.set(this, Mockito.mock(f.getType(), m.answer()));
+                }  else if (s != null && obj != null) {
+                    f.set(this, Mockito.spy(f.get(this)));
+                }
+
+            } catch (IllegalArgumentException | IllegalAccessException ex) {
+                java.util.logging.Logger.getLogger(Testosterone.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
         // configureMocks ResourceConfig
         configure(config.getResourceConfig());
         // configure Servlet container
@@ -181,7 +204,6 @@ public interface Testosterone {
                     });
                 }
             });
-
         }
 
         if (integration == null) {
@@ -200,6 +222,7 @@ public interface Testosterone {
 
         // invoking only for root setup
         if (getSetup().getRoot() == null) {
+             config.getResourceConfig().property("test", this);
             // registering setup so it can listen for application events
             config.getResourceConfig().register(getSetup());
             // registering db config so db is started/stopped with jersey application
@@ -218,10 +241,10 @@ public interface Testosterone {
      */
     default void start() throws Exception {
         if (!getServerConfig().isRunning()) {
-            // initializes configuration
-            initConfiguration(getServerConfig());
             // runs before server start method
             getSetup().beforeServerStart(this);
+            // initializes configuration
+            initConfiguration(getServerConfig());
             // starts server
             getServerConfig().start();
 

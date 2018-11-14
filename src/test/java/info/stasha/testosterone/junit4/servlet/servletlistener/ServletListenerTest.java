@@ -25,24 +25,30 @@ import static org.mockito.Mockito.times;
 @RunWith(TestosteroneRunner.class)
 public class ServletListenerTest implements Testosterone {
 
-	private ServletListener listener = Mockito.spy(new ServletListener());
+    private ServletListener listener = Mockito.spy(new ServletListener());
+    
+    @Override
+    public void configure(ServletContainerConfig sc) {
+        sc.addListener(listener);
+    }
 
-	@Override
-	public void configure(ServletContainerConfig sc) {
-		sc.addListener(listener);
-	}
+    @Override
+    public void afterServerStop() {
+        Mockito.verify(listener, times(1)).contextDestroyed(any(ServletContextEvent.class));
 
-	@Override
-	public void afterServerStop() {
-		Mockito.verify(listener, times(1)).contextDestroyed(any(ServletContextEvent.class));
-		Mockito.verify(listener, times(1)).requestDestroyed(any(ServletRequestEvent.class));
-	}
+        // There will be two requests destroyed, one that initialized the test 
+        // and other performed by @Request annotation
+        Mockito.verify(listener, times(2)).requestDestroyed(any(ServletRequestEvent.class));
+    }
 
-	@Test
-	@Request(url = "/", expectedStatus = 404)
-	public void test(Response resp) throws ServletException, IOException {
-		Mockito.verify(listener, times(1)).contextInitialized(any(ServletContextEvent.class));
-		Mockito.verify(listener, times(1)).requestInitialized(any(ServletRequestEvent.class));
-	}
+    @Test
+    @Request(url = "/", expectedStatus = 404)
+    public void test(Response resp) throws ServletException, IOException {
+        Mockito.verify(listener, times(1)).contextInitialized(any(ServletContextEvent.class));
+
+        // There will be two requests initialized, one to initialize the test 
+        // and other by @Request annotation
+        Mockito.verify(listener, times(2)).requestInitialized(any(ServletRequestEvent.class));
+    }
 
 }

@@ -45,8 +45,8 @@ public class GrizzlyServerConfig implements ServerConfig {
     protected final AtomicReference<Client> client = new AtomicReference<>(null);
 
     private HttpServer server;
-    protected Testosterone resourceObject;
-    protected Testosterone testObject;
+    protected Testosterone mainThreadTestObject;
+    protected Testosterone requestThreadTestObject;
     protected String testThreadName;
 
     /**
@@ -55,18 +55,18 @@ public class GrizzlyServerConfig implements ServerConfig {
      * @return
      */
     @Override
-    public Testosterone getResourceObject() {
-        return resourceObject;
+    public Testosterone getMainThreadTestObject() {
+        return mainThreadTestObject;
     }
 
     /**
      * {@inheritDoc }
      *
-     * @param resourceObject
+     * @param mainThreadTestObject
      */
     @Override
-    public void setResourceObject(Testosterone resourceObject) {
-        this.resourceObject = resourceObject;
+    public void setMainThreadTestObject(Testosterone mainThreadTestObject) {
+        this.mainThreadTestObject = mainThreadTestObject;
     }
 
     /**
@@ -75,8 +75,8 @@ public class GrizzlyServerConfig implements ServerConfig {
      * @return
      */
     @Override
-    public Testosterone getTestObject() {
-        return testObject;
+    public Testosterone getRequestThreadTestObject() {
+        return requestThreadTestObject;
     }
 
     /**
@@ -102,11 +102,11 @@ public class GrizzlyServerConfig implements ServerConfig {
     /**
      * {@inheritDoc }
      *
-     * @param testObject
+     * @param requestThreadTestObject
      */
     @Override
-    public void setTestObject(Testosterone testObject) {
-        this.testObject = testObject;
+    public void setRequestThreadTestObject(Testosterone requestThreadTestObject) {
+        this.requestThreadTestObject = requestThreadTestObject;
     }
 
     /**
@@ -312,7 +312,7 @@ public class GrizzlyServerConfig implements ServerConfig {
      */
     @Override
     public void initConfiguration(Testosterone obj) {
-        this.resourceObject = obj;
+        this.mainThreadTestObject = obj;
         if (Utils.isAnnotationPresent(obj, Singleton.class)) {
             this.resourceConfig.register(obj);
         } else {
@@ -402,7 +402,7 @@ public class GrizzlyServerConfig implements ServerConfig {
      */
     @Override
     public String toString() {
-        return "JerseyConfiguration{" + "testObject=" + testObject.getClass().getName() + '}';
+        return "JerseyConfiguration{" + "testObject=" + requestThreadTestObject.getClass().getName() + '}';
     }
 
 }

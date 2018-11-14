@@ -40,6 +40,8 @@ public class Setup implements ContainerResponseFilter {
     protected boolean afterServerStart;
     protected boolean beforeServerStop;
     protected boolean afterServerStop;
+    protected boolean requestsAlreadInvoked;
+    protected ExecutingTest executingTest;
 
     /**
      * Creates TestosteroneSetup.
@@ -272,6 +274,26 @@ public class Setup implements ContainerResponseFilter {
         this.afterServerStart = false;
         this.beforeServerStop = false;
         this.afterServerStop = false;
+    }
+
+    public ServiceLocator getServiceLocator() {
+        return locator;
+    }
+
+    public boolean isRequestsAlreadInvoked() {
+        return requestsAlreadInvoked;
+    }
+
+    public void setRequestsAlreadInvoked(boolean requestsAlreadInvoked) {
+        this.requestsAlreadInvoked = requestsAlreadInvoked;
+    }
+
+    public ExecutingTest getExecutingTest() {
+        return executingTest;
+    }
+
+    public void setExecutingTest(ExecutingTest executingTest) {
+        this.executingTest = executingTest;
     }
 
     @Override

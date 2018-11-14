@@ -1,17 +1,24 @@
 package info.stasha.testosterone;
 
 /**
- * JUnit test executor.
+ * Test executor.
  *
  * @author stasha
  */
 public interface TestExecutor {
 
-	/**
-	 * Executes http request/s to JUnit tests.
-	 *
-	 * @throws Throwable
-	 */
-	void execute() throws Throwable;
+    /**
+     * Executes method annotated with @Test.
+     *
+     * @throws Throwable
+     */
+    void executeTest() throws Throwable;
+
+    /**
+     * Executes tests annotated with @Requests or @Request annotation
+     *
+     * @throws Throwable
+     */
+    void executeRequests() throws Throwable;
 
 }

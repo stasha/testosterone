@@ -1,7 +1,5 @@
 package info.stasha.testosterone.junit4.jersey.injectables;
 
-import info.stasha.testosterone.annotation.Mock;
-import info.stasha.testosterone.annotation.Spy;
 import info.stasha.testosterone.jersey.MockingAbstractBinder;
 import info.stasha.testosterone.junit4.*;
 import info.stasha.testosterone.jersey.Testosterone;
@@ -14,8 +12,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.times;
+import org.mockito.Spy;
 
 /**
  * Mock and Spy Injection test.
@@ -37,7 +37,7 @@ public class MockAndSpyInjectTest implements Testosterone {
     @Override
     public void configureMocks(MockingAbstractBinder binder) {
         binder.bind(ServiceImpl.class).to(ServiceImpl.class).in(RequestScoped.class).proxy(true);
-        binder.bind(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
+        binder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
     }
 
     @Test

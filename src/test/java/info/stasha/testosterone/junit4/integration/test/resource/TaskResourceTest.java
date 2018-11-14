@@ -1,6 +1,7 @@
-package info.stasha.testosterone.junit4.integration.test;
+package info.stasha.testosterone.junit4.integration.test.resource;
 
 import info.stasha.testosterone.annotation.Request;
+import info.stasha.testosterone.jersey.Mock;
 import info.stasha.testosterone.jersey.MockingAbstractBinder;
 import info.stasha.testosterone.jersey.MockingResourceConfig;
 import info.stasha.testosterone.jersey.Testosterone;
@@ -9,28 +10,29 @@ import info.stasha.testosterone.junit4.integration.app.task.Task;
 import info.stasha.testosterone.junit4.integration.app.task.TaskResource;
 import info.stasha.testosterone.junit4.integration.app.task.service.TaskService;
 import info.stasha.testosterone.junit4.integration.app.task.service.TaskServiceFactory;
-import info.stasha.testosterone.junit4.integration.app.task.service.TaskServiceImpl;
 import javax.inject.Singleton;
 import static javax.ws.rs.HttpMethod.*;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.ArgumentMatchers.any;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.times;
+import org.mockito.Spy;
 
 /**
  * Testing TaskResource with mocks.
  *
  * @author stasha
  */
+@Ignore
 @RunWith(TestosteroneRunner.class)
 public class TaskResourceTest implements Testosterone {
 
-    protected TaskResource taskResource;
     protected final Task task = new Task(3L, "Title", "Description", false);
     protected final Task createTask = new Task("Title", "Description", false);
     public Entity taskEntity = Entity.json(task);
@@ -39,14 +41,17 @@ public class TaskResourceTest implements Testosterone {
     @Context
     protected TaskService taskService;
 
+    @Spy
+    private TaskResource taskResource = new TaskResource();
+
     @Override
     public void configureMocks(MockingResourceConfig config) {
-        taskResource = config.registerSpy(TaskResource.class);
+        config.register(taskResource);
     }
 
     @Override
     public void configureMocks(MockingAbstractBinder binder) {
-        binder.bindSpyFactory(TaskServiceFactory.class, TaskServiceImpl.class).to(TaskService.class).in(Singleton.class);
+        binder.bindFactory(Mock.mock(TaskServiceFactory.class)).to(TaskService.class).in(Singleton.class);
     }
 
     public <T> T verify(T mock, int invocations) {
