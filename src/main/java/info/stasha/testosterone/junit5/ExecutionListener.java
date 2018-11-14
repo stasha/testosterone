@@ -1,7 +1,7 @@
 package info.stasha.testosterone.junit5;
 
-import info.stasha.testosterone.Instrument;
-import info.stasha.testosterone.Interceptors;
+import info.stasha.testosterone.TestInstrumentation;
+import info.stasha.testosterone.TestIterceptors;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.support.descriptor.ClassSource;
@@ -48,7 +48,7 @@ public class ExecutionListener implements TestExecutionListener {
 				}
 			}
 			if (Testosterone.class.isAssignableFrom(cls)) {
-				return (Class<? extends Testosterone>) Instrument.testClass((Class<? extends Testosterone>) cls, new AfterAllAnnotation());
+				return (Class<? extends Testosterone>) TestInstrumentation.testClass((Class<? extends Testosterone>) cls, new AfterAllAnnotation());
 			}
 		}
 
@@ -64,9 +64,9 @@ public class ExecutionListener implements TestExecutionListener {
 	public void executionStarted(TestIdentifier testIdentifier) {
 		Class<? extends Testosterone> cls = getClass(testIdentifier);
 		if (testIdentifier.isContainer() && cls != null) {
-			Interceptors.beforeClass(cls);
+			TestIterceptors.beforeClass(cls);
 		} else if (testIdentifier.isTest()) {
-			Interceptors.before(cls);
+			TestIterceptors.before(cls);
 		}
 	}
 
@@ -80,9 +80,9 @@ public class ExecutionListener implements TestExecutionListener {
 	public void executionFinished(TestIdentifier testIdentifier, TestExecutionResult testExecutionResult) {
 		Class<? extends Testosterone> cls = getClass(testIdentifier);
 		if (testIdentifier.isContainer() && cls != null) {
-			Interceptors.afterClass(cls);
+			TestIterceptors.afterClass(cls);
 		} else if (testIdentifier.isTest()) {
-			Interceptors.after(cls);
+			TestIterceptors.after(cls);
 		}
 	}
 

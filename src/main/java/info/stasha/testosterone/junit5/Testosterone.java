@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.TestInstanceFactory;
 import org.junit.jupiter.api.extension.TestInstanceFactoryContext;
 import org.junit.jupiter.api.extension.TestInstantiationException;
 
-import info.stasha.testosterone.Instrument;
+import info.stasha.testosterone.TestInstrumentation;
 import info.stasha.testosterone.junit5.Testosterone.ContextInjectParameterResolver;
 import info.stasha.testosterone.junit5.Testosterone.TestosteroneFactory;
 import javax.inject.Inject;
@@ -47,7 +47,7 @@ public interface Testosterone extends info.stasha.testosterone.jersey.Testostero
 		public Object createTestInstance(TestInstanceFactoryContext factoryContext, ExtensionContext extensionContext)
 				throws TestInstantiationException {
 			try {
-				return Instrument.testClass((Class<? extends Testosterone>) factoryContext.getTestClass(), new AfterAllAnnotation()).newInstance();
+				return TestInstrumentation.testClass((Class<? extends Testosterone>) factoryContext.getTestClass(), new AfterAllAnnotation()).newInstance();
 			} catch (InstantiationException | IllegalAccessException ex) {
 				throw new RuntimeException(ex);
 			}

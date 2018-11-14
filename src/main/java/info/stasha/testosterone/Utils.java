@@ -73,15 +73,20 @@ public class Utils {
      * Returns all methods that are annotated with specified annotation.
      *
      * @param clazz
-     * @param annotation
+     * @param annotations
      * @return
      */
-    public static List<Method> getAnnotatedMethods(Class<?> clazz, Class<? extends Annotation> annotation) {
+    public static List<Method> getAnnotatedMethods(Class<?> clazz, List<Class<? extends Annotation>> annotations) {
         List<Method> methods = new ArrayList<>();
+        if (clazz == null || annotations.isEmpty()) {
+            return methods;
+        }
         while (clazz != null) {
             for (Method method : clazz.getDeclaredMethods()) {
-                if (method.isAnnotationPresent(annotation)) {
-                    methods.add(method);
+                for (Class<? extends Annotation> a : annotations) {
+                    if (method.isAnnotationPresent(a)) {
+                        methods.add(method);
+                    }
                 }
             }
 
@@ -197,7 +202,7 @@ public class Utils {
      * @param clazz
      * @return
      */
-    public static StartServer getServerStarts(Class<? extends Testosterone> clazz) {
+    public static Start getServerStarts(Class<? extends Testosterone> clazz) {
         Setup setup = ConfigFactory.SETUP.get(clazz.getName());
         Testosterone t = setup != null ? setup.getTestosterone() : null;
 
@@ -208,7 +213,7 @@ public class Utils {
                 return config.serverStarts();
             }
         }
-        return StartServer.BY_PARENT;
+        return Start.BY_PARENT;
     }
 
     /**

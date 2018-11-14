@@ -1,6 +1,6 @@
 package info.stasha.testosterone.testng;
 
-import info.stasha.testosterone.StartServer;
+import info.stasha.testosterone.Start;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.annotation.Request;
 import info.stasha.testosterone.junit4.jersey.service.Service;
@@ -16,7 +16,7 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-@Configuration(serverStarts = StartServer.PER_CLASS)
+@Configuration(serverStarts = Start.PER_CLASS)
 public class SuperTest implements Testosterone {
 
 	@Override

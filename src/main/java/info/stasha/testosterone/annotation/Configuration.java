@@ -1,7 +1,7 @@
 package info.stasha.testosterone.annotation;
 
 import info.stasha.testosterone.ConfigFactory;
-import info.stasha.testosterone.StartServer;
+import info.stasha.testosterone.Start;
 import info.stasha.testosterone.jersey.JettyConfigFactory;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -45,9 +45,9 @@ public @interface Configuration {
 	/**
 	 * When to start/stop server.
 	 *
-	 * @see StartServer
+	 * @see Start
 	 * @return
 	 */
-	StartServer serverStarts() default StartServer.PER_CLASS;
+	Start serverStarts() default Start.PER_CLASS;
 
 }

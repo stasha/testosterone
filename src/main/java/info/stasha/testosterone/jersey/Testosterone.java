@@ -18,12 +18,13 @@ import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.db.H2ConnectionFactory;
 import info.stasha.testosterone.jersey.inject.MockInjectionResolver;
 import info.stasha.testosterone.jersey.inject.SpyInjectionResolver;
-import info.stasha.testosterone.servlet.MockingServletContainerConfig;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import javax.inject.Singleton;
 import org.glassfish.hk2.api.InjectionResolver;
@@ -102,7 +103,7 @@ public interface Testosterone {
         return target().path(path);
     }
 
-    default IntegrationContainer getTests() {
+    default Map<String, Testosterone> getTests() {
         return getSetup().getTests();
     }
 
@@ -124,7 +125,7 @@ public interface Testosterone {
                 Object obj = f.get(this);
                 if (m != null && obj == null) {
                     f.set(this, Mockito.mock(f.getType(), m.answer()));
-                }  else if (s != null && obj != null) {
+                } else if (s != null && obj != null) {
                     f.set(this, Mockito.spy(f.get(this)));
                 }
 
@@ -179,7 +180,7 @@ public interface Testosterone {
             List<Class<? extends Testosterone>> testClasses = Arrays.asList(integration.value());
             Collections.reverse(testClasses);
 
-            IntegrationContainerImpl tests = new IntegrationContainerImpl();
+            Map<String, Testosterone> tests = new LinkedHashMap();
             for (Class<? extends Testosterone> cls : testClasses) {
                 try {
                     Testosterone t = cls.newInstance();
@@ -208,11 +209,11 @@ public interface Testosterone {
 
         if (integration == null) {
             // configureMocks MockingResourceConfig
-            configureMocks((MockingResourceConfig) config.getResourceConfig());
+            configureMocks(config.getResourceConfig());
             // configuring MockingServletContainerConfig
-            configureMocks((MockingServletContainerConfig) config.getServletContainerConfig());
+            configureMocks(config.getServletContainerConfig());
             // configureMocks mocking abstract binder
-            config.getResourceConfig().register(new MockingAbstractBinder() {
+            config.getResourceConfig().register(new AbstractBinder() {
                 @Override
                 protected void configure() {
                     Testosterone.this.configureMocks(this);
@@ -222,7 +223,7 @@ public interface Testosterone {
 
         // invoking only for root setup
         if (getSetup().getRoot() == null) {
-             config.getResourceConfig().property("test", this);
+            config.getResourceConfig().property("test", this);
             // registering setup so it can listen for application events
             config.getResourceConfig().register(getSetup());
             // registering db config so db is started/stopped with jersey application
@@ -290,7 +291,7 @@ public interface Testosterone {
      *
      * @param config
      */
-    default void configureMocks(MockingResourceConfig config) {
+    default void configureMocks(ResourceConfig config) {
 
     }
 
@@ -309,7 +310,7 @@ public interface Testosterone {
      *
      * @param binder
      */
-    default void configureMocks(MockingAbstractBinder binder) {
+    default void configureMocks(AbstractBinder binder) {
 
     }
 
@@ -329,7 +330,7 @@ public interface Testosterone {
      *
      * @param config
      */
-    default void configureMocks(MockingServletContainerConfig config) {
+    default void configureMocks(ServletContainerConfig config) {
 
     }
 

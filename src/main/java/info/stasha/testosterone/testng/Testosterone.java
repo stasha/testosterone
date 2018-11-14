@@ -1,6 +1,6 @@
 package info.stasha.testosterone.testng;
 
-import info.stasha.testosterone.Instrument;
+import info.stasha.testosterone.TestInstrumentation;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.testng.IObjectFactory2;
@@ -29,7 +29,7 @@ public interface Testosterone extends info.stasha.testosterone.jersey.Testostero
 		@Override
 		public Object newInstance(Class<?> cls) {
 			try {
-				return Instrument.testClass((Class<? extends Testosterone>) cls, 
+				return TestInstrumentation.testClass((Class<? extends Testosterone>) cls, 
 						new AfterClassAnnotation()).newInstance();
 			} catch (Throwable ex) {
 				Logger.getLogger(TestObjectFactory.class.getName()).log(Level.SEVERE, null, ex);

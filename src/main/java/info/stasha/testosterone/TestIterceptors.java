@@ -14,13 +14,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Interceptors intercepting JUnit calls to different test instance methods.
+ * TestIterceptors intercepting JUnit calls to different test instance methods.
  *
  * @author stasha
  */
-public class Interceptors {
+public class TestIterceptors {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Interceptors.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestIterceptors.class);
 
     /**
      * Starts the configuration.
@@ -62,8 +62,8 @@ public class Interceptors {
      * @param clazz
      */
     public static void beforeClass(Class<? extends Testosterone> clazz) {
-        StartServer s = Utils.getServerStarts(clazz);
-        if (s == StartServer.BY_PARENT || s == StartServer.PER_CLASS) {
+        Start s = Utils.getServerStarts(clazz);
+        if (s == Start.BY_PARENT || s == Start.PER_CLASS) {
             LOGGER.info("Starting server configured with: {}", s);
             start(Utils.getTestosterone(clazz));
         }
@@ -75,8 +75,8 @@ public class Interceptors {
      * @param clazz
      */
     public static void afterClass(Class<? extends Testosterone> clazz) {
-        StartServer s = Utils.getServerStarts(clazz);
-        if (s == StartServer.BY_PARENT || s == StartServer.PER_CLASS) {
+        Start s = Utils.getServerStarts(clazz);
+        if (s == Start.BY_PARENT || s == Start.PER_CLASS) {
             LOGGER.info("Stopping server configured with: {}", s);
             stop(Utils.getTestosterone(clazz));
         }
@@ -97,7 +97,7 @@ public class Interceptors {
      * @param orig
      */
     public static void before(@This Testosterone orig) {
-        if (orig.getServerConfig().getServerStarts() == StartServer.PER_TEST) {
+        if (orig.getServerConfig().getServerStarts() == Start.PER_TEST) {
             LOGGER.info("Starting server {} configuration", orig.getServerConfig().getServerStarts());
             start(orig);
         }
@@ -118,14 +118,14 @@ public class Interceptors {
      * @param orig
      */
     public static void after(@This Testosterone orig) {
-        if (orig.getServerConfig().getServerStarts() == StartServer.PER_TEST) {
+        if (orig.getServerConfig().getServerStarts() == Start.PER_TEST) {
             LOGGER.info("Stopping server {} configuration", orig.getServerConfig().getServerStarts());
             stop(orig);
         }
     }
 
     /**
-     * Interceptors
+     * TestIterceptors
      */
     public static class Intercept {
 
@@ -170,7 +170,7 @@ public class Interceptors {
 
             @RuntimeType
             public static Void postConstruct(@This Testosterone orig) throws Exception, Throwable {
-                ExecutingTest et = orig.getSetup().getExecutingTest();
+                TestInExecution et = orig.getSetup().getExecutingTest();
                 PathAndTest.test(null, null, et.getMainThreadTestMethod(), et.getManiThreadTest());
                 return null;
             }
@@ -180,6 +180,7 @@ public class Interceptors {
 
             /**
              *
+             * @param zuper
              * @param method
              * @param orig
              */
@@ -192,6 +193,7 @@ public class Interceptors {
 
             /**
              *
+             * @param zuper
              * @param method
              * @param orig
              */
@@ -207,7 +209,7 @@ public class Interceptors {
 
             @RuntimeType
             public static void afterClass(@Origin Method method) throws Exception {
-                Interceptors.afterClass((Class<? extends Testosterone>) method.getDeclaringClass());
+                TestIterceptors.afterClass((Class<? extends Testosterone>) method.getDeclaringClass());
             }
         }
 
@@ -250,14 +252,14 @@ public class Interceptors {
                 // Jersey resource before that will be invoked
                 Method resourceMethod = mainThreadTest.getClass().getMethod(method.getName(), method.getParameterTypes());
 
-                ExecutingTest et = orig.getSetup().getExecutingTest();
+                TestInExecution et = orig.getSetup().getExecutingTest();
                 // If we are in main JUnit thread, invoke http request to test
                 if (isMain) {
                     LOGGER.info("Starting {}", invoking);
 
                     try {
                         try {
-                            et = new ExecutingTest(orig, mainThreadTest, resourceMethod, Utils.getMethodStartingWithName(mainThreadTest.getClass(), resourceMethod), args);
+                            et = new TestInExecution(orig, mainThreadTest, resourceMethod, Utils.getMethodStartingWithName(mainThreadTest.getClass(), resourceMethod), args);
                             orig.getSetup().setExecutingTest(et);
                             // Invoking http request to resource before on resource object
                             et.executeTest();
@@ -283,7 +285,7 @@ public class Interceptors {
 
                     try {
                         LOGGER.info("Invoking {}", invoking);
-                        for (Method m : Utils.getAnnotatedMethods(orig.getClass(), org.junit.Before.class)) {
+                        for (Method m : Utils.getAnnotatedMethods(orig.getClass(), TestAnnotations.BEFORE)) {
                             Utils.invokeOriginalMethod(m, orig, new Object[]{});
                         }
 
@@ -303,7 +305,7 @@ public class Interceptors {
                         config.getExceptions().add(ex);
 
                     } finally {
-                        for (Method m : Utils.getAnnotatedMethods(orig.getClass(), org.junit.After.class)) {
+                        for (Method m : Utils.getAnnotatedMethods(orig.getClass(), TestAnnotations.AFTER)) {
                             Utils.invokeOriginalMethod(m, orig, new Object[]{});
                         }
                     }

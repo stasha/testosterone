@@ -1,11 +1,11 @@
 package info.stasha.testosterone.junit4.jersey.injectables;
 
-import info.stasha.testosterone.jersey.MockingAbstractBinder;
 import info.stasha.testosterone.junit4.*;
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.junit4.jersey.service.Service;
 import info.stasha.testosterone.junit4.jersey.service.ServiceFactory;
 import info.stasha.testosterone.junit4.jersey.service.ServiceImpl;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -35,7 +35,7 @@ public class MockAndSpyInjectTest implements Testosterone {
     private ServiceImpl spyServiceImpl;
 
     @Override
-    public void configureMocks(MockingAbstractBinder binder) {
+    public void configureMocks(AbstractBinder binder) {
         binder.bind(ServiceImpl.class).to(ServiceImpl.class).in(RequestScoped.class).proxy(true);
         binder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
     }

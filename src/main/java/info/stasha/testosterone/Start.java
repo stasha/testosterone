@@ -3,7 +3,7 @@ package info.stasha.testosterone;
 /**
  * When to start/stop server.
  */
-public enum StartServer {
+public enum Start {
 	/**
 	 * Server is started/stopped based on parent.<br>
 	 * This option will run server only once per suite, in case tests are run

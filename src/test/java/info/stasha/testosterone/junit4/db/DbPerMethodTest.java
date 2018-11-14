@@ -1,6 +1,6 @@
 package info.stasha.testosterone.junit4.db;
 
-import info.stasha.testosterone.StartServer;
+import info.stasha.testosterone.Start;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.junit4.*;
 import info.stasha.testosterone.db.H2Config;
@@ -20,7 +20,7 @@ import org.junit.runner.RunWith;
  * @author stasha
  */
 @RunWith(TestosteroneRunner.class)
-@Configuration(serverStarts = StartServer.PER_TEST)
+@Configuration(serverStarts = Start.PER_TEST)
 public class DbPerMethodTest implements Testosterone {
 
 	@Context

@@ -2,8 +2,6 @@ package info.stasha.testosterone.junit4.integration.test.resource;
 
 import info.stasha.testosterone.annotation.Request;
 import info.stasha.testosterone.jersey.Mock;
-import info.stasha.testosterone.jersey.MockingAbstractBinder;
-import info.stasha.testosterone.jersey.MockingResourceConfig;
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.junit4.TestosteroneRunner;
 import info.stasha.testosterone.junit4.integration.app.task.Task;
@@ -15,6 +13,8 @@ import static javax.ws.rs.HttpMethod.*;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.ArgumentMatchers.any;
@@ -41,12 +41,12 @@ public class TaskResourceTest implements Testosterone {
     protected TaskService taskService;
 
     @Override
-    public void configureMocks(MockingResourceConfig config) {
+    public void configureMocks(ResourceConfig config) {
         config.register(taskResource);
     }
 
     @Override
-    public void configureMocks(MockingAbstractBinder binder) {
+    public void configureMocks(AbstractBinder binder) {
         binder.bindFactory(Mock.mock(TaskServiceFactory.class)).to(TaskService.class).in(Singleton.class);
     }
 

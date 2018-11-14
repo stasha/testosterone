@@ -28,7 +28,7 @@ import net.bytebuddy.matcher.ElementMatchers;
  *
  * @author stasha
  */
-public class Instrument {
+public class TestInstrumentation {
 
     private static final Map<Class<? extends Testosterone>, Class<? extends Testosterone>> CLASSES = new HashMap<>();
 
@@ -72,14 +72,14 @@ public class Instrument {
                     .subclass(clazz)
                     .name(clazz.getName() + "_")
                     .defineMethod("__created__", Void.class, Visibility.PUBLIC)
-                    .intercept(MethodDelegation.to(Interceptors.Intercept.Constructor.class))
+                    .intercept(MethodDelegation.to(TestIterceptors.Intercept.Constructor.class))
                     //
                     .constructor(ElementMatchers.isDefaultConstructor())
                     .intercept(SuperMethodCall.INSTANCE.andThen(MethodCall.invoke(named("__created__"))))
                     .annotateType(new PathAnnotation(clazz))
                     //
                     .defineMethod("__afterClass__", void.class, Visibility.PUBLIC, Ownership.STATIC)
-                    .intercept(MethodDelegation.to(Interceptors.Intercept.AfterClass.class))
+                    .intercept(MethodDelegation.to(TestIterceptors.Intercept.AfterClass.class))
                     .annotateMethod(afterClassAnnotation)
                     //
                     .method(
@@ -94,7 +94,7 @@ public class Instrument {
                                     // testosterone
                                     .and(not(isAnnotatedWith(DontIntercept.class)))
                     )
-                    .intercept(MethodDelegation.to(Interceptors.Intercept.PathAndTest.class))
+                    .intercept(MethodDelegation.to(TestIterceptors.Intercept.PathAndTest.class))
                     .attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
                     .annotateMethod(new PathAnnotation())
                     .annotateMethod(new GetAnnotation())
@@ -102,29 +102,29 @@ public class Instrument {
                     .method(isAnnotatedWith(Path.class)
                             .and(not(isAnnotatedWith(DontIntercept.class)))
                     )
-                    .intercept(MethodDelegation.to(Interceptors.Intercept.PathAndTest.class))
+                    .intercept(MethodDelegation.to(TestIterceptors.Intercept.PathAndTest.class))
                     .attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
                     //
                     .method(isAnnotatedWith(named("org.junit.Before"))
                             .or(isAnnotatedWith(named("org.junit.jupiter.api.BeforeEach")))
                             .or(isAnnotatedWith(named("org.testng.annotations.Before")))
                     )
-                    .intercept(MethodDelegation.to(Interceptors.Intercept.Before.class))
+                    .intercept(MethodDelegation.to(TestIterceptors.Intercept.Before.class))
 //                    .attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
                     //
                     .method(isAnnotatedWith(named("org.junit.After"))
                             .or(isAnnotatedWith(named("org.junit.jupiter.api.AfterEach")))
                             .or(isAnnotatedWith(named("org.testng.annotations.After")))
                     )
-                    .intercept(MethodDelegation.to(Interceptors.Intercept.After.class))
+                    .intercept(MethodDelegation.to(TestIterceptors.Intercept.After.class))
 //                    .attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
                     //
                     .defineMethod("__postconstruct__", void.class, Visibility.PUBLIC)
-                    .intercept(MethodDelegation.to(Interceptors.Intercept.PostConstruct.class))
+                    .intercept(MethodDelegation.to(TestIterceptors.Intercept.PostConstruct.class))
                     .annotateMethod(new PostConstructAnnotation())
                     //
                     .defineMethod("__generic__", Void.class, Visibility.PUBLIC)
-                    .intercept(MethodDelegation.to(Interceptors.Intercept.GenericTest.class))
+                    .intercept(MethodDelegation.to(TestIterceptors.Intercept.GenericTest.class))
                     .annotateMethod(new PathAnnotation("__generic__"))
                     //
                     .make()

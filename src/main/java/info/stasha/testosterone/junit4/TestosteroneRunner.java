@@ -8,7 +8,7 @@ import org.junit.runner.Description;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 
-import info.stasha.testosterone.Instrument;
+import info.stasha.testosterone.TestInstrumentation;
 import info.stasha.testosterone.jersey.Testosterone;
 import org.junit.runner.notification.RunListener;
 import org.junit.runner.notification.RunNotifier;
@@ -52,9 +52,9 @@ public class TestosteroneRunner extends BlockJUnit4ClassRunner {
 	}
 
 	public TestosteroneRunner(Class<? extends Testosterone> clazz) throws Throwable {
-		super(Instrument.testClass(clazz, new AfterClassAnnotation()));
+		super(TestInstrumentation.testClass(clazz, new AfterClassAnnotation()));
 		this.testClass = clazz;
-		cls = Instrument.getInstrumentedClass(clazz);
+		cls = TestInstrumentation.getInstrumentedClass(clazz);
 	}
 
 	@Override

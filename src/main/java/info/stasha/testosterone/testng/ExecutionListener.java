@@ -1,7 +1,7 @@
 package info.stasha.testosterone.testng;
 
-import info.stasha.testosterone.Instrument;
-import info.stasha.testosterone.Interceptors;
+import info.stasha.testosterone.TestInstrumentation;
+import info.stasha.testosterone.TestIterceptors;
 import org.testng.ITestContext;
 import org.testng.ITestListener;
 import org.testng.ITestResult;
@@ -21,8 +21,8 @@ public class ExecutionListener implements ITestListener {
 	 */
 	@Override
 	public void onStart(ITestContext itc) {
-		Class<? extends Testosterone> clazz = Instrument.getInstrumentedClass(itc.getAllTestMethods()[0].getRealClass());
-		Interceptors.beforeClass(clazz);
+		Class<? extends Testosterone> clazz = TestInstrumentation.getInstrumentedClass(itc.getAllTestMethods()[0].getRealClass());
+		TestIterceptors.beforeClass(clazz);
 	}
 
 	/**
@@ -32,8 +32,8 @@ public class ExecutionListener implements ITestListener {
 	 */
 	@Override
 	public void onFinish(ITestContext itc) {
-		Class<? extends Testosterone> clazz = Instrument.getInstrumentedClass(itc.getAllTestMethods()[0].getRealClass());
-		Interceptors.afterClass(clazz);
+		Class<? extends Testosterone> clazz = TestInstrumentation.getInstrumentedClass(itc.getAllTestMethods()[0].getRealClass());
+		TestIterceptors.afterClass(clazz);
 	}
 
 	/**
@@ -43,7 +43,7 @@ public class ExecutionListener implements ITestListener {
 	 */
 	@Override
 	public void onTestStart(ITestResult itr) {
-		Interceptors.before((Testosterone) itr.getInstance());
+		TestIterceptors.before((Testosterone) itr.getInstance());
 	}
 
 	/**
@@ -53,7 +53,7 @@ public class ExecutionListener implements ITestListener {
 	 */
 	@Override
 	public void onTestSuccess(ITestResult itr) {
-		Interceptors.after((Testosterone) itr.getInstance());
+		TestIterceptors.after((Testosterone) itr.getInstance());
 	}
 
 	/**
@@ -63,7 +63,7 @@ public class ExecutionListener implements ITestListener {
 	 */
 	@Override
 	public void onTestFailure(ITestResult itr) {
-		Interceptors.after((Testosterone) itr.getInstance());
+		TestIterceptors.after((Testosterone) itr.getInstance());
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class ExecutionListener implements ITestListener {
 	 */
 	@Override
 	public void onTestFailedButWithinSuccessPercentage(ITestResult itr) {
-		Interceptors.after((Testosterone) itr.getInstance());
+		TestIterceptors.after((Testosterone) itr.getInstance());
 //		System.out.println(itr);
 	}
 

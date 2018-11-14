@@ -147,14 +147,14 @@ public interface ServerConfig {
 	 *
 	 * @return
 	 */
-	StartServer getServerStarts();
+	Start getServerStarts();
 
 	/**
 	 * Sets when server should start.
 	 *
 	 * @param serverStarts
 	 */
-	void setServerStarts(StartServer serverStarts);
+	void setServerStarts(Start serverStarts);
 
 	/**
 	 * Starts server.

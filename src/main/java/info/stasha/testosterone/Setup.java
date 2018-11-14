@@ -2,9 +2,9 @@ package info.stasha.testosterone;
 
 import info.stasha.testosterone.annotation.Integration;
 import info.stasha.testosterone.db.DbConfig;
-import info.stasha.testosterone.jersey.IntegrationContainer;
 import info.stasha.testosterone.jersey.Testosterone;
 import java.io.IOException;
+import java.util.Map;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
@@ -29,7 +29,7 @@ public class Setup implements ContainerResponseFilter {
     private ServiceLocator locator;
 
     protected Integration integration;
-    protected IntegrationContainer tests;
+    protected Map<String, Testosterone> tests;
     protected Setup parent;
     protected Setup root;
     protected boolean suite;
@@ -41,7 +41,7 @@ public class Setup implements ContainerResponseFilter {
     protected boolean beforeServerStop;
     protected boolean afterServerStop;
     protected boolean requestsAlreadInvoked;
-    protected ExecutingTest executingTest;
+    protected TestInExecution executingTest;
 
     /**
      * Creates TestosteroneSetup.
@@ -77,7 +77,7 @@ public class Setup implements ContainerResponseFilter {
      *
      * @return
      */
-    public IntegrationContainer getTests() {
+    public Map<String, Testosterone> getTests() {
         return tests;
     }
 
@@ -86,7 +86,7 @@ public class Setup implements ContainerResponseFilter {
      *
      * @param tests
      */
-    public void setTests(IntegrationContainer tests) {
+    public void setTests(Map<String, Testosterone> tests) {
         this.tests = tests;
     }
 
@@ -288,11 +288,11 @@ public class Setup implements ContainerResponseFilter {
         this.requestsAlreadInvoked = requestsAlreadInvoked;
     }
 
-    public ExecutingTest getExecutingTest() {
+    public TestInExecution getExecutingTest() {
         return executingTest;
     }
 
-    public void setExecutingTest(ExecutingTest executingTest) {
+    public void setExecutingTest(TestInExecution executingTest) {
         this.executingTest = executingTest;
     }
 

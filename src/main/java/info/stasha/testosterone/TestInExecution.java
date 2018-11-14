@@ -9,7 +9,7 @@ import java.util.Arrays;
  *
  * @author stasha
  */
-public class ExecutingTest implements TestExecutor {
+public class TestInExecution implements TestExecutor {
 
     private final Testosterone maniThreadTest;
     private final Testosterone serverThreadTest;
@@ -26,7 +26,7 @@ public class ExecutingTest implements TestExecutor {
      * @param originMainThreadTestMethod
      * @param arguments
      */
-    public ExecutingTest(Testosterone mainThreadTest,
+    public TestInExecution(Testosterone mainThreadTest,
             Testosterone serverTrhreadTest,
             Method mainThreadTestMethod,
             Method originMainThreadTestMethod,
