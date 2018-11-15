@@ -37,9 +37,10 @@ public interface ConfigFactory {
 	/**
 	 * Returns a db configuration.
 	 *
+     * @param obj
 	 * @return
 	 */
-	DbConfig getDbConfig();
+	DbConfig getDbConfig(Testosterone obj);
 
 	/**
 	 * Returns Setup object. If setup does not exist, than it is created and

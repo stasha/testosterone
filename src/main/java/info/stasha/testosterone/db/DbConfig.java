@@ -2,6 +2,7 @@ package info.stasha.testosterone.db;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Map;
 import javax.sql.DataSource;
 import org.glassfish.hk2.api.Factory;
 
@@ -12,52 +13,75 @@ import org.glassfish.hk2.api.Factory;
  */
 public interface DbConfig {
 
-	/**
-	 * Returns DataSource.
-	 *
-	 * @return
-	 */
-	DataSource getDataSource();
+    /**
+     * Add SQL query to DbConfig that will be invoked after DB starts.
+     *
+     * @param queryName
+     * @param query
+     * @return
+     */
+    DbConfig add(String queryName, String query);
 
-	/**
-	 * Returns Connection to DB.
-	 *
-	 * @return
-	 */
-	Connection getConnection();
+    /**
+     * Returns map of SQL queries that will be invoked after DB starts.
+     *
+     * @return
+     */
+    Map<String, String> getInitSqls();
 
-	/**
-	 * Factory for creating connections.
-	 *
-	 * @return
-	 */
-	Class<? extends Factory<Connection>> getConnectionFactory();
+    /**
+     * Initialize database.
+     *
+     * @throws java.sql.SQLException
+     */
+    void init() throws SQLException;
 
-	/**
-	 * Method for creating testing DB or schema.
-	 *
-	 * @throws SQLException
-	 */
-	void createTestingDb() throws SQLException;
+    /**
+     * Returns DataSource.
+     *
+     * @return
+     */
+    DataSource getDataSource();
 
-	/**
-	 * Method for dropping testing DB or schema.
-	 *
-	 * @throws SQLException
-	 */
-	void dropTestingDb() throws SQLException;
+    /**
+     * Returns Connection to DB.
+     *
+     * @return
+     */
+    Connection getConnection();
 
-	/**
-	 * Starts DB server.
-	 *
-	 * @throws Exception
-	 */
-	void start() throws Exception;
+    /**
+     * Factory for creating connections.
+     *
+     * @return
+     */
+    Class<? extends Factory<Connection>> getConnectionFactory();
 
-	/**
-	 * Stops DB server.
-	 *
-	 * @throws Exception
-	 */
-	void stop() throws Exception;
+    /**
+     * Method for creating testing DB or schema.
+     *
+     * @throws SQLException
+     */
+    void createTestingDb() throws SQLException;
+
+    /**
+     * Method for dropping testing DB or schema.
+     *
+     * @throws SQLException
+     */
+    void dropTestingDb() throws SQLException;
+
+    /**
+     * Starts DB server.
+     *
+     * @throws Exception
+     */
+    void start() throws Exception;
+
+    /**
+     * Stops DB server.
+     *
+     * @throws Exception
+     */
+    void stop() throws Exception;
 }

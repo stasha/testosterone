@@ -1,7 +1,11 @@
 package info.stasha.testosterone.db;
 
+import info.stasha.testosterone.jersey.Testosterone;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import javax.sql.DataSource;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.jersey.server.monitoring.ApplicationEvent;
@@ -24,124 +28,183 @@ import org.slf4j.LoggerFactory;
 @Service
 public class H2Config implements DbConfig, ApplicationEventListener {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(H2Config.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(H2Config.class);
+    private final Map<String, String> sqls = new LinkedHashMap<>();
 
-	protected String testDbName;
-	protected DataSource dataSource;
-	protected JdbcConnectionPool connectionPool;
+    private String testDbName;
+    private DataSource dataSource;
+    private JdbcConnectionPool connectionPool;
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @return
-	 */
-	@Override
-	public DataSource getDataSource() {
-		if (dataSource == null) {
-			JdbcDataSource ds = new JdbcDataSource();
-			testDbName = String.valueOf(Math.random()).replace(".", "");
-			ds.setURL("jdbc:h2:mem:" + testDbName);
-			ds.setUser("sa");
-			ds.setPassword("sa");
-			dataSource = ds;
-			connectionPool = JdbcConnectionPool.create(ds);
-			LOGGER.info("Created new datasource {}", ds.toString());
-		}
-		return dataSource;
-	}
+    protected Testosterone test;
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @return
-	 */
-	@Override
-	public Connection getConnection() {
-		try {
-			return connectionPool.getConnection();
-		} catch (SQLException ex) {
-			LOGGER.error("Failed to obtain new connection from connection pool.");
-			throw new RuntimeException(ex);
-		}
-	}
+    public H2Config(Testosterone test) {
+        this.test = test;
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @return
-	 */
-	@Override
-	public Class<? extends Factory<Connection>> getConnectionFactory() {
-		getDataSource();
-		return H2ConnectionFactory.class;
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @param queryName
+     * @param query
+     * @return
+     */
+    @Override
+    public DbConfig add(String queryName, String query) {
+        sqls.put(queryName, query);
+        return this;
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @throws SQLException
-	 */
-	@Override
-	public void createTestingDb() throws SQLException {
-		throw new UnsupportedOperationException("Testing DB is created on server startup");
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public Map<String, String> getInitSqls() {
+        return sqls;
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @throws SQLException
-	 */
-	@Override
-	public void dropTestingDb() throws SQLException {
-		throw new UnsupportedOperationException("Testing DB is dropped on server end");
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public DataSource getDataSource() {
+        if (dataSource == null) {
+            JdbcDataSource ds = new JdbcDataSource();
+            testDbName = String.valueOf(Math.random()).replace(".", "");
+            ds.setURL("jdbc:h2:mem:" + testDbName);
+            ds.setUser("sa");
+            ds.setPassword("sa");
+            dataSource = ds;
+            connectionPool = JdbcConnectionPool.create(ds);
+            LOGGER.info("Created new datasource {}", ds.toString());
+        }
+        return dataSource;
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @throws Exception
-	 */
-	@Override
-	public void start() throws Exception {
-		LOGGER.info("Starting H2 DB.");
-		getDataSource();
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public Connection getConnection() {
+        try {
+            return connectionPool.getConnection();
+        } catch (SQLException ex) {
+            LOGGER.error("Failed to obtain new connection from connection pool.");
+            throw new RuntimeException(ex);
+        }
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @throws Exception
-	 */
-	@Override
-	public void stop() throws Exception {
-		LOGGER.info("Stopping H2 DB.");
-		getConnection().prepareStatement("shutdown").execute();
-		this.connectionPool.dispose();
-		this.dataSource = null;
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public Class<? extends Factory<Connection>> getConnectionFactory() {
+        getDataSource();
+        return H2ConnectionFactory.class;
+    }
 
-	@Override
-	public void onEvent(ApplicationEvent ae) {
-		if (ae.getType() == INITIALIZATION_START) {
-			try {
-				start();
-			} catch (Exception ex) {
-				LOGGER.error("Failed to start H2 DB");
-				throw new RuntimeException(ex);
-			}
-		} else if (ae.getType() == DESTROY_FINISHED) {
-			try {
-				stop();
-			} catch (Exception ex) {
-				LOGGER.error("Failed to stop H2 DB");
-				throw new RuntimeException(ex);
-			}
-		}
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @throws SQLException
+     */
+    @Override
+    public void createTestingDb() throws SQLException {
+        throw new UnsupportedOperationException("Testing DB is created on server startup");
+    }
 
-	@Override
-	public RequestEventListener onRequest(RequestEvent re) {
-		return null;
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @throws SQLException
+     */
+    @Override
+    public void dropTestingDb() throws SQLException {
+        throw new UnsupportedOperationException("Testing DB is dropped on server end");
+    }
+
+    /**
+     * {@inheritDoc }
+     *
+     */
+    @Override
+    public void init() throws SQLException {
+        if (!sqls.isEmpty()) {
+            try (Connection conn = getConnection()) {
+                conn.setAutoCommit(false);
+                Statement st = conn.createStatement();
+                for (String queryName : sqls.keySet()) {
+                    String query = sqls.get(queryName);
+                    if (test.onDbInit(queryName, query)) {
+                        LOGGER.info("Adding SQL {} to batch.", queryName);
+                        st.addBatch(sqls.get(queryName));
+                    } else {
+                        LOGGER.info("Skipping SQL {}.", queryName);
+                    }
+                }
+                st.executeBatch();
+                conn.setAutoCommit(true);
+            } catch (SQLException ex) {
+                LOGGER.error("Failed to initialize database");
+                throw ex;
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc }
+     *
+     * @throws Exception
+     */
+    @Override
+    public void start() throws Exception {
+        LOGGER.info("Starting H2 DB.");
+        getDataSource();
+        init();
+    }
+
+    /**
+     * {@inheritDoc }
+     *
+     * @throws Exception
+     */
+    @Override
+    public void stop() throws Exception {
+        LOGGER.info("Stopping H2 DB.");
+        getConnection().prepareStatement("shutdown").execute();
+        this.connectionPool.dispose();
+        this.dataSource = null;
+    }
+
+    @Override
+    public void onEvent(ApplicationEvent ae) {
+        if (ae.getType() == INITIALIZATION_START) {
+            try {
+                start();
+            } catch (Exception ex) {
+                LOGGER.error("Failed to start H2 DB");
+                throw new RuntimeException(ex);
+            }
+        } else if (ae.getType() == DESTROY_FINISHED) {
+            try {
+                stop();
+            } catch (Exception ex) {
+                LOGGER.error("Failed to stop H2 DB");
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
+    @Override
+    public RequestEventListener onRequest(RequestEvent re) {
+        return null;
+    }
 
 }

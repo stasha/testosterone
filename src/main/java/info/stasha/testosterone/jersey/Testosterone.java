@@ -27,10 +27,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import javax.inject.Singleton;
+import javax.ws.rs.core.Context;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.api.InjectionResolver;
+import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.jersey.process.internal.RequestScoped;
+import org.glassfish.jersey.server.monitoring.ApplicationEvent;
+import static org.glassfish.jersey.server.monitoring.ApplicationEvent.Type.INITIALIZATION_FINISHED;
+import org.glassfish.jersey.server.monitoring.ApplicationEventListener;
+import org.glassfish.jersey.server.monitoring.RequestEvent;
+import org.glassfish.jersey.server.monitoring.RequestEventListener;
 import static org.mockito.AdditionalAnswers.delegatesTo;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -141,13 +148,18 @@ public interface Testosterone {
         configure(config.getResourceConfig());
         // configure Servlet container
         configure(config.getServletContainerConfig());
-        // configure database 
-//        configure()
+        // configure DB
+        configure(getSetup().getDbConfig());
         // configureMocks AbstractBinder
         config.getResourceConfig().register(new AbstractBinder() {
+
+            @Context
+            ServiceLocator locator;
+
             @Override
             protected void configure() {
                 this.bindFactory(new Factory<Testosterone>() {
+
                     @Override
                     public Testosterone provide() {
                         return Testosterone.this;
@@ -155,7 +167,7 @@ public interface Testosterone {
 
                     @Override
                     public void dispose(Testosterone instance) {
-                        // do nothing
+                        // do nothinglocator.inject(getSetup().getDbConfig());
                     }
                 }).to(Testosterone.class).in(Singleton.class);
                 // H2 connection factory
@@ -226,6 +238,8 @@ public interface Testosterone {
             configureMocks(config.getResourceConfig());
             // configuring MockingServletContainerConfig
             configureMocks(config.getServletContainerConfig());
+            // configure db mocks 
+            configureMocks(getSetup().getDbConfig());
             // configureMocks mocking abstract binder
             config.getResourceConfig().register(new AbstractBinder() {
                 @Override
@@ -237,7 +251,6 @@ public interface Testosterone {
 
         // invoking only for root setup
         if (getSetup().getRoot() == null) {
-            config.getResourceConfig().property("test", this);
             // registering setup so it can listen for application events
             config.getResourceConfig().register(getSetup());
             // registering db config so db is started/stopped with jersey application
@@ -262,6 +275,7 @@ public interface Testosterone {
             initConfiguration(getServerConfig());
             // starts server
             getServerConfig().start();
+//            getSetup().getDbConfig().start();
 
             // Invoke afterServerStart only if resource is singleton.
             // If there is no Singleton annotation, afterServerStart is 
@@ -283,6 +297,7 @@ public interface Testosterone {
             getSetup().beforeServerStop(this);
             // stops server
             getServerConfig().stop();
+//            getSetup().getDbConfig().stop();
             // runs after server stop method
             getSetup().afterServerStop(this);
             getSetup().clearFlags();
@@ -358,11 +373,24 @@ public interface Testosterone {
     }
 
     /**
+     * Override to add mock data to database.
      *
      * @param config
      */
     default void configureMocks(DbConfig config) {
 
+    }
+
+    /**
+     * Override to control what SQL query will be executed. Return false to skip
+     * executing SQL query.
+     *
+     * @param queryName
+     * @param query
+     * @return
+     */
+    default boolean onDbInit(String queryName, String query) {
+        return true;
     }
 
     /**

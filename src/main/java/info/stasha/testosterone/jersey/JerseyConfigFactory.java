@@ -54,11 +54,11 @@ public class JerseyConfigFactory implements ConfigFactory {
 	/**
 	 * Returns DbConfig instance.
 	 *
+     * @param obj
 	 * @return
 	 */
-	@Override
-	public DbConfig getDbConfig() {
-		return new H2Config();
+	public DbConfig getDbConfig(Testosterone obj) {
+		return new H2Config(obj);
 	}
 
 	/**
@@ -91,7 +91,7 @@ public class JerseyConfigFactory implements ConfigFactory {
 				}
 
 				Setup setup = new Setup(obj, serverConfig);
-				setup.setDbConfig(new H2Config());
+				setup.setDbConfig(new H2Config(obj));
 
 				SETUP.put(getKey(obj), setup);
 
