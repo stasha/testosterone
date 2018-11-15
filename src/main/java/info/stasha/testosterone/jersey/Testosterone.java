@@ -27,9 +27,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import javax.inject.Singleton;
+import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.api.InjectionResolver;
 import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.jersey.process.internal.RequestScoped;
+import static org.mockito.AdditionalAnswers.delegatesTo;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
@@ -114,7 +116,7 @@ public interface Testosterone {
      */
     default void initConfiguration(ServerConfig config) {
 
-        System.out.println(this.getClass().getName());
+//        System.out.println(this.getClass().getName());
         for (Field f : this.getClass().getSuperclass().getDeclaredFields()) {
             f.setAccessible(true);
 //            System.out.println(f.getName() + " : " + Arrays.toString(f.getAnnotations()));
@@ -123,10 +125,11 @@ public interface Testosterone {
 
             try {
                 Object obj = f.get(this);
-                if (m != null && obj == null) {
+
+                if (m != null && obj != null) {
                     f.set(this, Mockito.mock(f.getType(), m.answer()));
                 } else if (s != null && obj != null) {
-                    f.set(this, Mockito.spy(f.get(this)));
+                    f.set(this, Mockito.mock(obj.getClass(), delegatesTo(obj)));
                 }
 
             } catch (IllegalArgumentException | IllegalAccessException ex) {
@@ -144,6 +147,17 @@ public interface Testosterone {
         config.getResourceConfig().register(new AbstractBinder() {
             @Override
             protected void configure() {
+                this.bindFactory(new Factory<Testosterone>() {
+                    @Override
+                    public Testosterone provide() {
+                        return Testosterone.this;
+                    }
+
+                    @Override
+                    public void dispose(Testosterone instance) {
+                        // do nothing
+                    }
+                }).to(Testosterone.class).in(Singleton.class);
                 // H2 connection factory
                 this.bindFactory(H2ConnectionFactory.class)
                         .to(Connection.class)

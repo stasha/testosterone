@@ -5,7 +5,7 @@ package info.stasha.testosterone.junit4.jersey.service;
  *
  * @author stasha
  */
-public class ServiceImpl implements Service {
+public class ServiceImpl implements Service, MyService, GreetService {
 
 	private User user;
 

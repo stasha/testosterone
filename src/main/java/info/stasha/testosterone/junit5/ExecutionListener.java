@@ -1,7 +1,7 @@
 package info.stasha.testosterone.junit5;
 
 import info.stasha.testosterone.TestInstrumentation;
-import info.stasha.testosterone.TestIterceptors;
+import info.stasha.testosterone.TestInterceptors;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.support.descriptor.ClassSource;
@@ -64,9 +64,9 @@ public class ExecutionListener implements TestExecutionListener {
 	public void executionStarted(TestIdentifier testIdentifier) {
 		Class<? extends Testosterone> cls = getClass(testIdentifier);
 		if (testIdentifier.isContainer() && cls != null) {
-			TestIterceptors.beforeClass(cls);
+			TestInterceptors.beforeClass(cls);
 		} else if (testIdentifier.isTest()) {
-			TestIterceptors.before(cls);
+			TestInterceptors.before(cls);
 		}
 	}
 
@@ -80,9 +80,9 @@ public class ExecutionListener implements TestExecutionListener {
 	public void executionFinished(TestIdentifier testIdentifier, TestExecutionResult testExecutionResult) {
 		Class<? extends Testosterone> cls = getClass(testIdentifier);
 		if (testIdentifier.isContainer() && cls != null) {
-			TestIterceptors.afterClass(cls);
+			TestInterceptors.afterClass(cls);
 		} else if (testIdentifier.isTest()) {
-			TestIterceptors.after(cls);
+			TestInterceptors.after(cls);
 		}
 	}
 

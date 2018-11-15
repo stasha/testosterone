@@ -1,7 +1,7 @@
 package info.stasha.testosterone.junit4;
 
 import info.stasha.testosterone.TestInstrumentation;
-import info.stasha.testosterone.TestIterceptors;
+import info.stasha.testosterone.TestInterceptors;
 import info.stasha.testosterone.jersey.Testosterone;
 import org.junit.runner.Description;
 import org.junit.runner.Result;
@@ -28,10 +28,10 @@ public class ExecutionListener extends RunListener {
 		Class<? extends Testosterone> cls = TestInstrumentation.testClass((Class<? extends Testosterone>) description.getChildren().get(0).getTestClass(), new AfterClassAnnotation());
 		if (clazz != null && clazz != cls) {
 			// HACK BECAUSE TESTRUNFINISHED DOES NOT WORK
-			TestIterceptors.afterClass(clazz);
+			TestInterceptors.afterClass(clazz);
 		}
 		clazz = cls;
-		TestIterceptors.beforeClass(clazz);
+		TestInterceptors.beforeClass(clazz);
 	}
 
 	/**
@@ -45,7 +45,7 @@ public class ExecutionListener extends RunListener {
 	 */
 	@Override
 	public void testRunFinished(Result description) throws Exception {
-		TestIterceptors.afterClass(clazz);
+		TestInterceptors.afterClass(clazz);
 	}
 
 	/**
@@ -55,7 +55,7 @@ public class ExecutionListener extends RunListener {
 	 * @throws Exception
 	 */
 	public void testRunFinished(Description description) throws Exception {
-		TestIterceptors.afterClass(clazz);
+		TestInterceptors.afterClass(clazz);
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class ExecutionListener extends RunListener {
 	 */
 	@Override
 	public void testStarted(Description description) throws Exception {
-		TestIterceptors.before(clazz);
+		TestInterceptors.before(clazz);
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class ExecutionListener extends RunListener {
 	 */
 	@Override
 	public void testFinished(Description description) throws Exception {
-		TestIterceptors.after(clazz);
+		TestInterceptors.after(clazz);
 	}
 
 }

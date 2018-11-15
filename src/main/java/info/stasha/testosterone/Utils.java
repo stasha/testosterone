@@ -117,7 +117,6 @@ public class Utils {
      * @return
      */
     public static <T> T getAnnotation(Method m, Class<? extends Annotation> annotation, boolean includingSuper) {
-        System.out.println(m.getName());
         Annotation a = m.getAnnotation(annotation);
 
         if (a != null) {
@@ -312,7 +311,6 @@ public class Utils {
      */
     public static void copyFields(Object source, Object dest) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException {
         for (Field f : source.getClass().getSuperclass().getDeclaredFields()) {
-            System.out.println(f.getName());
             if (f.getName().contains("$") || Modifier.isStatic(f.getModifiers())) {
                 continue;
             }

@@ -14,13 +14,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * TestIterceptors intercepting JUnit calls to different test instance methods.
+ * TestInterceptors intercepting calls to test methods.
  *
  * @author stasha
  */
-public class TestIterceptors {
+public class TestInterceptors {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestIterceptors.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestInterceptors.class);
 
     /**
      * Starts the configuration.
@@ -125,7 +125,7 @@ public class TestIterceptors {
     }
 
     /**
-     * TestIterceptors
+     * TestInterceptors
      */
     public static class Intercept {
 
@@ -137,6 +137,7 @@ public class TestIterceptors {
              * @param orig
              * @throws java.lang.IllegalAccessException
              * @throws java.lang.reflect.InvocationTargetException
+             * @throws java.lang.NoSuchFieldException
              */
             @RuntimeType
             public static void constructor(@This Testosterone orig) throws IllegalAccessException, InvocationTargetException, IllegalArgumentException, NoSuchFieldException {
@@ -186,6 +187,7 @@ public class TestIterceptors {
              */
             public static void before(@SuperCall Callable<?> zuper, @Origin Method method, @This Testosterone orig) {
                 // do nothing
+                // it's called later manually in http request scope
             }
         }
 
@@ -199,6 +201,7 @@ public class TestIterceptors {
              */
             public static void after(@SuperCall Callable<?> zuper, @Origin Method method, @This Testosterone orig) {
                 // do nothing
+                // it's called later manually in http request scope
             }
         }
 
@@ -209,7 +212,7 @@ public class TestIterceptors {
 
             @RuntimeType
             public static void afterClass(@Origin Method method) throws Exception {
-                TestIterceptors.afterClass((Class<? extends Testosterone>) method.getDeclaringClass());
+                TestInterceptors.afterClass((Class<? extends Testosterone>) method.getDeclaringClass());
             }
         }
 
@@ -280,7 +283,7 @@ public class TestIterceptors {
                     }
 
                 } else {
-                    // if thread is not main JUnit thread, then it is http server thread
+                    // if thread is not main JUnit thread, then it is http servers thread
                     locator.inject(orig);
 
                     try {

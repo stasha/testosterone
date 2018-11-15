@@ -1,7 +1,7 @@
 package info.stasha.testosterone.testng;
 
 import info.stasha.testosterone.TestInstrumentation;
-import info.stasha.testosterone.TestIterceptors;
+import info.stasha.testosterone.TestInterceptors;
 import org.testng.ITestContext;
 import org.testng.ITestListener;
 import org.testng.ITestResult;
@@ -22,7 +22,7 @@ public class ExecutionListener implements ITestListener {
 	@Override
 	public void onStart(ITestContext itc) {
 		Class<? extends Testosterone> clazz = TestInstrumentation.getInstrumentedClass(itc.getAllTestMethods()[0].getRealClass());
-		TestIterceptors.beforeClass(clazz);
+		TestInterceptors.beforeClass(clazz);
 	}
 
 	/**
@@ -33,7 +33,7 @@ public class ExecutionListener implements ITestListener {
 	@Override
 	public void onFinish(ITestContext itc) {
 		Class<? extends Testosterone> clazz = TestInstrumentation.getInstrumentedClass(itc.getAllTestMethods()[0].getRealClass());
-		TestIterceptors.afterClass(clazz);
+		TestInterceptors.afterClass(clazz);
 	}
 
 	/**
@@ -43,7 +43,7 @@ public class ExecutionListener implements ITestListener {
 	 */
 	@Override
 	public void onTestStart(ITestResult itr) {
-		TestIterceptors.before((Testosterone) itr.getInstance());
+		TestInterceptors.before((Testosterone) itr.getInstance());
 	}
 
 	/**
@@ -53,7 +53,7 @@ public class ExecutionListener implements ITestListener {
 	 */
 	@Override
 	public void onTestSuccess(ITestResult itr) {
-		TestIterceptors.after((Testosterone) itr.getInstance());
+		TestInterceptors.after((Testosterone) itr.getInstance());
 	}
 
 	/**
@@ -63,7 +63,7 @@ public class ExecutionListener implements ITestListener {
 	 */
 	@Override
 	public void onTestFailure(ITestResult itr) {
-		TestIterceptors.after((Testosterone) itr.getInstance());
+		TestInterceptors.after((Testosterone) itr.getInstance());
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class ExecutionListener implements ITestListener {
 	 */
 	@Override
 	public void onTestFailedButWithinSuccessPercentage(ITestResult itr) {
-		TestIterceptors.after((Testosterone) itr.getInstance());
+		TestInterceptors.after((Testosterone) itr.getInstance());
 //		System.out.println(itr);
 	}
 

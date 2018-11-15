@@ -13,14 +13,14 @@ import org.glassfish.hk2.api.Factory;
 import org.mockito.Mockito;
 
 /**
- * Mocking.
+ * Jersey Factory utils.
  *
  * @author stasha
  */
-public class Mock {
+public class FactoryUtils {
 
     /**
-     * Mock provide interceptor.
+     * FactoryUtils provide interceptor.
      *
      * @param <T>
      */
@@ -47,19 +47,18 @@ public class Mock {
 
     /**
      * Returns instrumented class that will return object mock when "provide"
-     * method is called.
+     * method is called. Supported only from Jersey version 2.4.
      *
      * @param clazz
      * @return
      */
     public static Class<? extends Factory<Object>> mock(Class<? extends Factory<?>> clazz) {
         return create(clazz, new MockProvider<>());
-
     }
 
     /**
      * Returns instrumented class that will return spied object when "provide"
-     * method is called.
+     * method is called. Supported only from Jersey version 2.4.
      *
      * @param clazz
      * @return

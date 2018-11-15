@@ -2,7 +2,6 @@ package info.stasha.testosterone;
 
 import info.stasha.testosterone.jersey.Testosterone;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 /**
  * Test that's currently executing.
@@ -18,7 +17,7 @@ public class TestInExecution implements TestExecutor {
     private final Object[] arguments;
 
     /**
-     * Creates new ExecutingTest instance.
+     * Creates new TestInExecution instance.
      *
      * @param mainThreadTest
      * @param serverTrhreadTest
@@ -102,16 +101,6 @@ public class TestInExecution implements TestExecutor {
     @Override
     public void executeRequests() throws Throwable {
         maniThreadTest.getConfigFactory().getTestExecutor(mainThreadTestMethod, maniThreadTest).executeRequests();
-    }
-
-    /**
-     * {@inheritDoc }
-     *
-     * @return
-     */
-    @Override
-    public String toString() {
-        return "ExecutingTest{" + "test=" + mainThreadTestMethod + ", testosterone=" + maniThreadTest + ", origMethod=" + originMainThreadTestMethod + ", arguments=" + Arrays.toString(arguments) + '}';
     }
 
 }

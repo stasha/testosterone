@@ -1,6 +1,6 @@
 package info.stasha.testosterone.junit4.integration.test.service;
 
-import info.stasha.testosterone.jersey.Mock;
+import info.stasha.testosterone.jersey.FactoryUtils;
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.junit4.TestosteroneRunner;
 import info.stasha.testosterone.junit4.integration.app.task.Task;
@@ -39,7 +39,7 @@ public class TaskServiceTest implements Testosterone {
 
     @Override
     public void configureMocks(AbstractBinder binder) {
-        binder.bindFactory(Mock.mock(TaskDaoFactory.class)).to(TaskDao.class).in(Singleton.class);
+        binder.bindFactory(FactoryUtils.mock(TaskDaoFactory.class)).to(TaskDao.class).in(Singleton.class);
     }
 
     public <T> T verify(T mock, int invocations) {

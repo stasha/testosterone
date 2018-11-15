@@ -1,16 +1,20 @@
 package info.stasha.testosterone.jersey.inject;
 
+import info.stasha.testosterone.jersey.Testosterone;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 import java.util.logging.Level;
-import javax.ws.rs.core.Configuration;
+import javax.inject.Singleton;
 import javax.ws.rs.core.Context;
+import static org.eclipse.jetty.util.log.JettyLogHandler.config;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.api.Injectee;
 import org.glassfish.hk2.api.InjectionResolver;
 import org.glassfish.hk2.api.ServiceHandle;
 import org.glassfish.hk2.api.ServiceLocator;
 import static org.mockito.AdditionalAnswers.delegatesTo;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.slf4j.Logger;
@@ -29,25 +33,38 @@ public class SpyInjectionResolver implements InjectionResolver<Spy> {
     ServiceLocator locator;
 
     @Context
-    Configuration config;
+    Testosterone test;
 
     @Override
     public Object resolve(Injectee injectee, ServiceHandle<?> handle) {
 
+        AnnotatedElement el = injectee.getParent();
+        Singleton singleton = el.getAnnotation(Singleton.class);
+
+        if (singleton != null) {
+            if (el instanceof Field) {
+                try {
+                    Field f = (Field) el;
+                    f.setAccessible(true);
+                    Object obj = f.get(test);
+
+                    if (obj != null && obj.getClass().toString().toLowerCase().contains("mock")) {
+                        locator.inject(obj);
+                        return obj;
+                    }
+                } catch (IllegalArgumentException | IllegalAccessException ex) {
+                    LOGGER.error("Failed to create mock " + injectee.getRequiredType().getTypeName(), ex);
+                    throw new RuntimeException(ex);
+                }
+            }
+
+        }
+
         try {
-            Object test =  config.getProperty("test");
+
             Class<?> cls = Class.forName(injectee.getRequiredType().getTypeName());
 
             Object obj = locator.getService(cls);
-//            if (injectee.getParent() instanceof Field) {
-//                Field f = (Field) injectee.getParent();
-//                obj = test;
-//                f = test.getClass().getSuperclass().getDeclaredField(f.getName());
-//                f.setAccessible(true);
-//                if (f.get(obj) != null) {
-//                    return config.getProperty("test");
-//                }
-//            }
             if (obj instanceof Proxy) {
 
                 Class<?> nonProxy = Class.forName(obj.toString().substring(0, obj.toString().indexOf("@")));

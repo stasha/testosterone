@@ -1,5 +1,9 @@
 package info.stasha.testosterone.jersey.inject;
 
+import info.stasha.testosterone.jersey.Testosterone;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
+import javax.inject.Singleton;
 import javax.ws.rs.core.Context;
 import org.glassfish.hk2.api.Injectee;
 import org.glassfish.hk2.api.InjectionResolver;
@@ -21,13 +25,32 @@ public class MockInjectionResolver implements InjectionResolver<Mock> {
     @Context
     ServiceLocator locator;
 
+    @Context
+    Testosterone test;
+
     @Override
     public Object resolve(Injectee injectee, ServiceHandle<?> handle) {
         try {
-            Mock mock = injectee.getParent().getAnnotation(Mock.class);
+            AnnotatedElement el = injectee.getParent();
+
+            Mock mock = el.getAnnotation(Mock.class);
+            Singleton singleton = el.getAnnotation(Singleton.class);
+
+            if (singleton != null) {
+                if (el instanceof Field) {
+                    Field f = (Field) el;
+                    f.setAccessible(true);
+                    Object obj = f.get(test);
+
+                    if (obj != null && obj.toString().toLowerCase().contains("mock")) {
+                        return obj;
+                    }
+                }
+            }
+
             return Mockito.mock(Class.forName(injectee.getRequiredType().getTypeName()), mock.answer());
-        } catch (ClassNotFoundException ex) {
-            LOGGER.error("Failed to load class " + injectee.getRequiredType().getTypeName(), ex);
+        } catch (ClassNotFoundException | IllegalArgumentException | IllegalAccessException ex) {
+            LOGGER.error("Failed to create mock " + injectee.getRequiredType().getTypeName(), ex);
             throw new RuntimeException(ex);
         }
     }

@@ -8,6 +8,8 @@ import info.stasha.testosterone.annotation.Requests;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URI;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -58,9 +60,15 @@ public class TestExecutorImpl implements TestExecutor {
      *
      * @return
      */
+    private String getPath(String path) {
+        Path root = Utils.getAnnotation(target, Path.class);
+        String rp = root != null ? root.value() : "";
+        return Paths.get(rp, path).toString().replaceAll("\\\\", "/");
+    }
+
     private String getPath() {
         Path p = method.getAnnotation(Path.class);
-        return p == null ? "" : p.value();
+        return getPath(p == null ? "" : p.value());
     }
 
     /**
@@ -70,15 +78,18 @@ public class TestExecutorImpl implements TestExecutor {
      */
     @Override
     public void executeTest() throws Throwable {
-        String path = getPath();
+        Path root = Utils.getAnnotation(target, Path.class);
+        Path path = method.getAnnotation(Path.class);
+
+        String uri = getPath(path.value());
         // If path is not generic (instrumented paths start with "__generic__")
         // or if method has @Requests or @Request annotation
         // then we invoke __generic__ endpoint. This is needed to initialize test
         // before @Requests or @Request annotation is invoked.
-        if (!path.startsWith("__generic__") || Utils.hasRequestAnnotation(method)) {
-            executeRequest(new RequestAnnotation("__generic__"));
+        if (!uri.startsWith("__generic__") || Utils.hasRequestAnnotation(method)) {
+            executeRequest(new RequestAnnotation(getPath("__generic__")));
         } else {
-            executeRequest(new RequestAnnotation(getPath()));
+            executeRequest(new RequestAnnotation(uri));
         }
     }
 
