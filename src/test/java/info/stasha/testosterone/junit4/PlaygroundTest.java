@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * Testing @Before and @After if they are in requested scope
  *
  * @author stasha
  */
@@ -14,7 +13,6 @@ public class PlaygroundTest implements Testosterone {
 
     @Test
     public void test() {
-        System.out.println("test");
     }
 
 }

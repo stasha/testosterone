@@ -64,7 +64,10 @@ public class TestInstrumentation {
      * @param clazz
      * @return
      */
-    public static Class<? extends Testosterone> testClass(Class<? extends Testosterone> clazz, Annotation afterClassAnnotation) {
+    public static Class<? extends Testosterone> testClass(
+            Class<? extends Testosterone> clazz,
+            Annotation beforeClassAnnotation,
+            Annotation afterClassAnnotation) {
 
         if (!CLASSES.containsKey(clazz)) {
 
@@ -77,6 +80,10 @@ public class TestInstrumentation {
                     .constructor(ElementMatchers.isDefaultConstructor())
                     .intercept(SuperMethodCall.INSTANCE.andThen(MethodCall.invoke(named("__created__"))))
                     .annotateType(new PathAnnotation(clazz))
+                    //
+                    .defineMethod("__beforeClass__", void.class, Visibility.PUBLIC, Ownership.STATIC)
+                    .intercept(MethodDelegation.to(TestInterceptors.Intercept.BeforeClass.class))
+                    .annotateMethod(beforeClassAnnotation)
                     //
                     .defineMethod("__afterClass__", void.class, Visibility.PUBLIC, Ownership.STATIC)
                     .intercept(MethodDelegation.to(TestInterceptors.Intercept.AfterClass.class))
@@ -110,14 +117,14 @@ public class TestInstrumentation {
                             .or(isAnnotatedWith(named("org.testng.annotations.Before")))
                     )
                     .intercept(MethodDelegation.to(TestInterceptors.Intercept.Before.class))
-//                    .attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
+                    //                    .attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
                     //
                     .method(isAnnotatedWith(named("org.junit.After"))
                             .or(isAnnotatedWith(named("org.junit.jupiter.api.AfterEach")))
                             .or(isAnnotatedWith(named("org.testng.annotations.After")))
                     )
                     .intercept(MethodDelegation.to(TestInterceptors.Intercept.After.class))
-//                    .attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
+                    //                    .attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
                     //
                     .defineMethod("__postconstruct__", void.class, Visibility.PUBLIC)
                     .intercept(MethodDelegation.to(TestInterceptors.Intercept.PostConstruct.class))

@@ -217,6 +217,17 @@ public class TestInterceptors {
         }
 
         /**
+         * @BeforeClass annotation interceptor
+         */
+        public static class BeforeClass {
+
+            @RuntimeType
+            public static void beforeClass(@Origin Method method) throws Exception {
+                TestInterceptors.beforeClass((Class<? extends Testosterone>) method.getDeclaringClass());
+            }
+        }
+
+        /**
          * @Path and @Test annotation interceptor
          */
         public static class PathAndTest {

@@ -24,66 +24,70 @@ import org.slf4j.LoggerFactory;
  */
 public class ExecutionListener implements TestExecutionListener {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionListener.class);
 
-	/**
-	 * If available, returns instrumented test class.
-	 *
-	 * @param ti
-	 * @return
-	 */
-	private Class<? extends Testosterone> getClass(TestIdentifier ti) {
-		TestSource ts = ti.getSource().orElse(null);
-		if (ts != null) {
-			Class<?> cls = null;
-			if (ts instanceof ClassSource) {
-				cls = ((ClassSource) ts).getJavaClass();
-			} else if (ts instanceof MethodSource) {
-				String className = ((MethodSource) ts).getClassName();
-				try {
-					cls = Class.forName(className);
-				} catch (ClassNotFoundException ex) {
-					LOGGER.error("Failed to load class: " + className, ex);
-					throw new RuntimeException(ex);
-				}
-			}
-			if (Testosterone.class.isAssignableFrom(cls)) {
-				return (Class<? extends Testosterone>) TestInstrumentation.testClass((Class<? extends Testosterone>) cls, new AfterAllAnnotation());
-			}
-		}
+    /**
+     * If available, returns instrumented test class.
+     *
+     * @param ti
+     * @return
+     */
+    private Class<? extends Testosterone> getClass(TestIdentifier ti) {
+        TestSource ts = ti.getSource().orElse(null);
+        if (ts != null) {
+            Class<?> cls = null;
+            if (ts instanceof ClassSource) {
+                cls = ((ClassSource) ts).getJavaClass();
+            } else if (ts instanceof MethodSource) {
+                String className = ((MethodSource) ts).getClassName();
+                try {
+                    cls = Class.forName(className);
+                } catch (ClassNotFoundException ex) {
+                    LOGGER.error("Failed to load class: " + className, ex);
+                    throw new RuntimeException(ex);
+                }
+            }
+            if (Testosterone.class.isAssignableFrom(cls)) {
+                return (Class<? extends Testosterone>) TestInstrumentation.testClass(
+                        (Class<? extends Testosterone>) cls,
+                        new BeforeAllAnnotation(),
+                        new AfterAllAnnotation()
+                );
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @param testIdentifier
-	 */
-	@Override
-	public void executionStarted(TestIdentifier testIdentifier) {
-		Class<? extends Testosterone> cls = getClass(testIdentifier);
-		if (testIdentifier.isContainer() && cls != null) {
-			TestInterceptors.beforeClass(cls);
-		} else if (testIdentifier.isTest()) {
-			TestInterceptors.before(cls);
-		}
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @param testIdentifier
+     */
+    @Override
+    public void executionStarted(TestIdentifier testIdentifier) {
+        Class<? extends Testosterone> cls = getClass(testIdentifier);
+        if (testIdentifier.isContainer() && cls != null) {
+            TestInterceptors.beforeClass(cls);
+        } else if (testIdentifier.isTest()) {
+            TestInterceptors.before(cls);
+        }
+    }
 
-	/**
-	 * {@inheritDoc }
-	 *
-	 * @param testIdentifier
-	 * @param testExecutionResult
-	 */
-	@Override
-	public void executionFinished(TestIdentifier testIdentifier, TestExecutionResult testExecutionResult) {
-		Class<? extends Testosterone> cls = getClass(testIdentifier);
-		if (testIdentifier.isContainer() && cls != null) {
-			TestInterceptors.afterClass(cls);
-		} else if (testIdentifier.isTest()) {
-			TestInterceptors.after(cls);
-		}
-	}
+    /**
+     * {@inheritDoc }
+     *
+     * @param testIdentifier
+     * @param testExecutionResult
+     */
+    @Override
+    public void executionFinished(TestIdentifier testIdentifier, TestExecutionResult testExecutionResult) {
+        Class<? extends Testosterone> cls = getClass(testIdentifier);
+        if (testIdentifier.isContainer() && cls != null) {
+            TestInterceptors.afterClass(cls);
+        } else if (testIdentifier.isTest()) {
+            TestInterceptors.after(cls);
+        }
+    }
 
 }

@@ -26,70 +26,74 @@ import org.junit.jupiter.api.extension.ParameterResolver;
  * @author stasha
  */
 @Extensions({
-	@ExtendWith(TestosteroneFactory.class)
-	, @ExtendWith(ContextInjectParameterResolver.class)})
+    @ExtendWith(TestosteroneFactory.class)
+    , @ExtendWith(ContextInjectParameterResolver.class)})
 public interface Testosterone extends info.stasha.testosterone.jersey.Testosterone {
 
-	/**
-	 * Factory for creating instrumented test classes
-	 */
-	public static class TestosteroneFactory implements TestInstanceFactory {
+    /**
+     * Factory for creating instrumented test classes
+     */
+    public static class TestosteroneFactory implements TestInstanceFactory {
 
-		/**
-		 * {@inheritDoc }
-		 *
-		 * @param factoryContext
-		 * @param extensionContext
-		 * @return
-		 * @throws TestInstantiationException
-		 */
-		@Override
-		public Object createTestInstance(TestInstanceFactoryContext factoryContext, ExtensionContext extensionContext)
-				throws TestInstantiationException {
-			try {
-				return TestInstrumentation.testClass((Class<? extends Testosterone>) factoryContext.getTestClass(), new AfterAllAnnotation()).newInstance();
-			} catch (InstantiationException | IllegalAccessException ex) {
-				throw new RuntimeException(ex);
-			}
-		}
-	}
+        /**
+         * {@inheritDoc }
+         *
+         * @param factoryContext
+         * @param extensionContext
+         * @return
+         * @throws TestInstantiationException
+         */
+        @Override
+        public Object createTestInstance(TestInstanceFactoryContext factoryContext, ExtensionContext extensionContext)
+                throws TestInstantiationException {
+            try {
+                return TestInstrumentation.testClass(
+                        (Class<? extends Testosterone>) factoryContext.getTestClass(),
+                        new BeforeAllAnnotation(),
+                        new AfterAllAnnotation()
+                ).newInstance();
+            } catch (InstantiationException | IllegalAccessException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
 
-	/**
-	 * Class for handling @Context and @Inject annotations as method arguments.
-	 */
-	public static class ContextInjectParameterResolver implements ParameterResolver {
+    /**
+     * Class for handling @Context and @Inject annotations as method arguments.
+     */
+    public static class ContextInjectParameterResolver implements ParameterResolver {
 
-		private Class<? extends Testosterone> cls;
+        private Class<? extends Testosterone> cls;
 
-		/**
-		 * {@inheritDoc }
-		 *
-		 * @param pc
-		 * @param rc
-		 * @return
-		 * @throws ParameterResolutionException
-		 */
-		@Override
-		public Object resolveParameter(ParameterContext pc, ExtensionContext rc) throws ParameterResolutionException {
-			return cls.cast(null);
-		}
+        /**
+         * {@inheritDoc }
+         *
+         * @param pc
+         * @param rc
+         * @return
+         * @throws ParameterResolutionException
+         */
+        @Override
+        public Object resolveParameter(ParameterContext pc, ExtensionContext rc) throws ParameterResolutionException {
+            return cls.cast(null);
+        }
 
-		/**
-		 * {@inheritDoc }
-		 *
-		 * @param pc
-		 * @param ec
-		 * @return
-		 * @throws ParameterResolutionException
-		 */
-		@Override
-		public boolean supportsParameter(ParameterContext pc, ExtensionContext ec) throws ParameterResolutionException {
-			if (pc.getParameter().getType() == Response.class || pc.isAnnotated(Context.class) || pc.isAnnotated(Inject.class)) {
-				cls = (Class<? extends Testosterone>) pc.getParameter().getType();
-				return true;
-			}
-			return false;
-		}
-	}
+        /**
+         * {@inheritDoc }
+         *
+         * @param pc
+         * @param ec
+         * @return
+         * @throws ParameterResolutionException
+         */
+        @Override
+        public boolean supportsParameter(ParameterContext pc, ExtensionContext ec) throws ParameterResolutionException {
+            if (pc.getParameter().getType() == Response.class || pc.isAnnotated(Context.class) || pc.isAnnotated(Inject.class)) {
+                cls = (Class<? extends Testosterone>) pc.getParameter().getType();
+                return true;
+            }
+            return false;
+        }
+    }
 
 }

@@ -52,7 +52,11 @@ public class TestosteroneRunner extends BlockJUnit4ClassRunner {
 	}
 
 	public TestosteroneRunner(Class<? extends Testosterone> clazz) throws Throwable {
-		super(TestInstrumentation.testClass(clazz, new AfterClassAnnotation()));
+		super(TestInstrumentation.testClass(
+                clazz, 
+                new BeforeClassAnnotation(),
+                new AfterClassAnnotation()
+        ));
 		this.testClass = clazz;
 		cls = TestInstrumentation.getInstrumentedClass(clazz);
 	}
