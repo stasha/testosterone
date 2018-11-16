@@ -9,6 +9,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
 import info.stasha.testosterone.ServerConfig;
 import info.stasha.testosterone.ConfigFactory;
+import info.stasha.testosterone.TestInExecution;
 import info.stasha.testosterone.Utils;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.annotation.InjectTest;
@@ -16,6 +17,7 @@ import info.stasha.testosterone.annotation.Integration;
 import info.stasha.testosterone.annotation.Value;
 import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.db.H2ConnectionFactory;
+import info.stasha.testosterone.jersey.inject.InputStreamInjectionResolver;
 import info.stasha.testosterone.jersey.inject.MockInjectionResolver;
 import info.stasha.testosterone.jersey.inject.SpyInjectionResolver;
 import java.lang.reflect.Field;
@@ -33,17 +35,13 @@ import org.glassfish.hk2.api.InjectionResolver;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.jersey.process.internal.RequestScoped;
-import org.glassfish.jersey.server.monitoring.ApplicationEvent;
-import static org.glassfish.jersey.server.monitoring.ApplicationEvent.Type.INITIALIZATION_FINISHED;
-import org.glassfish.jersey.server.monitoring.ApplicationEventListener;
-import org.glassfish.jersey.server.monitoring.RequestEvent;
-import org.glassfish.jersey.server.monitoring.RequestEventListener;
 import static org.mockito.AdditionalAnswers.delegatesTo;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import info.stasha.testosterone.annotation.LoadFile;
 
 /**
  * Interface that should be implemented by every JUnit4 test class that needs
@@ -158,6 +156,7 @@ public interface Testosterone {
 
             @Override
             protected void configure() {
+
                 this.bindFactory(new Factory<Testosterone>() {
 
                     @Override
@@ -167,7 +166,7 @@ public interface Testosterone {
 
                     @Override
                     public void dispose(Testosterone instance) {
-                        // do nothinglocator.inject(getSetup().getDbConfig());
+
                     }
                 }).to(Testosterone.class).in(Singleton.class);
                 // H2 connection factory
@@ -176,6 +175,28 @@ public interface Testosterone {
                         .in(RequestScoped.class)
                         .proxy(true)
                         .proxyForSameScope(false);
+
+                this.bindFactory(new Factory<DbConfig>() {
+                    @Override
+                    public DbConfig provide() {
+                        return getSetup().getDbConfig();
+                    }
+
+                    @Override
+                    public void dispose(DbConfig instance) {
+                    }
+                }).to(DbConfig.class).in(Singleton.class);
+
+                this.bindFactory(new Factory<TestInExecution>() {
+                    @Override
+                    public TestInExecution provide() {
+                        return getSetup().getTestInExecution();
+                    }
+
+                    @Override
+                    public void dispose(TestInExecution instance) {
+                    }
+                }).to(TestInExecution.class).in(Singleton.class).proxy(true);
 
                 // custom @Value injection resolver
                 this.bind(ValueInjectionResolver.class)
@@ -190,7 +211,9 @@ public interface Testosterone {
                 this.bind(SpyInjectionResolver.class)
                         .to(new TypeLiteral<InjectionResolver<Spy>>() {
                         }).in(Singleton.class);
-
+                this.bind(InputStreamInjectionResolver.class)
+                        .to(new TypeLiteral<InjectionResolver<LoadFile>>() {
+                        }).in(Singleton.class);
                 // invokes method for configuring AbstractBinder
                 Testosterone.this.configure(this);
             }
@@ -254,7 +277,6 @@ public interface Testosterone {
             // registering setup so it can listen for application events
             config.getResourceConfig().register(getSetup());
             // registering db config so db is started/stopped with jersey application
-            config.getResourceConfig().register(getSetup().getDbConfig());
 //            config.getResourceConfig().property("com.sun.jersey.api.json.POJOMappingFeature", true);
             // initializes configuration
             config.initConfiguration(this);
@@ -269,10 +291,12 @@ public interface Testosterone {
      */
     default void start() throws Exception {
         if (!getServerConfig().isRunning()) {
-            // runs before server start method
-            getSetup().beforeServerStart(this);
+
             // initializes configuration
             initConfiguration(getServerConfig());
+            // runs before server start method
+            getSetup().beforeServerStart(this);
+            getSetup().getDbConfig().start();
             // starts server
             getServerConfig().start();
 //            getSetup().getDbConfig().start();
@@ -297,7 +321,7 @@ public interface Testosterone {
             getSetup().beforeServerStop(this);
             // stops server
             getServerConfig().stop();
-//            getSetup().getDbConfig().stop();
+            getSetup().getDbConfig().stop();
             // runs after server stop method
             getSetup().afterServerStop(this);
             getSetup().clearFlags();

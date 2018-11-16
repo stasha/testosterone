@@ -41,7 +41,7 @@ public class Setup implements ContainerResponseFilter {
     protected boolean beforeServerStop;
     protected boolean afterServerStop;
     protected boolean requestsAlreadInvoked;
-    protected TestInExecution executingTest;
+    protected TestInExecution testInExecution;
 
     /**
      * Creates TestosteroneSetup.
@@ -288,12 +288,12 @@ public class Setup implements ContainerResponseFilter {
         this.requestsAlreadInvoked = requestsAlreadInvoked;
     }
 
-    public TestInExecution getExecutingTest() {
-        return executingTest;
+    public TestInExecution getTestInExecution() {
+        return testInExecution;
     }
 
-    public void setExecutingTest(TestInExecution executingTest) {
-        this.executingTest = executingTest;
+    public void setTestInExecution(TestInExecution testInExecution) {
+        this.testInExecution = testInExecution;
     }
 
     @Override

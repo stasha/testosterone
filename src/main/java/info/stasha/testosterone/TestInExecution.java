@@ -4,93 +4,39 @@ import info.stasha.testosterone.jersey.Testosterone;
 import java.lang.reflect.Method;
 
 /**
- * Test that's currently executing.
+ * TestInExecution interface.
  *
  * @author stasha
  */
-public class TestInExecution implements TestExecutor {
-
-    private final Testosterone maniThreadTest;
-    private final Testosterone serverThreadTest;
-    private final Method mainThreadTestMethod;
-    private final Method originMainThreadTestMethod;
-    private final Object[] arguments;
+public interface TestInExecution extends TestExecutor {
 
     /**
-     * Creates new TestInExecution instance.
+     * Add after test event listener.
      *
-     * @param mainThreadTest
-     * @param serverTrhreadTest
-     * @param mainThreadTestMethod
-     * @param originMainThreadTestMethod
-     * @param arguments
+     * @param listener
      */
-    public TestInExecution(Testosterone mainThreadTest,
-            Testosterone serverTrhreadTest,
-            Method mainThreadTestMethod,
-            Method originMainThreadTestMethod,
-            Object[] arguments) {
-        this.maniThreadTest = mainThreadTest;
-        this.serverThreadTest = serverTrhreadTest;
-        this.mainThreadTestMethod = mainThreadTestMethod;
-        this.originMainThreadTestMethod = originMainThreadTestMethod;
-        this.arguments = arguments;
-    }
+    void addAfterTestListener(TestEventListener listener);
 
     /**
-     * Returns Testosterone instance that is in main thread.
+     * Adds before test event listener
      *
-     * @return
+     * @param listener
      */
-    public Testosterone getManiThreadTest() {
-        return maniThreadTest;
-    }
+    void addBeforeTestListeenr(TestEventListener listener);
 
     /**
-     * Return Testosterone instance that is in server thread.
+     * Executes after test listeners.
      *
-     * @return
+     * @throws Exception
      */
-    public Testosterone getServerThreadTest() {
-        return serverThreadTest;
-    }
+    void afterTest() throws Exception;
 
     /**
-     * Returns actual test method that should run.
+     * Executes before test listeners
      *
-     * @return
+     * @throws Exception
      */
-    public Method getMainThreadTestMethod() {
-        return mainThreadTestMethod;
-    }
-
-    /**
-     * Original test method that's not intercepted.
-     *
-     * @return
-     */
-    public Method getOriginMainThreadTestMethod() {
-        return originMainThreadTestMethod;
-    }
-
-    /**
-     * Passed arguments to test method.
-     *
-     * @return
-     */
-    public Object[] getArguments() {
-        return arguments;
-    }
-
-    /**
-     * Executes Test method.
-     *
-     * @throws Throwable
-     */
-    @Override
-    public void executeTest() throws Throwable {
-        maniThreadTest.getConfigFactory().getTestExecutor(mainThreadTestMethod, maniThreadTest).executeTest();
-    }
+    void beforeTest() throws Exception;
 
     /**
      * Executes Test method that is annotated with @Requests or @Request
@@ -98,9 +44,67 @@ public class TestInExecution implements TestExecutor {
      *
      * @throws Throwable
      */
-    @Override
-    public void executeRequests() throws Throwable {
-        maniThreadTest.getConfigFactory().getTestExecutor(mainThreadTestMethod, maniThreadTest).executeRequests();
-    }
+    void executeRequests() throws Throwable;
+
+    /**
+     * Executes Test method.
+     *
+     * @throws Throwable
+     */
+    void executeTest() throws Throwable;
+
+    /**
+     * Passed arguments to test method.
+     *
+     * @return
+     */
+    Object[] getArguments();
+
+    /**
+     * Returns actual test method that should run.
+     *
+     * @return
+     */
+    Method getMainThreadTestMethod();
+
+    /**
+     * Returns Testosterone instance that is in main thread.
+     *
+     * @return
+     */
+    Testosterone getManiThreadTest();
+
+    /**
+     * Original test method that's not intercepted.
+     *
+     * @return
+     */
+    Method getOriginMainThreadTestMethod();
+
+    /**
+     * Return Testosterone instance that is in server thread.
+     *
+     * @return
+     */
+    Testosterone getServerThreadTest();
+
+    /**
+     * Returns true if invoking method is really test method. There are two
+     * different scenarios when invoking test method, one is when test method
+     * has only @Test annotation and the other is when it has @Test and @Request
+     * annotations.<br>
+     * If there is @Request annotation, then first is invoked @Request
+     * annotation which doesn't behave like test and the next is real @Test.
+     *
+     * @return
+     */
+    boolean isIsTest();
+
+    /**
+     * Sets if executed method is test method itself or not.
+     *
+     * @param isTest
+     */
+    void setIsTest(boolean isTest);
 
 }

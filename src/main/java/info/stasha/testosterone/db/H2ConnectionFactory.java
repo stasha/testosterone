@@ -24,7 +24,7 @@ public class H2ConnectionFactory implements Factory<Connection> {
     private CloseableService cs;
 
     @Context
-    private H2Config config;
+    private DbConfig config;
 
     @Override
     public Connection provide() {

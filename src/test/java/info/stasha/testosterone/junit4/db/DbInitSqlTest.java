@@ -2,7 +2,6 @@ package info.stasha.testosterone.junit4.db;
 
 import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.junit4.*;
-import info.stasha.testosterone.db.H2Config;
 import info.stasha.testosterone.jersey.Testosterone;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -21,7 +20,7 @@ import org.junit.runner.RunWith;
 public class DbInitSqlTest implements Testosterone {
 
     @Context
-    H2Config config;
+    DbConfig config;
 
     String create = "CREATE TABLE people (\n"
             + "  id  int(11) NOT NULL auto_increment PRIMARY KEY,\n"

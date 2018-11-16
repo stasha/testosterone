@@ -2,7 +2,6 @@ package info.stasha.testosterone.junit;
 
 import info.stasha.testosterone.ServerConfig;
 import info.stasha.testosterone.Setup;
-import info.stasha.testosterone.jersey.GrizzlyServerConfig;
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.junit4.PlaygroundTest;
 import java.io.IOException;

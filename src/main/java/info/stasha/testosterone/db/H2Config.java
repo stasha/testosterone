@@ -8,15 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.sql.DataSource;
 import org.glassfish.hk2.api.Factory;
-import org.glassfish.jersey.server.monitoring.ApplicationEvent;
-import static org.glassfish.jersey.server.monitoring.ApplicationEvent.Type.DESTROY_FINISHED;
-import static org.glassfish.jersey.server.monitoring.ApplicationEvent.Type.INITIALIZATION_START;
-import org.glassfish.jersey.server.monitoring.ApplicationEventListener;
-import org.glassfish.jersey.server.monitoring.RequestEvent;
-import org.glassfish.jersey.server.monitoring.RequestEventListener;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.h2.jdbcx.JdbcDataSource;
-import org.jvnet.hk2.annotations.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,8 +18,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author stasha
  */
-@Service
-public class H2Config implements DbConfig, ApplicationEventListener {
+public class H2Config implements DbConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(H2Config.class);
     private final Map<String, String> sqls = new LinkedHashMap<>();
@@ -181,30 +173,6 @@ public class H2Config implements DbConfig, ApplicationEventListener {
         getConnection().prepareStatement("shutdown").execute();
         this.connectionPool.dispose();
         this.dataSource = null;
-    }
-
-    @Override
-    public void onEvent(ApplicationEvent ae) {
-        if (ae.getType() == INITIALIZATION_START) {
-            try {
-                start();
-            } catch (Exception ex) {
-                LOGGER.error("Failed to start H2 DB");
-                throw new RuntimeException(ex);
-            }
-        } else if (ae.getType() == DESTROY_FINISHED) {
-            try {
-                stop();
-            } catch (Exception ex) {
-                LOGGER.error("Failed to stop H2 DB");
-                throw new RuntimeException(ex);
-            }
-        }
-    }
-
-    @Override
-    public RequestEventListener onRequest(RequestEvent re) {
-        return null;
     }
 
 }

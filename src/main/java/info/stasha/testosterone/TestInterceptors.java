@@ -171,7 +171,7 @@ public class TestInterceptors {
 
             @RuntimeType
             public static Void postConstruct(@This Testosterone orig) throws Exception, Throwable {
-                TestInExecution et = orig.getSetup().getExecutingTest();
+                TestInExecution et = orig.getSetup().getTestInExecution();
                 PathAndTest.test(null, null, et.getMainThreadTestMethod(), et.getManiThreadTest());
                 return null;
             }
@@ -266,15 +266,15 @@ public class TestInterceptors {
                 // Jersey resource before that will be invoked
                 Method resourceMethod = mainThreadTest.getClass().getMethod(method.getName(), method.getParameterTypes());
 
-                TestInExecution et = orig.getSetup().getExecutingTest();
+                TestInExecution et = orig.getSetup().getTestInExecution();
                 // If we are in main JUnit thread, invoke http request to test
                 if (isMain) {
                     LOGGER.info("Starting {}", invoking);
 
                     try {
                         try {
-                            et = new TestInExecution(orig, mainThreadTest, resourceMethod, Utils.getMethodStartingWithName(mainThreadTest.getClass(), resourceMethod), args);
-                            orig.getSetup().setExecutingTest(et);
+                            et = new TestInExecutionImpl(orig, mainThreadTest, resourceMethod, Utils.getMethodStartingWithName(mainThreadTest.getClass(), resourceMethod), args);
+                            orig.getSetup().setTestInExecution(et);
                             // Invoking http request to resource before on resource object
                             et.executeTest();
                         } catch (InvocationTargetException ex) {
@@ -295,8 +295,11 @@ public class TestInterceptors {
 
                 } else {
                     // if thread is not main JUnit thread, then it is http servers thread
+                    if (!Utils.hasRequestAnnotation(method) || orig.getSetup().isRequestsAlreadInvoked()) {
+                        et.beforeTest();
+                    }
+                    
                     locator.inject(orig);
-
                     try {
                         LOGGER.info("Invoking {}", invoking);
                         for (Method m : Utils.getAnnotatedMethods(orig.getClass(), TestAnnotations.BEFORE)) {
@@ -307,7 +310,6 @@ public class TestInterceptors {
                             orig.getSetup().setRequestsAlreadInvoked(true);
                             et.executeRequests();
                         } else {
-//                            Utils.copyFields(mainThreadTest, orig);
                             return Utils.invokeOriginalMethod(resourceMethod, orig, args);
                         }
                     } catch (Throwable ex) {
@@ -319,6 +321,7 @@ public class TestInterceptors {
                         config.getExceptions().add(ex);
 
                     } finally {
+                        et.afterTest();
                         for (Method m : Utils.getAnnotatedMethods(orig.getClass(), TestAnnotations.AFTER)) {
                             Utils.invokeOriginalMethod(m, orig, new Object[]{});
                         }
