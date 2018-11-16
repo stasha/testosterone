@@ -18,6 +18,8 @@ public class TestInExecutionImpl implements TestInExecution {
     private final Method originMainThreadTestMethod;
     private final Object[] arguments;
     private boolean isTest;
+    private boolean isRequest;
+    private boolean beforesInvoked;
 
     private final Set<TestEventListener> beforeTest = new LinkedHashSet<>();
     private final Set<TestEventListener> afterTest = new LinkedHashSet<>();
@@ -104,7 +106,7 @@ public class TestInExecutionImpl implements TestInExecution {
      * @return
      */
     @Override
-    public boolean isIsTest() {
+    public boolean isTest() {
         return isTest;
     }
 
@@ -116,6 +118,26 @@ public class TestInExecutionImpl implements TestInExecution {
     @Override
     public void setIsTest(boolean isTest) {
         this.isTest = isTest;
+    }
+
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public boolean isRequest() {
+        return isRequest;
+    }
+
+    /**
+     * {@inheritDoc }
+     *
+     * @param isRequest
+     */
+    @Override
+    public void setIsRequest(boolean isRequest) {
+        this.isRequest = isRequest;
     }
 
     /**
@@ -146,6 +168,7 @@ public class TestInExecutionImpl implements TestInExecution {
     @Override
     public void beforeTest() throws Exception {
         isTest = true;
+        isRequest = false;
         while (beforeTest.iterator().hasNext()) {
             TestEventListener listener = beforeTest.iterator().next();
             try {
@@ -164,6 +187,7 @@ public class TestInExecutionImpl implements TestInExecution {
     @Override
     public void afterTest() throws Exception {
         isTest = false;
+        isRequest = false;
         while (afterTest.iterator().hasNext()) {
             TestEventListener listener = afterTest.iterator().next();
             try {

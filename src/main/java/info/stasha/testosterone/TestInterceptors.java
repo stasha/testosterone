@@ -172,6 +172,7 @@ public class TestInterceptors {
             @RuntimeType
             public static Void postConstruct(@This Testosterone orig) throws Exception, Throwable {
                 TestInExecution et = orig.getSetup().getTestInExecution();
+                et.setIsRequest(false);
                 PathAndTest.test(null, null, et.getMainThreadTestMethod(), et.getManiThreadTest());
                 return null;
             }
@@ -297,8 +298,10 @@ public class TestInterceptors {
                     // if thread is not main JUnit thread, then it is http servers thread
                     if (!Utils.hasRequestAnnotation(method) || orig.getSetup().isRequestsAlreadInvoked()) {
                         et.beforeTest();
+                    } else {
+                        et.setIsRequest(true);
                     }
-                    
+
                     locator.inject(orig);
                     try {
                         LOGGER.info("Invoking {}", invoking);

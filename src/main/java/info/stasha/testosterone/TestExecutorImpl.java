@@ -5,6 +5,10 @@ import com.mifmif.common.regex.Generex;
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.annotation.RequestAnnotation;
 import info.stasha.testosterone.annotation.Requests;
+import info.stasha.testosterone.jersey.TestResponseBuilder;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -81,14 +85,18 @@ public class TestExecutorImpl implements TestExecutor {
         Path path = method.getAnnotation(Path.class);
 
         String uri = getPath(path.value());
+
+        if (Utils.hasRequestAnnotation(method)) {
+        }
         // If path is not generic (instrumented paths start with "__generic__")
         // or if method has @Requests or @Request annotation
         // then we invoke __generic__ endpoint. This is needed to initialize test
         // before @Requests or @Request annotation is invoked.
         if (!uri.startsWith("__generic__") || Utils.hasRequestAnnotation(method)) {
-            executeRequest(new RequestAnnotation(getPath("__generic__")));
+            executeRequest(new RequestAnnotation(getPath("__generic__")), 1);
         } else {
-            executeRequest(new RequestAnnotation(uri));
+            target.getSetup().getTestInExecution().setIsRequest(false);
+            executeRequest(new RequestAnnotation(uri), 1);
         }
     }
 
@@ -113,6 +121,7 @@ public class TestExecutorImpl implements TestExecutor {
 
         int requestsRepeat = (requestsAnnotation == null || requestsAnnotation.repeat() == 0) ? 1 : requestsAnnotation.repeat();
 
+        int index = 0;
         for (int i = 0; i < requestsRepeat; ++i) {
 
             Request[] reqs;
@@ -137,7 +146,8 @@ public class TestExecutorImpl implements TestExecutor {
                 if (Arrays.stream(r.excludeFromRepeat()).anyMatch(((Integer) (i + 1))::equals)) {
                     continue;
                 }
-                executeRequest(r);
+
+                executeRequest(new RequestAnnotation(r), ++index);
             }
         }
     }
@@ -146,8 +156,10 @@ public class TestExecutorImpl implements TestExecutor {
      * Sends http request based on passed Request param.
      *
      * @param request
+     * @param index
      */
-    protected void executeRequest(Request request) {
+    protected void executeRequest(RequestAnnotation request, int index) {
+        LOGGER.info(request.toString());
 
         GET get = method.getAnnotation(GET.class);
         POST post = method.getAnnotation(POST.class);
@@ -215,7 +227,16 @@ public class TestExecutorImpl implements TestExecutor {
             if (!request.entity().isEmpty()) {
                 try {
                     Field e = target.getClass().getField(request.entity());
-                    entity = (Entity) e.get(target);
+                    e.setAccessible(true);
+                    Object obj = e.get(target);
+                    if (obj instanceof InputStream) {
+                        entity = Entity.json(new BufferedReader(new InputStreamReader((InputStream) obj))
+                                .lines().collect(Collectors.joining("\n")));
+                    } else if (obj instanceof Entity) {
+                        entity = (Entity) obj;
+                    } else if (obj != null) {
+                        entity = (Entity) Entity.json(String.valueOf(obj));
+                    }
                 } catch (NoSuchFieldException fex) {
                     try {
                         Method en = target.getClass().getMethod(request.entity());
@@ -277,6 +298,7 @@ public class TestExecutorImpl implements TestExecutor {
                 }
 
                 List<Object> params = new ArrayList<>();
+
                 for (Class<?> param : method.getParameterTypes()) {
                     if (param.equals(Response.class)) {
                         params.add(resp);
@@ -284,6 +306,14 @@ public class TestExecutorImpl implements TestExecutor {
                         params.add(request);
                     } else if (param.equals(WebTarget.class)) {
                         params.add(webTarget);
+                    } else if (param.equals(Integer.class)) {
+                        params.add(index++);
+                    } else if (param.equals(TestResponseBuilder.TestResponse.class)) {
+                        params.add(new TestResponseBuilder()
+                                .setIndex(index++).
+                                setRequest(request).
+                                setResponse(resp).
+                                setWebTarget(webTarget).build());
                     }
                 }
 

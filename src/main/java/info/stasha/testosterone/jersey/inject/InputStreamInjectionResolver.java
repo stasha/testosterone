@@ -34,7 +34,7 @@ public class InputStreamInjectionResolver implements InjectionResolver<LoadFile>
 
     @Override
     public Object resolve(Injectee injectee, ServiceHandle<?> handle) {
-        if (!test.isIsTest()) {
+        if (!test.isTest() && !test.isRequest()) {
             return null;
         }
         AnnotatedElement el = injectee.getParent();

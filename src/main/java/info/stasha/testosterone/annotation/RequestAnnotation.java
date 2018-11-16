@@ -207,9 +207,23 @@ public class RequestAnnotation implements Request {
         return this.entity;
     }
 
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
     @Override
     public String toString() {
-        return "RequestAnnotation{" + "repeat=" + repeat + ", excludeFromRepeat=" + Arrays.toString(excludeFromRepeat) + ", url=" + url + ", headerParams=" + Arrays.toString(headerParams) + ", method=" + method + ", expectedStatus=" + Arrays.toString(expectedStatus) + ", entity=" + entity + '}';
+        return "Request {"
+                + "url=" + url
+                + ", method=" + method
+                + ", headerParams=" + Arrays.toString(headerParams)
+                + ", entity=" + entity
+                + ", repeat=" + repeat
+                + ", excludeFromRepeat=" + Arrays.toString(excludeFromRepeat)
+                + ", expectedStatus=" + Arrays.toString(expectedStatus)
+                + ", expectedStatusBetween=" + Arrays.toString(expectedStatusBetween)
+                + "}";
     }
 
 }

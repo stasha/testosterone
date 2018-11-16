@@ -98,7 +98,7 @@ public interface TestInExecution extends TestExecutor {
      *
      * @return
      */
-    boolean isIsTest();
+    boolean isTest();
 
     /**
      * Sets if executed method is test method itself or not.
@@ -106,5 +106,19 @@ public interface TestInExecution extends TestExecutor {
      * @param isTest
      */
     void setIsTest(boolean isTest);
+
+    /**
+     * Returns true/false if currently invoking target is @Request.
+     *
+     * @return
+     */
+    boolean isRequest();
+
+    /**
+     * Sets if currently invoking target is @Request
+     *
+     * @param isRequest
+     */
+    void setIsRequest(boolean isRequest);
 
 }

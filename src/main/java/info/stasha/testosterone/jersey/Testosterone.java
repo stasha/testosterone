@@ -196,7 +196,7 @@ public interface Testosterone {
                     @Override
                     public void dispose(TestInExecution instance) {
                     }
-                }).to(TestInExecution.class).in(Singleton.class).proxy(true);
+                }).to(TestInExecution.class).in(RequestScoped.class).proxy(true);
 
                 // custom @Value injection resolver
                 this.bind(ValueInjectionResolver.class)
