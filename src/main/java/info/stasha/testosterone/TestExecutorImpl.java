@@ -95,7 +95,7 @@ public class TestExecutorImpl implements TestExecutor {
         if (!uri.startsWith("__generic__") || Utils.hasRequestAnnotation(method)) {
             executeRequest(new RequestAnnotation(getPath("__generic__")), 1);
         } else {
-            target.getSetup().getTestInExecution().setIsRequest(false);
+            target.getTestConfig().getSetup().getTestInExecution().setIsRequest(false);
             executeRequest(new RequestAnnotation(uri), 1);
         }
     }
@@ -286,13 +286,13 @@ public class TestExecutorImpl implements TestExecutor {
                 String s = Arrays.toString(request.expectedStatus()).replace(",", " or ");
                 List<Integer> expectedStatus = Arrays.stream(request.expectedStatus()).boxed().collect(Collectors.toList());
                 if (request.expectedStatus().length > 0 && !expectedStatus.contains(status)) {
-                    target.getServerConfig().getExceptions()
+                    target.getTestConfig().getExceptions()
                             .add(new AssertionError("Response status code should be " + s + ". Expecting " + s + " but was [" + status + "]"));
                 }
 
                 int between[] = request.expectedStatusBetween();
                 if ((request.expectedStatus().length == 0 && between.length > 0) && (status < between[0] || status > between[1])) {
-                    target.getServerConfig().getExceptions()
+                    target.getTestConfig().getExceptions()
                             .add(new AssertionError("Response status code should be between [" + between[0] + " and " + between[1]
                                     + "] but was [" + status + "]"));
                 }

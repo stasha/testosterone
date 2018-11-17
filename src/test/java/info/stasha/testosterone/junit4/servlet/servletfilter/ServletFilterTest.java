@@ -5,7 +5,6 @@ import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.junit4.TestosteroneRunner;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
 import java.io.IOException;
-import javax.inject.Singleton;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;

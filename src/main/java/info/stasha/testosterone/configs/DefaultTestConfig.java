@@ -1,0 +1,419 @@
+package info.stasha.testosterone.configs;
+
+import info.stasha.testosterone.ServerConfig;
+import info.stasha.testosterone.Setup;
+import info.stasha.testosterone.StartServer;
+import info.stasha.testosterone.TestConfig;
+import info.stasha.testosterone.TestExecutor;
+import info.stasha.testosterone.TestExecutorImpl;
+import info.stasha.testosterone.TestInExecution;
+import info.stasha.testosterone.Utils;
+import info.stasha.testosterone.annotation.Configuration;
+import info.stasha.testosterone.annotation.InjectTest;
+import info.stasha.testosterone.annotation.Integration;
+import info.stasha.testosterone.annotation.LoadFile;
+import info.stasha.testosterone.annotation.Value;
+import info.stasha.testosterone.db.DbConfig;
+import info.stasha.testosterone.db.H2Config;
+import info.stasha.testosterone.db.H2ConnectionFactory;
+import info.stasha.testosterone.jersey.JettyServerConfig;
+import info.stasha.testosterone.jersey.Testosterone;
+import info.stasha.testosterone.jersey.inject.InjectTestResolver;
+import info.stasha.testosterone.jersey.inject.InputStreamInjectionResolver;
+import info.stasha.testosterone.jersey.inject.MockInjectionResolver;
+import info.stasha.testosterone.jersey.inject.SpyInjectionResolver;
+import info.stasha.testosterone.jersey.inject.ValueInjectionResolver;
+import info.stasha.testosterone.servlet.ServletContainerConfig;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.sql.Connection;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import javax.inject.Singleton;
+import javax.ws.rs.core.Context;
+import org.glassfish.hk2.api.Factory;
+import org.glassfish.hk2.api.InjectionResolver;
+import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.hk2.api.TypeLiteral;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.process.internal.RequestScoped;
+import static org.mockito.AdditionalAnswers.delegatesTo;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.Spy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Default test configuration.
+ *
+ * @author stasha
+ */
+public class DefaultTestConfig implements TestConfig {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultTestConfig.class);
+
+    private final Set<Throwable> exceptions = new HashSet<>();
+
+    private final Testosterone testosterone;
+    private final Configuration config;
+    private ServerConfig serverConfig;
+    private ServletContainerConfig servletContainerConfig;
+    private DbConfig dbConfig;
+    private TestExecutor testExecutor;
+    private String baseUri;
+    private int httpPort;
+    private StartServer startServer;
+    private Setup setup;
+    private final String mainThreadName;
+
+    public DefaultTestConfig(Testosterone testosterone) {
+        this(testosterone, null);
+    }
+
+    public DefaultTestConfig(Testosterone testosterone, Configuration config) {
+        this.testosterone = testosterone;
+        this.config = config;
+        this.mainThreadName = Thread.currentThread().getName();
+    }
+
+    @Override
+    public Testosterone getTest() {
+        return testosterone;
+    }
+
+    @Override
+    public ServerConfig getServerConfig() {
+        if (serverConfig == null) {
+            this.serverConfig = new JettyServerConfig(this);
+        }
+
+        return this.serverConfig;
+    }
+
+    @Override
+    public ServletContainerConfig getServletContainerConfig() {
+        if (this.servletContainerConfig == null) {
+            this.servletContainerConfig = new ServletContainerConfig(this);
+            this.serverConfig.setServletContainerConfig(servletContainerConfig);
+        }
+
+        return this.servletContainerConfig;
+    }
+
+    @Override
+    public DbConfig getDbConfig() {
+        if (dbConfig == null) {
+            this.dbConfig = new H2Config(this);
+        }
+
+        return this.dbConfig;
+    }
+
+    @Override
+    public TestExecutor getTestExecutor(Method method, Testosterone test) {
+        return new TestExecutorImpl(method, test);
+    }
+
+    @Override
+    public String getBaseUri() {
+        if (this.baseUri == null) {
+            this.baseUri = config != null ? config.baseUri() : BASE_URI;
+        }
+
+        return this.baseUri;
+    }
+
+    @Override
+    public int getHttpPort() {
+        if (this.httpPort == 0) {
+            this.httpPort = config != null ? config.httpPort() : HTTP_PORT;
+        }
+
+        return this.httpPort;
+    }
+
+    @Override
+    public StartServer getStartServer() {
+        if (this.startServer == null) {
+            this.startServer = config != null ? config.startServer() : StartServer.PER_CLASS;
+        }
+
+        return this.startServer;
+    }
+
+    @Override
+    public Setup getSetup() {
+        if (this.setup == null) {
+            this.setup = new Setup(this);
+        }
+        return this.setup;
+    }
+
+    @Override
+    public String getMainThreadName() {
+        return this.mainThreadName;
+    }
+
+    @Override
+    public Set<Throwable> getExceptions() {
+        return exceptions;
+    }
+
+    @Override
+    public void throwExceptions() throws Throwable {
+        for (Throwable ex : exceptions) {
+            // this will come only to first exception,
+            // bot for now it is good enough
+            throw ex;
+        }
+    }
+
+    /**
+     * Initializes configuration.
+     *
+     * @param config
+     */
+    @Override
+    public void init(TestConfig config) {
+
+        Testosterone ts = config.getTest();
+        ServerConfig sc = config.getServerConfig();
+        DbConfig dbc = config.getDbConfig();
+        Setup st = config.getSetup();
+
+        for (Field f : ts.getClass().getSuperclass().getDeclaredFields()) {
+            f.setAccessible(true);
+            Mock m = f.getAnnotation(Mock.class);
+            Spy s = f.getAnnotation(Spy.class);
+
+            try {
+                Object obj = f.get(ts);
+
+                if (m != null && obj != null) {
+                    f.set(ts, Mockito.mock(f.getType(), m.answer()));
+                } else if (s != null && obj != null) {
+                    f.set(ts, Mockito.mock(obj.getClass(), delegatesTo(obj)));
+                }
+
+            } catch (IllegalArgumentException | IllegalAccessException ex) {
+                java.util.logging.Logger.getLogger(Testosterone.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        // configureMocks ResourceConfig
+        ts.configure(sc.getResourceConfig());
+        // configure Servlet container
+        ts.configure(config.getServletContainerConfig());
+        // configure DB
+        ts.configure(dbc);
+        // configureMocks AbstractBinder
+        sc.getResourceConfig().register(new AbstractBinder() {
+
+            @Context
+            ServiceLocator locator;
+
+            @Override
+            protected void configure() {
+
+                this.bindFactory(new Factory<Testosterone>() {
+
+                    @Override
+                    public Testosterone provide() {
+                        return ts;
+                    }
+
+                    @Override
+                    public void dispose(Testosterone instance) {
+                    }
+                }).to(Testosterone.class).in(Singleton.class);
+
+                this.bindFactory(H2ConnectionFactory.class)
+                        .to(Connection.class)
+                        .in(RequestScoped.class)
+                        .proxy(true)
+                        .proxyForSameScope(false);
+
+                this.bindFactory(new Factory<DbConfig>() {
+                    @Override
+                    public DbConfig provide() {
+                        return dbc;
+                    }
+
+                    @Override
+                    public void dispose(DbConfig instance) {
+                    }
+                }).to(DbConfig.class).in(Singleton.class);
+
+                this.bindFactory(new Factory<TestInExecution>() {
+                    @Override
+                    public TestInExecution provide() {
+                        return st.getTestInExecution();
+                    }
+
+                    @Override
+                    public void dispose(TestInExecution instance) {
+                    }
+                }).to(TestInExecution.class).in(RequestScoped.class).proxy(true);
+
+                // injection resolvers
+                this.bind(ValueInjectionResolver.class)
+                        .to(new TypeLiteral<InjectionResolver<Value>>() {
+                        }).in(Singleton.class);
+                this.bind(InjectTestResolver.class)
+                        .to(new TypeLiteral<InjectionResolver<InjectTest>>() {
+                        }).in(Singleton.class);
+                this.bind(MockInjectionResolver.class)
+                        .to(new TypeLiteral<InjectionResolver<Mock>>() {
+                        }).in(Singleton.class);
+                this.bind(SpyInjectionResolver.class)
+                        .to(new TypeLiteral<InjectionResolver<Spy>>() {
+                        }).in(Singleton.class);
+                this.bind(InputStreamInjectionResolver.class)
+                        .to(new TypeLiteral<InjectionResolver<LoadFile>>() {
+                        }).in(Singleton.class);
+                // invokes method for configuring AbstractBinder
+                ts.configure(this);
+            }
+        });
+
+        // Mocked configuratinos are excluded from integration tests
+        Integration integration = st.getIntegration();
+
+        // if this is integration, then build configuration from all 
+        // registered classes in @Integration annotation
+        if (integration != null && st.getRoot() == null) {
+
+            List<Class<? extends Testosterone>> testClasses = Arrays.asList(integration.value());
+            Collections.reverse(testClasses);
+
+            Map<String, Testosterone> tests = new LinkedHashMap();
+            for (Class<? extends Testosterone> cls : testClasses) {
+                try {
+                    Testosterone t = cls.newInstance();
+                    Setup s = t.getTestConfig().getSetup();
+                    s.setParent(st);
+                    s.setRoot(st);
+                    t.getTestConfig().init(this);
+                    tests.put(cls.getTypeName(), t);
+                } catch (InstantiationException | IllegalAccessException ex) {
+                    java.util.logging.Logger.getLogger(Testosterone.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            st.setTests(tests);
+
+            sc.getResourceConfig().property("tests", tests);
+
+            sc.getResourceConfig().register(new AbstractBinder() {
+                @Override
+                protected void configure() {
+                    tests.forEach((k, v) -> {
+                        v.configure(this);
+                    });
+                }
+            });
+        }
+
+        if (integration == null) {
+            // configureMocks MockingResourceConfig
+            ts.configureMocks(sc.getResourceConfig());
+            // configuring MockingServletContainerConfig
+            ts.configureMocks(sc.getServletContainerConfig());
+            // configure db mocks 
+            ts.configureMocks(dbc);
+            // configureMocks mocking abstract binder
+            sc.getResourceConfig().register(new AbstractBinder() {
+                @Override
+                protected void configure() {
+                    ts.configureMocks(this);
+                }
+            });
+        }
+
+        // invoking only for root setup
+        if (st.getRoot() == null) {
+            // registering setup so it can listen for application events
+            sc.getResourceConfig().register(st);
+            // registering db config so db is started/stopped with jersey application
+//            config.getResourceConfig().property("com.sun.jersey.api.json.POJOMappingFeature", true);
+            // initializes configuration
+            sc.init();
+        }
+
+    }
+
+    /**
+     * Starts server.
+     *
+     * @throws Exception
+     */
+    @Override
+    public void start() throws Exception {
+
+        if (!getServerConfig().isRunning()) {
+            init(this);
+
+            setup.beforeServerStart(this.testosterone);
+
+            LOGGER.info("Starting server with {} configuration", getStartServer());
+
+            dbConfig.start();
+            serverConfig.start();
+
+            LOGGER.info(this.toString());
+            // Invoke afterServerStart only if resource is singleton.
+            // If there is no Singleton annotation, afterServerStart is 
+            // invoked by @PostConstruct interceptor
+            if (Utils.isAnnotationPresent(this.testosterone, Singleton.class)) {
+                setup.afterServerStart(this.testosterone);
+            }
+        }
+    }
+
+    /**
+     * Stops server.
+     *
+     * @throws Exception
+     */
+    @Override
+    public void stop() throws Exception {
+        try {
+            if (getServerConfig().isRunning()) {
+                setup.beforeServerStop(this.testosterone);
+
+                LOGGER.info("Stopping server configured with: {}", getStartServer());
+                serverConfig.stop();
+                dbConfig.stop();
+                setup.afterServerStop(this.testosterone);
+                setup.clearFlags();
+
+                System.out.println("");
+            }
+        } finally {
+            Testosterone.TEST_CONFIGURATIONS.remove(Utils.getInstrumentedClassName(this.testosterone));
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "DefaultTestConfig{"
+                + "startServer=" + startServer
+                + ", baseUri=" + baseUri
+                + ", httpPort=" + httpPort
+                + ", mainThreadName=" + mainThreadName
+                + ", testConfig=" + this.getClass().getName()
+                + ", testosterone=" + testosterone.getClass().getName()
+                + ", serverConfig=" + serverConfig.getClass().getName()
+                + ", servletContainerConfig=" + servletContainerConfig.getClass().getName()
+                + ", dbConfig=" + dbConfig.getClass().getName()
+                + "}";
+    }
+
+}

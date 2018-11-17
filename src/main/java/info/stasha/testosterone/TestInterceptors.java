@@ -27,19 +27,8 @@ public class TestInterceptors {
      *
      * @param t
      */
-    private static void start(Testosterone t) {
-        try {
-            t.start();
-        } catch (Exception ex) {
-            LOGGER.error("Failed to start configuration.", ex);
-            try {
-                t.stop();
-            } catch (Exception ex1) {
-                LOGGER.error("Failed to stop configuration.", ex);
-                throw new RuntimeException(ex);
-            }
-            throw new RuntimeException(ex);
-        }
+    private static void start(Testosterone t) throws Exception {
+        t.getTestConfig().start();
     }
 
     /**
@@ -47,24 +36,18 @@ public class TestInterceptors {
      *
      * @param t
      */
-    private static void stop(Testosterone t) {
-        try {
-            t.stop();
-        } catch (Exception ex) {
-            LOGGER.error("Failed to stop configuration.", ex);
-            throw new RuntimeException(ex);
-        }
+    private static void stop(Testosterone t) throws Exception {
+        t.getTestConfig().stop();
     }
 
     /**
-     * Start configuration before test class.
+     * StartServer configuration before test class.
      *
      * @param clazz
      */
-    public static void beforeClass(Class<? extends Testosterone> clazz) {
-        Start s = Utils.getServerStarts(clazz);
-        if (s == Start.BY_PARENT || s == Start.PER_CLASS) {
-            LOGGER.info("Starting server configured with: {}", s);
+    public static void beforeClass(Class<? extends Testosterone> clazz) throws Exception {
+        StartServer s = Utils.getServerStarts(clazz);
+        if (Utils.isTestosterone(clazz) && s == StartServer.PER_CLASS) {
             start(Utils.getTestosterone(clazz));
         }
     }
@@ -73,32 +56,33 @@ public class TestInterceptors {
      * Stop configuration after test class.
      *
      * @param clazz
+     * @throws java.lang.Exception
      */
-    public static void afterClass(Class<? extends Testosterone> clazz) {
-        Start s = Utils.getServerStarts(clazz);
-        if (s == Start.BY_PARENT || s == Start.PER_CLASS) {
-            LOGGER.info("Stopping server configured with: {}", s);
+    public static void afterClass(Class<? extends Testosterone> clazz) throws Exception {
+        StartServer s = Utils.getServerStarts(clazz);
+        if (Utils.isTestosterone(clazz) && s == StartServer.PER_CLASS) {
             stop(Utils.getTestosterone(clazz));
         }
     }
 
     /**
-     * Start configuration before test method.
+     * StartServer configuration before test method.
      *
      * @param clazz
+     * @throws java.lang.Exception
      */
-    public static void before(Class<? extends Testosterone> clazz) {
+    public static void before(Class<? extends Testosterone> clazz) throws Exception {
         before(Utils.getTestosterone(clazz));
     }
 
     /**
-     * Start configuration before test method.
+     * StartServer configuration before test method.
      *
      * @param orig
+     * @throws java.lang.Exception
      */
-    public static void before(@This Testosterone orig) {
-        if (orig.getServerConfig().getServerStarts() == Start.PER_TEST) {
-            LOGGER.info("Starting server {} configuration", orig.getServerConfig().getServerStarts());
+    public static void before(@This Testosterone orig) throws Exception {
+        if (Utils.isTestosterone(orig) && orig.getTestConfig().getStartServer() == StartServer.PER_TEST_METHOD) {
             start(orig);
         }
     }
@@ -107,8 +91,9 @@ public class TestInterceptors {
      * Stop configuration after test method.
      *
      * @param clazz
+     * @throws java.lang.Exception
      */
-    public static void after(Class<? extends Testosterone> clazz) {
+    public static void after(Class<? extends Testosterone> clazz) throws Exception {
         after(Utils.getTestosterone(clazz));
     }
 
@@ -116,10 +101,10 @@ public class TestInterceptors {
      * Stop configuration after test method.
      *
      * @param orig
+     * @throws java.lang.Exception
      */
-    public static void after(@This Testosterone orig) {
-        if (orig.getServerConfig().getServerStarts() == Start.PER_TEST) {
-            LOGGER.info("Stopping server {} configuration", orig.getServerConfig().getServerStarts());
+    public static void after(@This Testosterone orig) throws Exception {
+        if (Utils.isTestosterone(orig) && orig.getTestConfig().getStartServer() == StartServer.PER_TEST_METHOD) {
             stop(orig);
         }
     }
@@ -141,13 +126,9 @@ public class TestInterceptors {
              */
             @RuntimeType
             public static void constructor(@This Testosterone orig) throws IllegalAccessException, InvocationTargetException, IllegalArgumentException, NoSuchFieldException {
-                Setup setup = orig.getSetup();
-                ServerConfig sc = orig.getServerConfig();
-                if (sc.getTestThreadName() == null || Thread.currentThread().getName().equals(sc.getTestThreadName())) {
-//                    System.out.println("test thread");
-                } else {
-                    Testosterone test = sc.getMainThreadTestObject();
-                    Utils.copyFields(test, orig);
+                Testosterone main = orig.getTestConfig().getTest();
+                if (!orig.equals(main)) {
+                    Utils.copyFields(main, orig);
                 }
             }
         }
@@ -159,21 +140,21 @@ public class TestInterceptors {
 
             @RuntimeType
             public static void postConstruct(@This Testosterone orig) throws Exception {
-                LOGGER.info("Invoking @PostConstruct");
-                orig.getSetup().afterServerStart(orig);
+                LOGGER.debug("Invoking @PostConstruct");
+                orig.getTestConfig().getSetup().afterServerStart(orig);
             }
         }
 
         /**
          * @PostConstruct interceptor
          */
-        public static class GenericTest {
+        public static class GenericUrl {
 
             @RuntimeType
-            public static Void postConstruct(@This Testosterone orig) throws Exception, Throwable {
-                TestInExecution et = orig.getSetup().getTestInExecution();
+            public static Void generic(@This Testosterone orig) throws Exception, Throwable {
+                TestInExecution et = orig.getTestConfig().getSetup().getTestInExecution();
                 et.setIsRequest(false);
-                PathAndTest.test(null, null, et.getMainThreadTestMethod(), et.getManiThreadTest());
+                PathAndTest.test(null, null, et.getMainThreadTestMethod(), et.getMainThreadTest());
                 return null;
             }
         }
@@ -248,26 +229,20 @@ public class TestInterceptors {
             public static Object test(@SuperCall Callable<?> zuper, @AllArguments Object[] args, @Origin Method method, @This Testosterone orig) throws Throwable {
 
                 String invoking = orig.getClass().getName() + ":" + method.getName();
-                ServiceLocator locator = orig.getSetup().getServiceLocator();
-                ServerConfig config = orig.getServerConfig();
-                Testosterone mainThreadTest = config.getMainThreadTestObject();
-                Testosterone requestThreadTest = config.getRequestThreadTestObject();
 
-                // This before is always executed as first by JUnit framework.
-                // If there is no stored testingObject, we store it.
-                if (requestThreadTest == null) {
-                    config.setRequestThreadTestObject(orig);
-                    config.setTestThreadName(Thread.currentThread().getName());
-                }
+                TestConfig config = orig.getTestConfig();
+                Setup setup = config.getSetup();
+                ServiceLocator locator = setup.getServiceLocator();
+                Testosterone mainThreadTest = config.getTest();
 
                 Utils.copyFields(mainThreadTest, orig);
                 // Flag if this is the main thread in which JUnit test runs
-                boolean isMain = Thread.currentThread().getName().equals(config.getTestThreadName());
+                boolean isMain = Thread.currentThread().getName().equals(config.getMainThreadName());
 
                 // Jersey resource before that will be invoked
                 Method resourceMethod = mainThreadTest.getClass().getMethod(method.getName(), method.getParameterTypes());
 
-                TestInExecution et = orig.getSetup().getTestInExecution();
+                TestInExecution et = setup.getTestInExecution();
                 // If we are in main JUnit thread, invoke http request to test
                 if (isMain) {
                     LOGGER.info("Starting {}", invoking);
@@ -275,7 +250,7 @@ public class TestInterceptors {
                     try {
                         try {
                             et = new TestInExecutionImpl(orig, mainThreadTest, resourceMethod, Utils.getMethodStartingWithName(mainThreadTest.getClass(), resourceMethod), args);
-                            orig.getSetup().setTestInExecution(et);
+                            setup.setTestInExecution(et);
                             // Invoking http request to resource before on resource object
                             et.executeTest();
                         } catch (InvocationTargetException ex) {
@@ -290,13 +265,13 @@ public class TestInterceptors {
                     } finally {
                         // clear junit errors
                         config.getExceptions().clear();
-                        orig.getSetup().setRequestsAlreadInvoked(false);
+                        setup.setRequestsAlreadInvoked(false);
                         LOGGER.info("Ending test {}", invoking);
                     }
 
                 } else {
                     // if thread is not main JUnit thread, then it is http servers thread
-                    if (!Utils.hasRequestAnnotation(method) || orig.getSetup().isRequestsAlreadInvoked()) {
+                    if (!Utils.hasRequestAnnotation(method) || setup.isRequestsAlreadInvoked()) {
                         et.beforeTest();
                     } else {
                         et.setIsRequest(true);
@@ -309,8 +284,8 @@ public class TestInterceptors {
                             Utils.invokeOriginalMethod(m, orig, new Object[]{});
                         }
 
-                        if (Utils.hasRequestAnnotation(method) && !orig.getSetup().isRequestsAlreadInvoked()) {
-                            orig.getSetup().setRequestsAlreadInvoked(true);
+                        if (Utils.hasRequestAnnotation(method) && !setup.isRequestsAlreadInvoked()) {
+                            setup.setRequestsAlreadInvoked(true);
                             et.executeRequests();
                         } else {
                             return Utils.invokeOriginalMethod(resourceMethod, orig, args);

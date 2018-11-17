@@ -1,5 +1,6 @@
 package info.stasha.testosterone.db;
 
+import info.stasha.testosterone.TestConfig;
 import info.stasha.testosterone.jersey.Testosterone;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -29,8 +30,11 @@ public class H2Config implements DbConfig {
 
     protected Testosterone test;
 
-    public H2Config(Testosterone test) {
-        this.test = test;
+    private final TestConfig config;
+
+    public H2Config(TestConfig config) {
+        this.config = config;
+        this.test = config.getTest();
     }
 
     /**

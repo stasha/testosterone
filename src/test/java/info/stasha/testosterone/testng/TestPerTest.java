@@ -1,13 +1,19 @@
 package info.stasha.testosterone.testng;
 
-import info.stasha.testosterone.Start;
+import info.stasha.testosterone.StartServer;
 import info.stasha.testosterone.annotation.Configuration;
+import org.testng.annotations.Test;
 
 /**
  *
  * @author stasha
  */
-@Configuration(serverStarts = Start.PER_TEST, port = 9998)
+@Configuration(startServer = StartServer.PER_TEST_METHOD, httpPort = 9998)
 public class TestPerTest extends SuperTest {
-	
+
+    @Test
+    public void test() {
+
+    }
+
 }

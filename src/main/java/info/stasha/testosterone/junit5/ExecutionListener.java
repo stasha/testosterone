@@ -2,6 +2,7 @@ package info.stasha.testosterone.junit5;
 
 import info.stasha.testosterone.TestInstrumentation;
 import info.stasha.testosterone.TestInterceptors;
+import info.stasha.testosterone.Utils;
 import org.junit.platform.engine.TestExecutionResult;
 import org.junit.platform.engine.TestSource;
 import org.junit.platform.engine.support.descriptor.ClassSource;
@@ -49,10 +50,7 @@ public class ExecutionListener implements TestExecutionListener {
             }
             if (Testosterone.class.isAssignableFrom(cls)) {
                 return (Class<? extends Testosterone>) TestInstrumentation.testClass(
-                        (Class<? extends Testosterone>) cls,
-                        new BeforeAllAnnotation(),
-                        new AfterAllAnnotation()
-                );
+                        (Class<? extends Testosterone>) cls, new BeforeAllAnnotation(), new AfterAllAnnotation());
             }
         }
 
@@ -67,10 +65,22 @@ public class ExecutionListener implements TestExecutionListener {
     @Override
     public void executionStarted(TestIdentifier testIdentifier) {
         Class<? extends Testosterone> cls = getClass(testIdentifier);
-        if (testIdentifier.isContainer() && cls != null) {
-            TestInterceptors.beforeClass(cls);
-        } else if (testIdentifier.isTest()) {
-            TestInterceptors.before(cls);
+        if (cls != null && Utils.isTestosterone(cls)) {
+            if (testIdentifier.isContainer()) {
+                try {
+                    TestInterceptors.beforeClass(cls);
+                } catch (Exception ex) {
+                    LOGGER.error("Failed to start test", ex);
+                    throw new RuntimeException(ex);
+                }
+            } else if (testIdentifier.isTest()) {
+                try {
+                    TestInterceptors.before(cls);
+                } catch (Exception ex) {
+                    LOGGER.error("Failed to start test", ex);
+                    throw new RuntimeException(ex);
+                }
+            }
         }
     }
 
@@ -82,11 +92,24 @@ public class ExecutionListener implements TestExecutionListener {
      */
     @Override
     public void executionFinished(TestIdentifier testIdentifier, TestExecutionResult testExecutionResult) {
+
         Class<? extends Testosterone> cls = getClass(testIdentifier);
-        if (testIdentifier.isContainer() && cls != null) {
-            TestInterceptors.afterClass(cls);
-        } else if (testIdentifier.isTest()) {
-            TestInterceptors.after(cls);
+        if (cls != null && Utils.isTestosterone(cls)) {
+            if (testIdentifier.isContainer()) {
+                try {
+                    TestInterceptors.afterClass(cls);
+                } catch (Exception ex) {
+                    LOGGER.error("Failed to finish test", ex);
+                    throw new RuntimeException(ex);
+                }
+            } else if (testIdentifier.isTest()) {
+                try {
+                    TestInterceptors.after(cls);
+                } catch (Exception ex) {
+                    LOGGER.error("Failed to finish test", ex);
+                    throw new RuntimeException(ex);
+                }
+            }
         }
     }
 

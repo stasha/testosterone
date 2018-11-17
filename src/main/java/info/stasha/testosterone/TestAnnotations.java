@@ -43,11 +43,11 @@ public class TestAnnotations {
             case "beforeClass":
                 return get("org.junit.BeforeClass", "org.junit.jupiter.api.BeforeAll", "org.testng.annotations.BeforeClass");
             case "before":
-                return get("org.junit.Before", "org.junit.jupiter.api.BeforeEach", "org.testng.annotations.Before");
+                return get("org.junit.Before", "org.junit.jupiter.api.BeforeEach", "org.testng.annotations.BeforeMethod");
             case "test":
                 return get("org.junit.Test", "org.junit.jupiter.api.Test", "org.testng.annotations.Test");
             case "after":
-                return get("org.junit.After", "org.junit.jupiter.api.AfterEach", "org.testng.annotations.After");
+                return get("org.junit.After", "org.junit.jupiter.api.AfterEach", "org.testng.annotations.AfterMethod");
             case "afterClass":
                 return get("org.junit.AfterClass", "org.junit.jupiter.api.AfterAll", "org.testng.annotations.AfterClass");
         }

@@ -8,9 +8,11 @@ import org.junit.jupiter.api.extension.TestInstanceFactoryContext;
 import org.junit.jupiter.api.extension.TestInstantiationException;
 
 import info.stasha.testosterone.TestInstrumentation;
+import info.stasha.testosterone.jersey.TestResponseBuilder.TestResponse;
 import info.stasha.testosterone.junit5.Testosterone.ContextInjectParameterResolver;
 import info.stasha.testosterone.junit5.Testosterone.TestosteroneFactory;
 import javax.inject.Inject;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
@@ -88,7 +90,11 @@ public interface Testosterone extends info.stasha.testosterone.jersey.Testostero
          */
         @Override
         public boolean supportsParameter(ParameterContext pc, ExtensionContext ec) throws ParameterResolutionException {
-            if (pc.getParameter().getType() == Response.class || pc.isAnnotated(Context.class) || pc.isAnnotated(Inject.class)) {
+            if (pc.getParameter().getType() == Response.class
+                    || pc.getParameter().getType() == TestResponse.class
+                    || pc.getParameter().getType() == WebTarget.class
+                    || pc.isAnnotated(Context.class)
+                    || pc.isAnnotated(Inject.class)) {
                 cls = (Class<? extends Testosterone>) pc.getParameter().getType();
                 return true;
             }

@@ -1,6 +1,6 @@
 package info.stasha.testosterone.junit4.lifecycle;
 
-import info.stasha.testosterone.Start;
+import info.stasha.testosterone.StartServer;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.junit4.TestosteroneRunner;
@@ -18,7 +18,7 @@ import org.junit.runner.RunWith;
  * @author stasha
  */
 @RunWith(TestosteroneRunner.class)
-@Configuration(serverStarts = Start.PER_TEST)
+@Configuration(startServer = StartServer.PER_TEST_METHOD)
 public class TestLifeCyclePerTestTest implements Testosterone {
 
     protected static final StringBuilder SB = new StringBuilder();

@@ -1,94 +1,63 @@
 package info.stasha.testosterone.jersey;
 
-import info.stasha.testosterone.jersey.inject.InjectTestResolver;
-import info.stasha.testosterone.jersey.inject.ValueInjectionResolver;
-import info.stasha.testosterone.Setup;
 import javax.ws.rs.client.WebTarget;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
-import info.stasha.testosterone.ServerConfig;
-import info.stasha.testosterone.ConfigFactory;
-import info.stasha.testosterone.TestInExecution;
+import info.stasha.testosterone.TestConfig;
 import info.stasha.testosterone.Utils;
 import info.stasha.testosterone.annotation.Configuration;
-import info.stasha.testosterone.annotation.InjectTest;
-import info.stasha.testosterone.annotation.Integration;
-import info.stasha.testosterone.annotation.Value;
 import info.stasha.testosterone.db.DbConfig;
-import info.stasha.testosterone.db.H2ConnectionFactory;
-import info.stasha.testosterone.jersey.inject.InputStreamInjectionResolver;
-import info.stasha.testosterone.jersey.inject.MockInjectionResolver;
-import info.stasha.testosterone.jersey.inject.SpyInjectionResolver;
-import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import javax.inject.Singleton;
-import javax.ws.rs.core.Context;
-import org.glassfish.hk2.api.Factory;
-import org.glassfish.hk2.api.InjectionResolver;
-import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.hk2.api.TypeLiteral;
-import org.glassfish.jersey.process.internal.RequestScoped;
-import static org.mockito.AdditionalAnswers.delegatesTo;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import info.stasha.testosterone.annotation.LoadFile;
+import info.stasha.testosterone.configs.DefaultTestConfig;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 
 /**
- * Interface that should be implemented by every JUnit4 test class that needs
- * Testosterone functionality.
+ * Testosterone
  *
  * @author stasha
  */
 public interface Testosterone {
 
     static final Logger LOGGER = LoggerFactory.getLogger(Testosterone.class);
+    static final Map<String, TestConfig> TEST_CONFIGURATIONS = new HashMap<>();
 
     /**
      * Returns testosterone configuration factory.
      *
      * @return
      */
-    default ConfigFactory getConfigFactory() {
-        Configuration conf = Testosterone.this.getClass().getAnnotation(Configuration.class);
-        if (conf != null && conf.configuration() != null) {
-            try {
-//				LOGGER.info("Creating ConfigFactory {} from @Configuration annotation.", conf.configuration().getName());
-                return conf.configuration().newInstance();
-            } catch (InstantiationException | IllegalAccessException ex) {
-                LOGGER.error("Failed to create configuration from @Configuration annotation.");
-            }
+    default TestConfig getTestConfig() {
+        TestConfig config = TEST_CONFIGURATIONS.get(Utils.getInstrumentedClassName(this));
+
+        // returning existing config
+        if (config != null) {
+            return config;
         }
 
-//		LOGGER.info("Creating default JettyConfigFactory");
-        return new JettyConfigFactory();
-    }
+        Configuration conf = Testosterone.this.getClass().getAnnotation(Configuration.class);
 
-    /**
-     * Returns testosterone setup.
-     *
-     * @return
-     */
-    default Setup getSetup() {
-        return getConfigFactory().getSetup(this);
-    }
+        try {
+            if (conf != null) {
+                Constructor con = conf.configuration().
+                        getDeclaredConstructor(Testosterone.class, Configuration.class);
 
-    /**
-     * Returns testosterone configuration.
-     *
-     * @return
-     */
-    default ServerConfig getServerConfig() {
-        return getSetup().getServerConfig();
+                config = (TestConfig) con.newInstance(this, conf);
+            } else {
+                config = new DefaultTestConfig(this);
+            }
+
+            TEST_CONFIGURATIONS.put(Utils.getInstrumentedClassName(this), config);
+
+            return config;
+        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            LOGGER.error("Failed to create Test Configuration.", ex);
+            throw new RuntimeException(ex);
+        }
     }
 
     /**
@@ -97,7 +66,7 @@ public interface Testosterone {
      * @return
      */
     default WebTarget target() {
-        return getServerConfig().target();
+        return getTestConfig().getServerConfig().target();
     }
 
     /**
@@ -108,226 +77,6 @@ public interface Testosterone {
      */
     default WebTarget target(String path) {
         return target().path(path);
-    }
-
-    default Map<String, Testosterone> getTests() {
-        return getSetup().getTests();
-    }
-
-    /**
-     * Initializes configuration.
-     *
-     * @param config
-     */
-    default void initConfiguration(ServerConfig config) {
-
-//        System.out.println(this.getClass().getName());
-        for (Field f : this.getClass().getSuperclass().getDeclaredFields()) {
-            f.setAccessible(true);
-//            System.out.println(f.getName() + " : " + Arrays.toString(f.getAnnotations()));
-            Mock m = f.getAnnotation(Mock.class);
-            Spy s = f.getAnnotation(Spy.class);
-
-            try {
-                Object obj = f.get(this);
-
-                if (m != null && obj != null) {
-                    f.set(this, Mockito.mock(f.getType(), m.answer()));
-                } else if (s != null && obj != null) {
-                    f.set(this, Mockito.mock(obj.getClass(), delegatesTo(obj)));
-                }
-
-            } catch (IllegalArgumentException | IllegalAccessException ex) {
-                java.util.logging.Logger.getLogger(Testosterone.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-
-        // configureMocks ResourceConfig
-        configure(config.getResourceConfig());
-        // configure Servlet container
-        configure(config.getServletContainerConfig());
-        // configure DB
-        configure(getSetup().getDbConfig());
-        // configureMocks AbstractBinder
-        config.getResourceConfig().register(new AbstractBinder() {
-
-            @Context
-            ServiceLocator locator;
-
-            @Override
-            protected void configure() {
-
-                this.bindFactory(new Factory<Testosterone>() {
-
-                    @Override
-                    public Testosterone provide() {
-                        return Testosterone.this;
-                    }
-
-                    @Override
-                    public void dispose(Testosterone instance) {
-
-                    }
-                }).to(Testosterone.class).in(Singleton.class);
-                // H2 connection factory
-                this.bindFactory(H2ConnectionFactory.class)
-                        .to(Connection.class)
-                        .in(RequestScoped.class)
-                        .proxy(true)
-                        .proxyForSameScope(false);
-
-                this.bindFactory(new Factory<DbConfig>() {
-                    @Override
-                    public DbConfig provide() {
-                        return getSetup().getDbConfig();
-                    }
-
-                    @Override
-                    public void dispose(DbConfig instance) {
-                    }
-                }).to(DbConfig.class).in(Singleton.class);
-
-                this.bindFactory(new Factory<TestInExecution>() {
-                    @Override
-                    public TestInExecution provide() {
-                        return getSetup().getTestInExecution();
-                    }
-
-                    @Override
-                    public void dispose(TestInExecution instance) {
-                    }
-                }).to(TestInExecution.class).in(RequestScoped.class).proxy(true);
-
-                // custom @Value injection resolver
-                this.bind(ValueInjectionResolver.class)
-                        .to(new TypeLiteral<InjectionResolver<Value>>() {
-                        }).in(Singleton.class);
-                this.bind(InjectTestResolver.class)
-                        .to(new TypeLiteral<InjectionResolver<InjectTest>>() {
-                        }).in(Singleton.class);
-                this.bind(MockInjectionResolver.class)
-                        .to(new TypeLiteral<InjectionResolver<Mock>>() {
-                        }).in(Singleton.class);
-                this.bind(SpyInjectionResolver.class)
-                        .to(new TypeLiteral<InjectionResolver<Spy>>() {
-                        }).in(Singleton.class);
-                this.bind(InputStreamInjectionResolver.class)
-                        .to(new TypeLiteral<InjectionResolver<LoadFile>>() {
-                        }).in(Singleton.class);
-                // invokes method for configuring AbstractBinder
-                Testosterone.this.configure(this);
-            }
-        });
-
-        // Mocked configuratinos are excluded from integration tests
-        Integration integration = getSetup().getIntegration();
-
-        // if this is integration, then build configuration from all 
-        // registered classes in @Integration annotation
-        if (integration != null && getSetup().getRoot() == null) {
-
-            List<Class<? extends Testosterone>> testClasses = Arrays.asList(integration.value());
-            Collections.reverse(testClasses);
-
-            Map<String, Testosterone> tests = new LinkedHashMap();
-            for (Class<? extends Testosterone> cls : testClasses) {
-                try {
-                    Testosterone t = cls.newInstance();
-                    t.getSetup().setParent(getSetup());
-                    t.getSetup().setRoot(getSetup());
-                    t.initConfiguration(getServerConfig());
-                    tests.put(cls.getTypeName(), t);
-                } catch (InstantiationException | IllegalAccessException ex) {
-                    java.util.logging.Logger.getLogger(Testosterone.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-
-            getSetup().setTests(tests);
-
-            config.getResourceConfig().property("tests", tests);
-
-            config.getResourceConfig().register(new AbstractBinder() {
-                @Override
-                protected void configure() {
-                    tests.forEach((k, v) -> {
-                        v.configure(this);
-                    });
-                }
-            });
-        }
-
-        if (integration == null) {
-            // configureMocks MockingResourceConfig
-            configureMocks(config.getResourceConfig());
-            // configuring MockingServletContainerConfig
-            configureMocks(config.getServletContainerConfig());
-            // configure db mocks 
-            configureMocks(getSetup().getDbConfig());
-            // configureMocks mocking abstract binder
-            config.getResourceConfig().register(new AbstractBinder() {
-                @Override
-                protected void configure() {
-                    Testosterone.this.configureMocks(this);
-                }
-            });
-        }
-
-        // invoking only for root setup
-        if (getSetup().getRoot() == null) {
-            // registering setup so it can listen for application events
-            config.getResourceConfig().register(getSetup());
-            // registering db config so db is started/stopped with jersey application
-//            config.getResourceConfig().property("com.sun.jersey.api.json.POJOMappingFeature", true);
-            // initializes configuration
-            config.initConfiguration(this);
-        }
-
-    }
-
-    /**
-     * Starts server.
-     *
-     * @throws Exception
-     */
-    default void start() throws Exception {
-        if (!getServerConfig().isRunning()) {
-
-            // initializes configuration
-            initConfiguration(getServerConfig());
-            // runs before server start method
-            getSetup().beforeServerStart(this);
-            getSetup().getDbConfig().start();
-            // starts server
-            getServerConfig().start();
-//            getSetup().getDbConfig().start();
-
-            // Invoke afterServerStart only if resource is singleton.
-            // If there is no Singleton annotation, afterServerStart is 
-            // invoked by @PostConstruct interceptor
-            if (Utils.isAnnotationPresent(this, Singleton.class)) {
-                getSetup().afterServerStart(this);
-            }
-        }
-    }
-
-    /**
-     * Stops server.
-     *
-     * @throws Exception
-     */
-    default void stop() throws Exception {
-        if (getServerConfig().isRunning()) {
-            // runs before server stop method
-            getSetup().beforeServerStop(this);
-            // stops server
-            getServerConfig().stop();
-            getSetup().getDbConfig().stop();
-            // runs after server stop method
-            getSetup().afterServerStop(this);
-            getSetup().clearFlags();
-
-            System.out.println("");
-        }
     }
 
     /**

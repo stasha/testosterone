@@ -1,5 +1,5 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
-<suite name="TestNG" verbose="2">
+<suite name="TestNG" verbose="1">
     <test name="testng" preserve-order="true" >
 	 <packages>
             <package name="info.stasha.testosterone.testng.*"/>

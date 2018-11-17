@@ -72,7 +72,7 @@ public interface TestInExecution extends TestExecutor {
      *
      * @return
      */
-    Testosterone getManiThreadTest();
+    Testosterone getMainThreadTest();
 
     /**
      * Original test method that's not intercepted.

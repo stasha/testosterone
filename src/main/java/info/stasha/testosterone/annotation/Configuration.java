@@ -1,8 +1,8 @@
 package info.stasha.testosterone.annotation;
 
-import info.stasha.testosterone.ConfigFactory;
-import info.stasha.testosterone.Start;
-import info.stasha.testosterone.jersey.JettyConfigFactory;
+import info.stasha.testosterone.StartServer;
+import info.stasha.testosterone.TestConfig;
+import info.stasha.testosterone.configs.DefaultTestConfig;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -26,28 +26,28 @@ public @interface Configuration {
 	 *
 	 * @return
 	 */
-	Class<? extends ConfigFactory> configuration() default JettyConfigFactory.class;
+	Class<? extends TestConfig> configuration() default DefaultTestConfig.class;
 
 	/**
 	 * Server base uri.
 	 *
 	 * @return
 	 */
-	String baseUri() default "http://localhost/";
+	String baseUri() default TestConfig.BASE_URI;
 
 	/**
-	 * Server port
+	 * Server httpPort
 	 *
 	 * @return
 	 */
-	int port() default 9999;
+	int httpPort() default TestConfig.HTTP_PORT;
 
 	/**
 	 * When to start/stop server.
 	 *
-	 * @see Start
+	 * @see StartServer
 	 * @return
 	 */
-	Start serverStarts() default Start.PER_CLASS;
+	StartServer startServer() default StartServer.PER_CLASS;
 
 }

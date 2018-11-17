@@ -67,7 +67,7 @@ public class AfterClassAnnotation implements AfterClass {
 	 */
 	@Override
 	public boolean alwaysRun() {
-		return false;
+		return true;
 	}
 
 	/**

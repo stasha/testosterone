@@ -43,25 +43,11 @@ public class TestInstrumentation {
     }
 
     /**
-     * Returns new instrumented class that extends test class. It adds
-     * methods:<br>
-     * __afterClass__ - invoked when JUnit calls @AfterClass.<br>
-     * This is just a hack because JUnit4 doesn't fire testRunFinished
-     * event.<br>
-     * __postconstruct__ - invoked when object is fully prepared including all
-     * injections<br>
-     * <p>
-     * Methods annotated with @Test annotation are also annotated with @Path and
-     *
-     * @GET annotations. In case @Path annotation is present, then nor @Path nor
-     * @GET annotations are added.
-     * </p>
-     * <p>
-     * Methods annotated with @DontIntercept annotation are skipped by
-     * instrumentation and will behave as non normal JUnit/Jersey methods.
-     * </p>
+     * Returns new instrumented test class.
      *
      * @param clazz
+     * @param beforeClassAnnotation
+     * @param afterClassAnnotation
      * @return
      */
     public static Class<? extends Testosterone> testClass(
@@ -73,7 +59,7 @@ public class TestInstrumentation {
 
             Class<? extends Testosterone> cls = new ByteBuddy()
                     .subclass(clazz)
-                    .name(clazz.getName() + "_")
+                    .name(Utils.getInstrumentedClassName(clazz))
                     .defineMethod("__created__", Void.class, Visibility.PUBLIC)
                     .intercept(MethodDelegation.to(TestInterceptors.Intercept.Constructor.class))
                     //
@@ -84,10 +70,12 @@ public class TestInstrumentation {
                     .defineMethod("__beforeClass__", void.class, Visibility.PUBLIC, Ownership.STATIC)
                     .intercept(MethodDelegation.to(TestInterceptors.Intercept.BeforeClass.class))
                     .annotateMethod(beforeClassAnnotation)
+//                    .attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
                     //
                     .defineMethod("__afterClass__", void.class, Visibility.PUBLIC, Ownership.STATIC)
                     .intercept(MethodDelegation.to(TestInterceptors.Intercept.AfterClass.class))
                     .annotateMethod(afterClassAnnotation)
+//                    .attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
                     //
                     .method(
                             // junit4 annotations
@@ -114,14 +102,14 @@ public class TestInstrumentation {
                     //
                     .method(isAnnotatedWith(named("org.junit.Before"))
                             .or(isAnnotatedWith(named("org.junit.jupiter.api.BeforeEach")))
-                            .or(isAnnotatedWith(named("org.testng.annotations.Before")))
+                            .or(isAnnotatedWith(named("org.testng.annotations.BeforeMethod")))
                     )
                     .intercept(MethodDelegation.to(TestInterceptors.Intercept.Before.class))
                     //                    .attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
                     //
                     .method(isAnnotatedWith(named("org.junit.After"))
                             .or(isAnnotatedWith(named("org.junit.jupiter.api.AfterEach")))
-                            .or(isAnnotatedWith(named("org.testng.annotations.After")))
+                            .or(isAnnotatedWith(named("org.testng.annotations.AfterMethod")))
                     )
                     .intercept(MethodDelegation.to(TestInterceptors.Intercept.After.class))
                     //                    .attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
@@ -131,7 +119,7 @@ public class TestInstrumentation {
                     .annotateMethod(new PostConstructAnnotation())
                     //
                     .defineMethod("__generic__", Void.class, Visibility.PUBLIC)
-                    .intercept(MethodDelegation.to(TestInterceptors.Intercept.GenericTest.class))
+                    .intercept(MethodDelegation.to(TestInterceptors.Intercept.GenericUrl.class))
                     .annotateMethod(new PathAnnotation("__generic__"))
                     //
                     .make()

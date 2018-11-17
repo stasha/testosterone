@@ -1,7 +1,6 @@
 package info.stasha.testosterone;
 
 import info.stasha.testosterone.annotation.Integration;
-import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.jersey.Testosterone;
 import java.io.IOException;
 import java.util.Map;
@@ -28,36 +27,23 @@ public class Setup implements ContainerResponseFilter {
     @Context
     private ServiceLocator locator;
 
-    protected Integration integration;
-    protected Map<String, Testosterone> tests;
-    protected Setup parent;
-    protected Setup root;
-    protected boolean suite;
-    protected final Testosterone testosterone;
-    protected final ServerConfig serverConfig;
-    protected DbConfig dbConfig;
-    protected boolean beforeServerStart;
-    protected boolean afterServerStart;
-    protected boolean beforeServerStop;
-    protected boolean afterServerStop;
-    protected boolean requestsAlreadInvoked;
-    protected TestInExecution testInExecution;
+    private final TestConfig config;
+    private final Testosterone testosterone;
 
-    /**
-     * Creates TestosteroneSetup.
-     *
-     * @param testosterone
-     * @param serverConfig
-     */
-    public Setup(Testosterone testosterone, ServerConfig serverConfig) {
-        if (testosterone == null) {
-            throw new IllegalArgumentException("Testosterone instance can't be null");
-        }
-        if (serverConfig == null) {
-            throw new IllegalArgumentException("Configuration instance can't be null");
-        }
-        this.testosterone = testosterone;
-        this.serverConfig = serverConfig;
+    private Integration integration;
+    private Map<String, Testosterone> tests;
+    private Setup parent;
+    private Setup root;
+    private boolean beforeServerStart;
+    private boolean afterServerStart;
+    private boolean beforeServerStop;
+    private boolean afterServerStop;
+    private boolean requestsAlreadInvoked;
+    private TestInExecution testInExecution;
+
+    public Setup(TestConfig config) {
+        this.config = config;
+        this.testosterone = config.getTest();
     }
 
     /**
@@ -100,33 +86,6 @@ public class Setup implements ContainerResponseFilter {
     }
 
     /**
-     * Returns serverConfig used by testosterone test class.
-     *
-     * @return
-     */
-    public ServerConfig getServerConfig() {
-        return serverConfig;
-    }
-
-    /**
-     * Returns DB configuration.
-     *
-     * @return
-     */
-    public DbConfig getDbConfig() {
-        return dbConfig;
-    }
-
-    /**
-     * Sets DB configuration.
-     *
-     * @param dbConfig
-     */
-    public void setDbConfig(DbConfig dbConfig) {
-        this.dbConfig = dbConfig;
-    }
-
-    /**
      * Returns root setup.
      *
      * @return
@@ -141,9 +100,7 @@ public class Setup implements ContainerResponseFilter {
      * @param root
      */
     public void setRoot(Setup root) {
-        if (this.root == null) {
-            this.root = root;
-        }
+        this.root = this.root == null ? root : this.root;
     }
 
     /**
@@ -165,12 +122,84 @@ public class Setup implements ContainerResponseFilter {
     }
 
     /**
-     * Returns true/false if this setup is suite.
+     * Returns if beforeServerStart was invoked.
      *
      * @return
      */
-    public boolean isSuite() {
-        return suite;
+    public boolean isBeforeServerStart() {
+        return beforeServerStart;
+    }
+
+    /**
+     * Returns if afterServerStart was invoked.
+     *
+     * @return
+     */
+    public boolean isAfterServerStart() {
+        return afterServerStart;
+    }
+
+    /**
+     * Returns if beforeServerStop was invoked.
+     *
+     * @return
+     */
+    public boolean isBeforeServerStop() {
+        return beforeServerStop;
+    }
+
+    /**
+     * Returns if afterServerStop was invoked.
+     *
+     * @return
+     */
+    public boolean isAfterServerStop() {
+        return afterServerStop;
+    }
+
+    /**
+     * Returns ServiceLocator
+     *
+     * @return
+     */
+    public ServiceLocator getServiceLocator() {
+        return locator;
+    }
+
+    /**
+     * Returns true/false if all @Request/s on test method were invoked.
+     *
+     * @return
+     */
+    public boolean isRequestsAlreadInvoked() {
+        return requestsAlreadInvoked;
+    }
+
+    /**
+     * Sets if all @Request/s were invoked.
+     *
+     * @param requestsAlreadInvoked
+     */
+    public void setRequestsAlreadInvoked(boolean requestsAlreadInvoked) {
+        this.requestsAlreadInvoked = requestsAlreadInvoked;
+    }
+
+    /**
+     * Returns test in execution instance
+     *
+     * @return
+     */
+    public TestInExecution getTestInExecution() {
+        return testInExecution;
+    }
+
+    /**
+     * Sets test in execution instance.
+     *
+     * @param testInExecution
+     */
+    public void setTestInExecution(TestInExecution testInExecution) {
+        this.testInExecution = testInExecution;
     }
 
     /**
@@ -230,42 +259,6 @@ public class Setup implements ContainerResponseFilter {
     }
 
     /**
-     * Returns if beforeServerStart was invoked.
-     *
-     * @return
-     */
-    public boolean isBeforeServerStart() {
-        return beforeServerStart;
-    }
-
-    /**
-     * Returns if afterServerStart was invoked.
-     *
-     * @return
-     */
-    public boolean isAfterServerStart() {
-        return afterServerStart;
-    }
-
-    /**
-     * Returns if beforeServerStop was invoked.
-     *
-     * @return
-     */
-    public boolean isBeforeServerStop() {
-        return beforeServerStop;
-    }
-
-    /**
-     * Returns if afterServerStop was invoked.
-     *
-     * @return
-     */
-    public boolean isAfterServerStop() {
-        return afterServerStop;
-    }
-
-    /**
      * Clears all start/stop flags
      */
     public void clearFlags() {
@@ -276,31 +269,28 @@ public class Setup implements ContainerResponseFilter {
         this.afterServerStop = false;
     }
 
-    public ServiceLocator getServiceLocator() {
-        return locator;
-    }
-
-    public boolean isRequestsAlreadInvoked() {
-        return requestsAlreadInvoked;
-    }
-
-    public void setRequestsAlreadInvoked(boolean requestsAlreadInvoked) {
-        this.requestsAlreadInvoked = requestsAlreadInvoked;
-    }
-
-    public TestInExecution getTestInExecution() {
-        return testInExecution;
-    }
-
-    public void setTestInExecution(TestInExecution testInExecution) {
-        this.testInExecution = testInExecution;
+    /**
+     * Filter that injects injectables.
+     *
+     * @param requestContext
+     * @param responseContext
+     * @throws IOException
+     */
+    @Override
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
+        locator.inject(testosterone);
     }
 
     @Override
-    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
-        if (locator != null && testosterone != null) {
-            locator.inject(testosterone);
-        }
+    public String toString() {
+        return "Setup{"
+                + ", beforeServerStart=" + beforeServerStart
+                + ", afterServerStart=" + afterServerStart
+                + ", beforeServerStop=" + beforeServerStop
+                + ", afterServerStop=" + afterServerStop
+                + ", requestsAlreadInvoked=" + requestsAlreadInvoked
+                + ", testInExecution=" + testInExecution
+                + "}";
     }
 
 }

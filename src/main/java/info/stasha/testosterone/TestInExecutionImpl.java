@@ -12,14 +12,13 @@ import java.util.Set;
  */
 public class TestInExecutionImpl implements TestInExecution {
 
-    private final Testosterone maniThreadTest;
+    private final Testosterone mainThreadTest;
     private final Testosterone serverThreadTest;
     private final Method mainThreadTestMethod;
     private final Method originMainThreadTestMethod;
     private final Object[] arguments;
     private boolean isTest;
     private boolean isRequest;
-    private boolean beforesInvoked;
 
     private final Set<TestEventListener> beforeTest = new LinkedHashSet<>();
     private final Set<TestEventListener> afterTest = new LinkedHashSet<>();
@@ -38,7 +37,7 @@ public class TestInExecutionImpl implements TestInExecution {
             Method mainThreadTestMethod,
             Method originMainThreadTestMethod,
             Object[] arguments) {
-        this.maniThreadTest = mainThreadTest;
+        this.mainThreadTest = mainThreadTest;
         this.serverThreadTest = serverTrhreadTest;
         this.mainThreadTestMethod = mainThreadTestMethod;
         this.originMainThreadTestMethod = originMainThreadTestMethod;
@@ -51,8 +50,8 @@ public class TestInExecutionImpl implements TestInExecution {
      * @return
      */
     @Override
-    public Testosterone getManiThreadTest() {
-        return maniThreadTest;
+    public Testosterone getMainThreadTest() {
+        return mainThreadTest;
     }
 
     /**
@@ -205,7 +204,7 @@ public class TestInExecutionImpl implements TestInExecution {
      */
     @Override
     public void executeTest() throws Throwable {
-        maniThreadTest.getConfigFactory().getTestExecutor(mainThreadTestMethod, maniThreadTest).executeTest();
+        mainThreadTest.getTestConfig().getTestExecutor(mainThreadTestMethod, mainThreadTest).executeTest();
     }
 
     /**
@@ -216,7 +215,15 @@ public class TestInExecutionImpl implements TestInExecution {
      */
     @Override
     public void executeRequests() throws Throwable {
-        maniThreadTest.getConfigFactory().getTestExecutor(mainThreadTestMethod, maniThreadTest).executeRequests();
+        mainThreadTest.getTestConfig().getTestExecutor(mainThreadTestMethod, mainThreadTest).executeRequests();
+    }
+
+    @Override
+    public String toString() {
+        return "TestInExecutionImpl{"
+                + "test=" + mainThreadTest.getClass().getName() + ":" + mainThreadTestMethod.getName()
+                + ", isTest=" + isTest + ", "
+                + "isRequest=" + isRequest + '}';
     }
 
 }

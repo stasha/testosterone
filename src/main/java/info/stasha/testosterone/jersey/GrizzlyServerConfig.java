@@ -2,10 +2,6 @@ package info.stasha.testosterone.jersey;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -16,7 +12,7 @@ import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import info.stasha.testosterone.ServerConfig;
-import info.stasha.testosterone.Start;
+import info.stasha.testosterone.TestConfig;
 import info.stasha.testosterone.Utils;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
 import javax.inject.Singleton;
@@ -24,48 +20,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Base class for configuring Jersey
+ * Grizzly server configuration.
  *
  * @author stasha
  */
 public class GrizzlyServerConfig implements ServerConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GrizzlyServerConfig.class);
-
-    protected String baseUri = "http://localhost/";
-    protected int port = 9999;
-    protected Start serverStarts = Start.BY_PARENT;
-
-    protected final Set<Throwable> exceptions = new LinkedHashSet<>();
-    protected final List<Throwable> expectedException = new ArrayList<>();
-    protected ServletContainerConfig servletContainerConfig = new ServletContainerConfig();
-
-    protected ResourceConfig resourceConfig;
-    protected final AtomicReference<Client> client = new AtomicReference<>(null);
-
+    private final TestConfig config;
+    private ServletContainerConfig servletContainerConfig;
+    private ResourceConfig resourceConfig;
+    private final AtomicReference<Client> client = new AtomicReference<>(null);
     private HttpServer server;
-    protected Testosterone mainThreadTestObject;
-    protected Testosterone requestThreadTestObject;
-    protected String testThreadName;
 
-    /**
-     * {@inheritDoc }
-     *
-     * @return
-     */
-    @Override
-    public Testosterone getMainThreadTestObject() {
-        return mainThreadTestObject;
-    }
-
-    /**
-     * {@inheritDoc }
-     *
-     * @param mainThreadTestObject
-     */
-    @Override
-    public void setMainThreadTestObject(Testosterone mainThreadTestObject) {
-        this.mainThreadTestObject = mainThreadTestObject;
+    public GrizzlyServerConfig(TestConfig config) {
+        this.config = config;
     }
 
     /**
@@ -74,60 +43,8 @@ public class GrizzlyServerConfig implements ServerConfig {
      * @return
      */
     @Override
-    public Testosterone getRequestThreadTestObject() {
-        return requestThreadTestObject;
-    }
-
-    /**
-     * {@inheritDoc }
-     *
-     * @return
-     */
-    @Override
-    public String getTestThreadName() {
-        return testThreadName;
-    }
-
-    /**
-     * {@inheritDoc }
-     *
-     * @param testThreadName
-     */
-    @Override
-    public void setTestThreadName(String testThreadName) {
-        this.testThreadName = testThreadName;
-    }
-
-    /**
-     * {@inheritDoc }
-     *
-     * @param requestThreadTestObject
-     */
-    @Override
-    public void setRequestThreadTestObject(Testosterone requestThreadTestObject) {
-        this.requestThreadTestObject = requestThreadTestObject;
-    }
-
-    /**
-     * {@inheritDoc }
-     *
-     * @return
-     */
-    @Override
-    public Set<Throwable> getExceptions() {
-        return exceptions;
-    }
-
-    /**
-     * {@inheritDoc }
-     *
-     * @throws Throwable
-     */
-    @Override
-    public void throwExceptions() throws Throwable {
-        if (getExceptions().size() > 0) {
-            throw getExceptions().iterator().next();
-        }
+    public TestConfig getTestConfig() {
+        return this.config;
     }
 
     /**
@@ -150,17 +67,17 @@ public class GrizzlyServerConfig implements ServerConfig {
      */
     @Override
     public ServletContainerConfig getServletContainerConfig() {
-        return null;
+        return this.servletContainerConfig;
     }
 
     /**
      * {@inheritDoc }
      *
-     * @param servletContainerConfig
+     * @param config
      */
     @Override
-    public void setServletContainerConfig(ServletContainerConfig servletContainerConfig) {
-        this.servletContainerConfig = servletContainerConfig;
+    public void setServletContainerConfig(ServletContainerConfig config) {
+        this.servletContainerConfig = config;
     }
 
     /**
@@ -201,7 +118,6 @@ public class GrizzlyServerConfig implements ServerConfig {
         try {
             return client().target(getBaseUri());
         } catch (Exception ex) {
-            ex.printStackTrace();
             throw ex;
         }
     }
@@ -257,7 +173,7 @@ public class GrizzlyServerConfig implements ServerConfig {
      * @throws URISyntaxException
      */
     protected void createServer() throws URISyntaxException {
-        server = GrizzlyHttpServerFactory.createHttpServer(new URI(getBaseUri()), configure());
+        server = GrizzlyHttpServerFactory.createHttpServer(getBaseUri(), configure());
     }
 
     /**
@@ -306,26 +222,15 @@ public class GrizzlyServerConfig implements ServerConfig {
 
     /**
      * {@inheritDoc }
-     *
-     * @param obj
-     */
-    @Override
-    public void initConfiguration(Testosterone obj) {
-        this.mainThreadTestObject = obj;
-        if (Utils.isAnnotationPresent(obj, Singleton.class)) {
-            this.resourceConfig.register(obj);
-        } else {
-            this.resourceConfig.register(obj.getClass());
-        }
-
-        init();
-    }
-
-    /**
-     * {@inheritDoc }
      */
     @Override
     public void init() {
+        if (Utils.isAnnotationPresent(config.getTest(), Singleton.class)) {
+            this.resourceConfig.register(config.getTest());
+        } else {
+            this.resourceConfig.register(config.getTest().getClass());
+        }
+
         try {
             createServer();
 
@@ -337,71 +242,11 @@ public class GrizzlyServerConfig implements ServerConfig {
     /**
      * {@inheritDoc }
      *
-     * @param baseUri
-     */
-    @Override
-    public void setBaseUri(String baseUri) {
-        this.baseUri = baseUri;
-    }
-
-    /**
-     * {@inheritDoc }
-     *
-     * @param port
-     */
-    @Override
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    /**
-     * {@inheritDoc }
-     *
-     * @param serverStarts
-     */
-    @Override
-    public void setServerStarts(Start serverStarts) {
-        this.serverStarts = serverStarts;
-    }
-
-    /**
-     * {@inheritDoc }
-     *
      * @return
      */
     @Override
-    public String getBaseUri() {
-        return UriBuilder.fromUri(this.baseUri).port(getPort()).build().toString();
-    }
-
-    /**
-     * {@inheritDoc }
-     *
-     * @return
-     */
-    @Override
-    public int getPort() {
-        return this.port;
-    }
-
-    /**
-     * {@inheritDoc }
-     *
-     * @return
-     */
-    @Override
-    public Start getServerStarts() {
-        return this.serverStarts;
-    }
-
-    /**
-     * {@inheritDoc }
-     *
-     * @return
-     */
-    @Override
-    public String toString() {
-        return "JerseyConfiguration{" + "testObject=" + requestThreadTestObject.getClass().getName() + '}';
+    public URI getBaseUri() {
+        return UriBuilder.fromUri(config.getBaseUri()).port(config.getHttpPort()).build();
     }
 
 }

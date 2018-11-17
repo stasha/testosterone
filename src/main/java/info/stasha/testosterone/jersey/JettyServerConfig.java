@@ -1,6 +1,6 @@
 package info.stasha.testosterone.jersey;
 
-import info.stasha.testosterone.servlet.ServletContainerConfig;
+import info.stasha.testosterone.TestConfig;
 import java.util.EventListener;
 import javax.servlet.Filter;
 import javax.servlet.Servlet;
@@ -22,15 +22,11 @@ public class JettyServerConfig extends GrizzlyServerConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(JettyServerConfig.class);
 
     protected Server server;
+    private final TestConfig config;
 
-    /**
-     * {@inheritDoc }
-     *
-     * @return
-     */
-    @Override
-    public ServletContainerConfig getServletContainerConfig() {
-        return this.servletContainerConfig;
+    public JettyServerConfig(TestConfig config) {
+        super(config);
+        this.config = config;
     }
 
     /**
@@ -48,7 +44,7 @@ public class JettyServerConfig extends GrizzlyServerConfig {
      */
     @Override
     protected void createServer() {
-        server = new Server(getPort());
+        server = new Server(config.getHttpPort());
         initializeServletContainer();
     }
 
@@ -62,13 +58,13 @@ public class JettyServerConfig extends GrizzlyServerConfig {
         server.setHandler(context);
 
         // registering context params
-        servletContainerConfig.getContextParams().forEach((t, u) -> {
+        config.getServletContainerConfig().getContextParams().forEach((t, u) -> {
             LOGGER.debug("Setting initial context param {}:{}", t, u);
             context.setInitParameter(t, u);
         });
 
         // registering servlet listeners
-        servletContainerConfig.getListeners().forEach((t) -> {
+        config.getServletContainerConfig().getListeners().forEach((t) -> {
             EventListener listener;
             if (t.getListener() == null) {
                 try {
@@ -86,7 +82,7 @@ public class JettyServerConfig extends GrizzlyServerConfig {
         });
 
         // registering servlet filters
-        servletContainerConfig.getFilters().forEach((t) -> {
+        config.getServletContainerConfig().getFilters().forEach((t) -> {
             try {
                 FilterHolder fh = new FilterHolder();
                 Filter filter;
@@ -110,7 +106,7 @@ public class JettyServerConfig extends GrizzlyServerConfig {
         });
 
         // registering servlets
-        servletContainerConfig.getServlets().forEach((t) -> {
+        config.getServletContainerConfig().getServlets().forEach((t) -> {
             try {
                 ServletHolder sh = new ServletHolder();
                 Servlet servlet;
@@ -145,12 +141,12 @@ public class JettyServerConfig extends GrizzlyServerConfig {
      */
     protected void addRestServlet(ServletContextHandler context) {
         // registering Jersey servlet
-        LOGGER.debug("Adding jersey servlet with path: {} to servlet container.", servletContainerConfig.getJerseyServletPath());
+        LOGGER.debug("Adding jersey servlet with path: {} to servlet container.", config.getServletContainerConfig().getJerseyServletPath());
         ServletHolder holder = new ServletHolder();
-        holder.setServlet(new ServletContainer(this.resourceConfig));
+        holder.setServlet(new ServletContainer(this.getResourceConfig()));
         holder.setInitOrder(1);
 //        holder.setInitParameter("com.sun.jersey.api.json.POJOMappingFeature", "true");
-        context.addServlet(holder, servletContainerConfig.getJerseyServletPath());
+        context.addServlet(holder, config.getServletContainerConfig().getJerseyServletPath());
 
     }
 
@@ -165,11 +161,11 @@ public class JettyServerConfig extends GrizzlyServerConfig {
 
         if (server != null && !server.isRunning()) {
             try {
-                LOGGER.info("Starting server at: {} for test {}", getBaseUri(), this.getMainThreadTestObject().getClass().getName());
+//                LOGGER.info("Starting server at: {} for test {}", getBaseUri(), this.getMainThreadTestObject().getClass().getName());
                 server.start();
             } catch (java.net.BindException ex) {
                 LOGGER.error("Server failed to start.", ex);
-                throw new RuntimeException(ex);
+                throw ex;
             }
         }
     }
@@ -183,12 +179,12 @@ public class JettyServerConfig extends GrizzlyServerConfig {
     public void stop() throws Exception {
         cleanUp();
         if (server != null && server.isRunning()) {
-            LOGGER.info("Stopping server at: {} for test {}", getBaseUri(), this.getMainThreadTestObject().getClass().getName());
+//            LOGGER.info("Stopping server at: {} for test {}", getBaseUri(), this.getMainThreadTestObject().getClass().getName());
             try {
                 server.stop();
             } catch (Exception ex) {
                 LOGGER.error("Server failed to stop.", ex);
-                throw new RuntimeException(ex);
+                throw ex;
             }
         }
     }

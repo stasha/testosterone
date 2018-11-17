@@ -51,6 +51,56 @@ public class Utils {
     }
 
     /**
+     * Returns true/false if passed class is Testosterone class.
+     *
+     * @param clazz
+     * @return
+     */
+    public static boolean isTestosterone(Class<?> clazz) {
+        if (clazz == null) {
+            return false;
+        }
+        return Testosterone.class.isAssignableFrom(clazz);
+    }
+
+    /**
+     * Returns true/false if passed object is Testosterone object.
+     *
+     * @param obj
+     * @return
+     */
+    public static boolean isTestosterone(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        return obj instanceof Testosterone;
+    }
+
+    /**
+     * Returns instrumented class name.
+     *
+     * @param clazz
+     * @return
+     */
+    public static String getInstrumentedClassName(Class<? extends Testosterone> clazz) {
+        String name = clazz.getName();
+        if (!name.endsWith("_")) {
+            return name + "_";
+        }
+        return name;
+    }
+
+    /**
+     * Returns instrumented class name.
+     *
+     * @param obj
+     * @return
+     */
+    public static String getInstrumentedClassName(Testosterone obj) {
+        return getInstrumentedClassName(obj.getClass());
+    }
+
+    /**
      * Returns testosterone instance based on passed class.
      *
      * @param clazz
@@ -59,9 +109,8 @@ public class Utils {
     public static Testosterone getTestosterone(Class<? extends Testosterone> clazz) {
         Testosterone t = null;
         try {
-            Setup setup = ConfigFactory.SETUP.get(clazz.getName());
-            t = setup != null ? setup.getTestosterone() : null;
-            t = t == null ? (Testosterone) clazz.newInstance() : t;
+            TestConfig config = Testosterone.TEST_CONFIGURATIONS.get(getInstrumentedClassName(clazz));
+            t = config == null ? (Testosterone) clazz.newInstance() : config.getTest();
         } catch (InstantiationException | IllegalAccessException ex) {
             LOGGER.error("Failed to initialize new Testosterone object.", ex);
             throw new RuntimeException(ex);
@@ -201,18 +250,18 @@ public class Utils {
      * @param clazz
      * @return
      */
-    public static Start getServerStarts(Class<? extends Testosterone> clazz) {
-        Setup setup = ConfigFactory.SETUP.get(clazz.getName());
-        Testosterone t = setup != null ? setup.getTestosterone() : null;
+    public static StartServer getServerStarts(Class<? extends Testosterone> clazz) {
+        TestConfig config = Testosterone.TEST_CONFIGURATIONS.get(getInstrumentedClassName(clazz));
 
-        if (t == null) {
-            Configuration config = clazz.getAnnotation(Configuration.class
-            );
-            if (config != null) {
-                return config.serverStarts();
+        if (config == null) {
+            Configuration cf = clazz.getAnnotation(Configuration.class);
+            if (cf != null) {
+                return cf.startServer();
             }
+            return TestConfig.START_SERVER;
         }
-        return Start.BY_PARENT;
+
+        return config.getStartServer();
     }
 
     /**
