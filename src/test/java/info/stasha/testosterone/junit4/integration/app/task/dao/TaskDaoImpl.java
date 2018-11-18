@@ -1,6 +1,8 @@
 package info.stasha.testosterone.junit4.integration.app.task.dao;
 
 import info.stasha.testosterone.junit4.integration.app.task.Task;
+import info.stasha.testosterone.junit4.integration.app.user.User;
+import info.stasha.testosterone.junit4.integration.app.user.dao.UserDao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,6 +16,9 @@ import javax.ws.rs.core.Context;
  * @author stasha
  */
 public class TaskDaoImpl implements TaskDao {
+    
+    @Context
+    private UserDao userDao;
 
     @Context
     private Connection conn;
@@ -24,6 +29,9 @@ public class TaskDaoImpl implements TaskDao {
         t.setTitle(rs.getString(2));
         t.setDescription(rs.getString(3));
         t.setDone(rs.getBoolean(4));
+        
+        t.setUser(userDao.getUser(new User(1L)));
+
         return t;
     }
 
@@ -40,10 +48,11 @@ public class TaskDaoImpl implements TaskDao {
 
     @Override
     public void createTask(Task task) throws SQLException {
-        try (PreparedStatement ps = conn.prepareStatement("insert into tasks (title, description, done) values (?, ?, ?)")) {
+        try (PreparedStatement ps = conn.prepareStatement("insert into tasks (title, description, done, users_user_id) values (?, ?, ?, ?)")) {
             ps.setString(1, task.getTitle());
             ps.setString(2, task.getDescription());
             ps.setBoolean(3, task.getDone());
+            ps.setLong(4, task.getUser().getId());
             ps.executeUpdate();
         }
     }

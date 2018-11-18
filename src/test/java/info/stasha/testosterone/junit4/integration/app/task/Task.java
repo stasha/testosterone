@@ -1,6 +1,6 @@
 package info.stasha.testosterone.junit4.integration.app.task;
 
-import info.stasha.testosterone.junit4.jersey.service.User;
+import info.stasha.testosterone.junit4.integration.app.user.User;
 import javax.ws.rs.PathParam;
 
 /**
@@ -30,11 +30,26 @@ public class Task {
         this.done = done;
     }
 
+    public Task(String title, String description, Boolean done, User user) {
+        this.title = title;
+        this.description = description;
+        this.done = done;
+        this.user = user;
+    }
+
     public Task(Long id, String title, String description, Boolean done) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.done = done;
+    }
+
+    public Task(Long id, String title, String description, Boolean done, User user) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.done = done;
+        this.user = user;
     }
 
     public Long getId() {

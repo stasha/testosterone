@@ -136,23 +136,20 @@ public class H2Config implements DbConfig {
     public DbConfig execute() throws SQLException {
         if (!sqls.isEmpty()) {
             try (Connection conn = getConnection()) {
-                conn.setAutoCommit(false);
+//                conn.setAutoCommit(false);
                 Statement st = conn.createStatement();
                 for (String queryName : sqls.keySet()) {
                     String query = sqls.get(queryName);
                     if (test.onDbInit(queryName, query)) {
-                        LOGGER.info("Adding SQL {} to batch.", queryName);
-                        st.addBatch(sqls.get(queryName));
+                        LOGGER.info("Executing SQL {}.", queryName);
+                        st.execute(sqls.get(queryName));
                     } else {
                         LOGGER.info("Skipping SQL {}.", queryName);
                     }
                 }
 
-                LOGGER.info("Executing batch.");
-                st.executeBatch();
-                conn.setAutoCommit(true);
                 sqls.clear();
-                LOGGER.info("Batch executed successfully.");
+                LOGGER.info("SQL scripts executed successfully.");
             } catch (SQLException ex) {
                 LOGGER.error("Failed to execute SQL query.", ex);
                 throw ex;

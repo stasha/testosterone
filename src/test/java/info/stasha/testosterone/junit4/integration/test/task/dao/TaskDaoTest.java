@@ -9,6 +9,7 @@ import info.stasha.testosterone.junit4.TestosteroneRunner;
 import info.stasha.testosterone.junit4.integration.app.task.Task;
 import info.stasha.testosterone.junit4.integration.app.task.dao.TaskDao;
 import info.stasha.testosterone.junit4.integration.app.task.dao.TaskDaoFactory;
+import info.stasha.testosterone.junit4.integration.app.user.User;
 import info.stasha.testosterone.junit4.integration.test.user.dao.UserDaoTest;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -42,8 +43,10 @@ public class TaskDaoTest implements Testosterone {
             + "  title VARCHAR(56) NOT NULL,\n"
             + "  description VARCHAR(56) NOT NULL,\n"
             + "  done BOOLEAN NOT NULL,\n"
+            + "  users_user_id BIGINT(11) NOT NULL,\n"
             + "  created_at DATETIME,\n"
-            + "  updated_at DATETIME\n"
+            + "  updated_at DATETIME,\n"
+            + "  FOREIGN KEY (users_user_id) REFERENCES users(id)\n"
             + "  )";
 
     @Context
@@ -64,15 +67,15 @@ public class TaskDaoTest implements Testosterone {
 
     @Override
     public void configureMocks(DbConfig config) {
-        config.add("addMockTasks", "insert into tasks (title, description, done) values "
-                + "('Create Task Test1', 'Testing TaskDao1', false),"
-                + "('Create Task Test2', 'Testing TaskDao2', true),"
-                + "('Create Task Test3', 'Testing TaskDao3', false)");
+        config.add("addMockTasks", "insert into tasks (title, description, done, users_user_id) values "
+                + "('Create Task Test1', 'Testing TaskDao1', false, 1),"
+                + "('Create Task Test2', 'Testing TaskDao2', true, 2),"
+                + "('Create Task Test3', 'Testing TaskDao3', false, 3)");
     }
 
     @Before
     public void setUp() throws Exception {
-        assertEquals("Task list should contain 1 task", 3, taskDao.getAllTasks().size());
+        assertEquals("Task list should contain 3 tasks", 3, taskDao.getAllTasks().size());
     }
 
     @After
@@ -82,7 +85,7 @@ public class TaskDaoTest implements Testosterone {
 
     @Test
     public void readAllTasks() throws Exception {
-        taskDao.createTask(new Task("Create Task Test 4", "Testing TaskDao 2", Boolean.FALSE));
+        taskDao.createTask(new Task("Create Task Test 4", "Testing TaskDao 2", Boolean.FALSE, new User(1L)));
 
         List<Task> tasks = taskDao.getAllTasks();
         assertEquals("Task list should contain 4 tasks", 4, tasks.size());

@@ -1,15 +1,16 @@
 package info.stasha.testosterone.junit4.integration.test;
 
-import info.stasha.testosterone.annotation.InjectTest;
 import info.stasha.testosterone.annotation.Integration;
 import info.stasha.testosterone.annotation.Request;
-import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.junit4.TestosteroneRunner;
 import info.stasha.testosterone.junit4.integration.app.task.Task;
 import info.stasha.testosterone.junit4.integration.app.task.TaskResource;
+import info.stasha.testosterone.junit4.integration.app.user.User;
+import info.stasha.testosterone.junit4.integration.app.user.dao.UserDao;
 import info.stasha.testosterone.junit4.integration.test.task.dao.TaskDaoTest;
 import info.stasha.testosterone.junit4.integration.test.task.service.TaskServiceTest;
+import java.sql.SQLException;
 import static javax.ws.rs.HttpMethod.DELETE;
 import static javax.ws.rs.HttpMethod.GET;
 import static javax.ws.rs.HttpMethod.POST;
@@ -17,9 +18,7 @@ import static javax.ws.rs.HttpMethod.PUT;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,39 +35,22 @@ import org.junit.runner.RunWith;
 public class TaskEndpointIntegrationTest implements Testosterone {
 
     protected TaskResource taskResource;
-    protected final Task task = new Task(3L, "Title", "Description", false);
-    protected final Task createTask = new Task("Title", "Description", false);
+    protected final Task task = new Task(3L, "Title", "Description", false, new User(2L));
+    protected final Task createTask = new Task("Title", "Description", false, new User(1L));
     public Entity taskEntity = Entity.json(task);
     public Entity createTaskEntity = Entity.json(createTask);
 
-    @InjectTest
-    TaskDaoTest daoTest;
-    
     @Context
-    DbConfig dbconfig;
+    UserDao userDao;
 
     @Override
     public void configure(ResourceConfig config) {
         config.register(TaskResource.class);
     }
 
-    @Override
-    public void configure(AbstractBinder binder) {
-//        binder.bind(new TaskDaoTest()).to(Testosterone.class).proxy(true);
-    }
-    
-    
-
     @Before
-    public void setUp() throws Exception {
-//        daoTest.configure(dbconfig);
-//        daoTest.configureMocks(dbconfig);
-//        dbconfig.execute();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-//        daoTest.tearDown();
+    public void setUp() throws SQLException {
+        userDao.createUser(new User("Jon", "Doe", 23));
     }
 
     @Test

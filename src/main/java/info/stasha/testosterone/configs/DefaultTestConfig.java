@@ -64,7 +64,6 @@ public class DefaultTestConfig implements TestConfig {
     private ServerConfig serverConfig;
     private ServletContainerConfig servletContainerConfig;
     private DbConfig dbConfig;
-    private TestExecutor testExecutor;
     private String baseUri;
     private int httpPort;
     private StartServer startServer;
@@ -199,7 +198,7 @@ public class DefaultTestConfig implements TestConfig {
             LOGGER.info("Processing dependency: {}", dep.getTest().getClass().getName());
         }
 
-        Integration integration = dep.getTest().getClass().getAnnotation(Integration.class);
+        Integration integration = root.getTest().getClass().getAnnotation(Integration.class);
         Dependencies dependencies = dep.getTest().getClass().getAnnotation(Dependencies.class);
 
         dep.getTest().configure(root.getServerConfig().getResourceConfig());
@@ -293,38 +292,46 @@ public class DefaultTestConfig implements TestConfig {
 
         }
 
-        dep.getTest().configureMocks(root.getServerConfig().getResourceConfig());
-        dep.getTest().configureMocks(root.getServletContainerConfig());
+        // Configure mocks only for root test. 
+        // Skips configuring mocks for classes registered in @Intergration annotation
+        if (integration == null || root.equals(dep)) {
+            dep.getTest().configureMocks(root.getServerConfig().getResourceConfig());
+            dep.getTest().configureMocks(root.getServletContainerConfig());
 
-        root.getServerConfig().getResourceConfig().register(new AbstractBinder() {
-            @Override
-            protected void configure() {
-                dep.getTest().configureMocks(this);
-            }
-        });
+            root.getServerConfig().getResourceConfig().register(new AbstractBinder() {
+                @Override
+                protected void configure() {
+                    dep.getTest().configureMocks(this);
+                }
+            });
+        }
+        
+        if(!root.equals(dep)) {
+            tests.add(dep.getTest());
+        }
 
-        if (dependencies != null || integration != null) {
-
+        if (integration != null || dependencies != null) {
             List<Class<? extends Testosterone>> testClasses = null;
-            if (integration != null) {
+
+            if (integration != null && root.equals(dep)) {
                 testClasses = Arrays.asList(integration.value());
                 LOGGER.info("Gathering integration configurations");
             } else if (dependencies != null) {
                 testClasses = Arrays.asList(dependencies.value());
                 LOGGER.info("Gathering dependency configurations");
-            } else {
-                return;
             }
 
-            Collections.reverse(testClasses);
+            if (testClasses != null) {
 
-            for (Class<? extends Testosterone> cls : testClasses) {
-                try {
-                    Testosterone t = cls.newInstance();
-                    t.getTestConfig().init(root, t.getTestConfig(), tests);
-                    tests.add(t);
-                } catch (InstantiationException | IllegalAccessException ex) {
-                    java.util.logging.Logger.getLogger(Testosterone.class.getName()).log(Level.SEVERE, null, ex);
+                Collections.reverse(testClasses);
+
+                for (Class<? extends Testosterone> cls : testClasses) {
+                    try {
+                        Testosterone t = cls.newInstance();
+                        t.getTestConfig().init(root, t.getTestConfig(), tests);
+                    } catch (InstantiationException | IllegalAccessException ex) {
+                        java.util.logging.Logger.getLogger(Testosterone.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
 
@@ -333,13 +340,17 @@ public class DefaultTestConfig implements TestConfig {
         // For reason why DB configuration is in the end, please see 
         // the comments about order at the beginning of this method.
         dep.getTest().configure(root.getDbConfig());
-        dep.getTest().configureMocks(root.getDbConfig());
+        // Configure mocks only for root test. 
+        // Skips configuring mocks for classes registered in @Intergration annotation
+        if (integration == null || root.equals(dep)) {
+            dep.getTest().configureMocks(root.getDbConfig());
+        }
 
         // After everything is configured, including @Dependencies na @Integration,
         // we initialize the server
         if (root.equals(dep)) {
             root.getServerConfig().getResourceConfig().register(new AbstractBinder() {
-                
+
                 @Override
                 protected void configure() {
                     tests.forEach((test) -> {
