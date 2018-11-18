@@ -82,7 +82,8 @@ public class TestExecutorImpl implements TestExecutor {
     @Override
     public void executeTest() throws Throwable {
         Path root = Utils.getAnnotation(target, Path.class);
-        Path path = method.getAnnotation(Path.class);
+        Method resourceMethod = target.getTestConfig().getSetup().getTestInExecution().getMainThreadTest().getClass().getMethod(method.getName(), method.getParameterTypes());
+        Path path = resourceMethod.getAnnotation(Path.class);
 
         String uri = getPath(path.value());
 
