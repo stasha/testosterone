@@ -41,7 +41,7 @@ public class H2ConnectionFactory implements Factory<Connection> {
     @Override
     public void dispose(Connection conn) {
         try {
-            if (conn != null && !conn.isClosed()) {
+            if (!conn.isClosed()) {
                 conn.close();
                 LOGGER.info("Connection {} was successfully closed.", conn.toString());
             }

@@ -1,5 +1,6 @@
 package info.stasha.testosterone.junit4.integration.app.task;
 
+import info.stasha.testosterone.junit4.jersey.service.User;
 import javax.ws.rs.PathParam;
 
 /**
@@ -13,6 +14,8 @@ public class Task {
     private String title;
     private String description;
     private Boolean done;
+
+    private User user;
 
     public Task() {
     }
@@ -67,6 +70,15 @@ public class Task {
 
     public Task setDone(Boolean done) {
         this.done = done;
+        return this;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public Task setUser(User user) {
+        this.user = user;
         return this;
     }
 

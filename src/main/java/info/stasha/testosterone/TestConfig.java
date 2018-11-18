@@ -4,6 +4,7 @@ import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -40,7 +41,7 @@ public interface TestConfig {
 
     void throwExceptions() throws Throwable;
 
-    void init(TestConfig config);
+    void init(TestConfig root, TestConfig dep, List<Testosterone> tests);
 
     void start() throws Exception;
 

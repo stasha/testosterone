@@ -127,11 +127,13 @@ public class H2Config implements DbConfig {
     }
 
     /**
-     * {@inheritDoc }
+     * Executes all SQL queries in the queue and removes them after execution.
      *
+     * @return
+     * @throws SQLException
      */
     @Override
-    public void init() throws SQLException {
+    public DbConfig execute() throws SQLException {
         if (!sqls.isEmpty()) {
             try (Connection conn = getConnection()) {
                 conn.setAutoCommit(false);
@@ -145,13 +147,27 @@ public class H2Config implements DbConfig {
                         LOGGER.info("Skipping SQL {}.", queryName);
                     }
                 }
+
+                LOGGER.info("Executing batch.");
                 st.executeBatch();
                 conn.setAutoCommit(true);
+                sqls.clear();
+                LOGGER.info("Batch executed successfully.");
             } catch (SQLException ex) {
-                LOGGER.error("Failed to initialize database");
+                LOGGER.error("Failed to execute SQL query.", ex);
                 throw ex;
             }
         }
+        return this;
+    }
+
+    /**
+     * {@inheritDoc }
+     *
+     */
+    @Override
+    public void init() throws SQLException {
+        execute();
     }
 
     /**

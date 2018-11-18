@@ -11,20 +11,6 @@ import java.lang.reflect.Method;
 public interface TestInExecution extends TestExecutor {
 
     /**
-     * Add after test event listener.
-     *
-     * @param listener
-     */
-    void addAfterTestListener(TestEventListener listener);
-
-    /**
-     * Adds before test event listener
-     *
-     * @param listener
-     */
-    void addBeforeTestListeenr(TestEventListener listener);
-
-    /**
      * Executes after test listeners.
      *
      * @throws Exception

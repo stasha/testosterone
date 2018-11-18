@@ -14,13 +14,23 @@ import org.glassfish.hk2.api.Factory;
 public interface DbConfig {
 
     /**
-     * Add SQL query to DbConfig that will be invoked after DB starts.
+     * Add SQL query to DbConfig queue.<br>
+     * Scripts will be invoked after DB starts.
+     *
      *
      * @param queryName
      * @param query
      * @return
      */
     DbConfig add(String queryName, String query);
+
+    /**
+     * Executes SQL queries that are in queue
+     *
+     * @return
+     * @throws java.sql.SQLException
+     */
+    DbConfig execute() throws SQLException;
 
     /**
      * Returns map of SQL queries that will be invoked after DB starts.

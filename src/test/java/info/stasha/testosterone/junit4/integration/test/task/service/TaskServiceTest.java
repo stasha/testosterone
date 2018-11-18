@@ -1,4 +1,4 @@
-package info.stasha.testosterone.junit4.integration.test.service;
+package info.stasha.testosterone.junit4.integration.test.task.service;
 
 import info.stasha.testosterone.jersey.FactoryUtils;
 import info.stasha.testosterone.jersey.Testosterone;

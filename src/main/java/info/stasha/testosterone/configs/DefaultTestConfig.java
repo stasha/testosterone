@@ -9,6 +9,7 @@ import info.stasha.testosterone.TestExecutorImpl;
 import info.stasha.testosterone.TestInExecution;
 import info.stasha.testosterone.Utils;
 import info.stasha.testosterone.annotation.Configuration;
+import info.stasha.testosterone.annotation.Dependencies;
 import info.stasha.testosterone.annotation.InjectTest;
 import info.stasha.testosterone.annotation.Integration;
 import info.stasha.testosterone.annotation.LoadFile;
@@ -27,19 +28,16 @@ import info.stasha.testosterone.servlet.ServletContainerConfig;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import javax.inject.Singleton;
-import javax.ws.rs.core.Context;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.api.InjectionResolver;
-import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
@@ -178,173 +176,182 @@ public class DefaultTestConfig implements TestConfig {
     /**
      * Initializes configuration.
      *
-     * @param config
+     * @param root
+     * @param dep
+     * @param tests
      */
     @Override
-    public void init(TestConfig config) {
+    public void init(TestConfig root, TestConfig dep, final List<Testosterone> tests) {
 
-        Testosterone ts = config.getTest();
-        ServerConfig sc = config.getServerConfig();
-        DbConfig dbc = config.getDbConfig();
-        Setup st = config.getSetup();
-
-        for (Field f : ts.getClass().getSuperclass().getDeclaredFields()) {
-            f.setAccessible(true);
-            Mock m = f.getAnnotation(Mock.class);
-            Spy s = f.getAnnotation(Spy.class);
-
-            try {
-                Object obj = f.get(ts);
-
-                if (m != null && obj != null) {
-                    f.set(ts, Mockito.mock(f.getType(), m.answer()));
-                } else if (s != null && obj != null) {
-                    f.set(ts, Mockito.mock(obj.getClass(), delegatesTo(obj)));
-                }
-
-            } catch (IllegalArgumentException | IllegalAccessException ex) {
-                java.util.logging.Logger.getLogger(Testosterone.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        //The configuration order is:
+        //
+        // 1. For Jersey bindings, first registered is one that gets used.
+        //    This means root configuration must be processed before other
+        //    registered configurations in @Dependencies or @Integration. 
+        //    This allows overriding bindings specified 
+        //    in @Dependencies and @Integration.
+        //
+        // 2. For DB, root configuration must be processed as last, 
+        //
+        if (root.equals(dep)) {
+            LOGGER.info("Configuration start: {}", dep.getTest().getClass().getName());
+        } else {
+            LOGGER.info("Processing dependency: {}", dep.getTest().getClass().getName());
         }
 
-        // configureMocks ResourceConfig
-        ts.configure(sc.getResourceConfig());
-        // configure Servlet container
-        ts.configure(config.getServletContainerConfig());
-        // configure DB
-        ts.configure(dbc);
-        // configureMocks AbstractBinder
-        sc.getResourceConfig().register(new AbstractBinder() {
+        Integration integration = dep.getTest().getClass().getAnnotation(Integration.class);
+        Dependencies dependencies = dep.getTest().getClass().getAnnotation(Dependencies.class);
 
-            @Context
-            ServiceLocator locator;
+        dep.getTest().configure(root.getServerConfig().getResourceConfig());
+        dep.getTest().configure(root.getServletContainerConfig());
 
+        if (root.equals(dep)) {
+            root.getServerConfig().getResourceConfig().register(new AbstractBinder() {
+
+                @Override
+                protected void configure() {
+
+                    this.bindFactory(new Factory<Testosterone>() {
+
+                        @Override
+                        public Testosterone provide() {
+                            return root.getTest();
+                        }
+
+                        @Override
+                        public void dispose(Testosterone instance) {
+                        }
+                    }).to(Testosterone.class).in(Singleton.class);
+
+                    this.bindFactory(H2ConnectionFactory.class)
+                            .to(Connection.class)
+                            .in(RequestScoped.class)
+                            .proxy(true)
+                            .proxyForSameScope(false);
+
+                    this.bindFactory(new Factory<DbConfig>() {
+                        @Override
+                        public DbConfig provide() {
+                            return root.getDbConfig();
+                        }
+
+                        @Override
+                        public void dispose(DbConfig instance) {
+                        }
+                    }).to(DbConfig.class).in(Singleton.class);
+
+                    this.bindFactory(new Factory<TestInExecution>() {
+                        @Override
+                        public TestInExecution provide() {
+                            return root.getSetup().getTestInExecution();
+                        }
+
+                        @Override
+                        public void dispose(TestInExecution instance) {
+                        }
+                    }).to(TestInExecution.class).in(RequestScoped.class).proxy(true);
+
+                    // injection resolvers
+                    this.bind(ValueInjectionResolver.class)
+                            .to(new TypeLiteral<InjectionResolver<Value>>() {
+                            }).in(Singleton.class);
+                    this.bind(InjectTestResolver.class)
+                            .to(new TypeLiteral<InjectionResolver<InjectTest>>() {
+                            }).in(Singleton.class);
+                    this.bind(MockInjectionResolver.class)
+                            .to(new TypeLiteral<InjectionResolver<Mock>>() {
+                            }).in(Singleton.class);
+                    this.bind(SpyInjectionResolver.class)
+                            .to(new TypeLiteral<InjectionResolver<Spy>>() {
+                            }).in(Singleton.class);
+                    this.bind(InputStreamInjectionResolver.class)
+                            .to(new TypeLiteral<InjectionResolver<LoadFile>>() {
+                            }).in(Singleton.class);
+
+                    root.getTest().configure(this);
+                }
+            });
+
+            for (Field f : root.getTest().getClass().getSuperclass().getDeclaredFields()) {
+                f.setAccessible(true);
+                Mock m = f.getAnnotation(Mock.class);
+                Spy s = f.getAnnotation(Spy.class);
+
+                try {
+                    Object obj = f.get(root.getTest());
+
+                    if (m != null && obj != null) {
+                        f.set(root.getTest(), Mockito.mock(f.getType(), m.answer()));
+                    } else if (s != null && obj != null) {
+                        f.set(root.getTest(), Mockito.mock(obj.getClass(), delegatesTo(obj)));
+                    }
+
+                } catch (IllegalArgumentException | IllegalAccessException ex) {
+                    java.util.logging.Logger.getLogger(Testosterone.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+        }
+
+        dep.getTest().configureMocks(root.getServerConfig().getResourceConfig());
+        dep.getTest().configureMocks(root.getServletContainerConfig());
+
+        root.getServerConfig().getResourceConfig().register(new AbstractBinder() {
             @Override
             protected void configure() {
-
-                this.bindFactory(new Factory<Testosterone>() {
-
-                    @Override
-                    public Testosterone provide() {
-                        return ts;
-                    }
-
-                    @Override
-                    public void dispose(Testosterone instance) {
-                    }
-                }).to(Testosterone.class).in(Singleton.class);
-
-                this.bindFactory(H2ConnectionFactory.class)
-                        .to(Connection.class)
-                        .in(RequestScoped.class)
-                        .proxy(true)
-                        .proxyForSameScope(false);
-
-                this.bindFactory(new Factory<DbConfig>() {
-                    @Override
-                    public DbConfig provide() {
-                        return dbc;
-                    }
-
-                    @Override
-                    public void dispose(DbConfig instance) {
-                    }
-                }).to(DbConfig.class).in(Singleton.class);
-
-                this.bindFactory(new Factory<TestInExecution>() {
-                    @Override
-                    public TestInExecution provide() {
-                        return st.getTestInExecution();
-                    }
-
-                    @Override
-                    public void dispose(TestInExecution instance) {
-                    }
-                }).to(TestInExecution.class).in(RequestScoped.class).proxy(true);
-
-                // injection resolvers
-                this.bind(ValueInjectionResolver.class)
-                        .to(new TypeLiteral<InjectionResolver<Value>>() {
-                        }).in(Singleton.class);
-                this.bind(InjectTestResolver.class)
-                        .to(new TypeLiteral<InjectionResolver<InjectTest>>() {
-                        }).in(Singleton.class);
-                this.bind(MockInjectionResolver.class)
-                        .to(new TypeLiteral<InjectionResolver<Mock>>() {
-                        }).in(Singleton.class);
-                this.bind(SpyInjectionResolver.class)
-                        .to(new TypeLiteral<InjectionResolver<Spy>>() {
-                        }).in(Singleton.class);
-                this.bind(InputStreamInjectionResolver.class)
-                        .to(new TypeLiteral<InjectionResolver<LoadFile>>() {
-                        }).in(Singleton.class);
-                // invokes method for configuring AbstractBinder
-                ts.configure(this);
+                dep.getTest().configureMocks(this);
             }
         });
 
-        // Mocked configuratinos are excluded from integration tests
-        Integration integration = st.getIntegration();
+        if (dependencies != null || integration != null) {
 
-        // if this is integration, then build configuration from all 
-        // registered classes in @Integration annotation
-        if (integration != null && st.getRoot() == null) {
+            List<Class<? extends Testosterone>> testClasses = null;
+            if (integration != null) {
+                testClasses = Arrays.asList(integration.value());
+                LOGGER.info("Gathering integration configurations");
+            } else if (dependencies != null) {
+                testClasses = Arrays.asList(dependencies.value());
+                LOGGER.info("Gathering dependency configurations");
+            } else {
+                return;
+            }
 
-            List<Class<? extends Testosterone>> testClasses = Arrays.asList(integration.value());
             Collections.reverse(testClasses);
 
-            Map<String, Testosterone> tests = new LinkedHashMap();
             for (Class<? extends Testosterone> cls : testClasses) {
                 try {
                     Testosterone t = cls.newInstance();
-                    Setup s = t.getTestConfig().getSetup();
-                    s.setParent(st);
-                    s.setRoot(st);
-                    t.getTestConfig().init(this);
-                    tests.put(cls.getTypeName(), t);
+                    t.getTestConfig().init(root, t.getTestConfig(), tests);
+                    tests.add(t);
                 } catch (InstantiationException | IllegalAccessException ex) {
                     java.util.logging.Logger.getLogger(Testosterone.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
 
-            st.setTests(tests);
+        }
 
-            sc.getResourceConfig().property("tests", tests);
+        // For reason why DB configuration is in the end, please see 
+        // the comments about order at the beginning of this method.
+        dep.getTest().configure(root.getDbConfig());
+        dep.getTest().configureMocks(root.getDbConfig());
 
-            sc.getResourceConfig().register(new AbstractBinder() {
+        // After everything is configured, including @Dependencies na @Integration,
+        // we initialize the server
+        if (root.equals(dep)) {
+            root.getServerConfig().getResourceConfig().register(new AbstractBinder() {
+                
                 @Override
                 protected void configure() {
-                    tests.forEach((k, v) -> {
-                        v.configure(this);
+                    tests.forEach((test) -> {
+                        test.configure(this);
                     });
                 }
             });
-        }
-
-        if (integration == null) {
-            // configureMocks MockingResourceConfig
-            ts.configureMocks(sc.getResourceConfig());
-            // configuring MockingServletContainerConfig
-            ts.configureMocks(sc.getServletContainerConfig());
-            // configure db mocks 
-            ts.configureMocks(dbc);
-            // configureMocks mocking abstract binder
-            sc.getResourceConfig().register(new AbstractBinder() {
-                @Override
-                protected void configure() {
-                    ts.configureMocks(this);
-                }
-            });
-        }
-
-        // invoking only for root setup
-        if (st.getRoot() == null) {
             // registering setup so it can listen for application events
-            sc.getResourceConfig().register(st);
-            // registering db config so db is started/stopped with jersey application
-//            config.getResourceConfig().property("com.sun.jersey.api.json.POJOMappingFeature", true);
-            // initializes configuration
-            sc.init();
+            root.getServerConfig().getResourceConfig().register(root.getSetup());
+
+            LOGGER.info("Configuration end:   {}", root.getTest().getClass().getName());
+            root.getServerConfig().init();
         }
 
     }
@@ -358,7 +365,7 @@ public class DefaultTestConfig implements TestConfig {
     public void start() throws Exception {
 
         if (!getServerConfig().isRunning()) {
-            init(this);
+            init(this, this, new ArrayList<>());
 
             setup.beforeServerStart(this.testosterone);
 

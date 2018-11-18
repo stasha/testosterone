@@ -30,10 +30,7 @@ public class Setup implements ContainerResponseFilter {
     private final TestConfig config;
     private final Testosterone testosterone;
 
-    private Integration integration;
     private Map<String, Testosterone> tests;
-    private Setup parent;
-    private Setup root;
     private boolean beforeServerStart;
     private boolean afterServerStart;
     private boolean beforeServerStop;
@@ -44,18 +41,6 @@ public class Setup implements ContainerResponseFilter {
     public Setup(TestConfig config) {
         this.config = config;
         this.testosterone = config.getTest();
-    }
-
-    /**
-     * Returns integration annotation.
-     *
-     * @return
-     */
-    public Integration getIntegration() {
-        if (this.root == null) {
-            return Utils.getAnnotation(this.testosterone, Integration.class);
-        }
-        return Utils.getAnnotation(this.root.getTestosterone(), Integration.class);
     }
 
     /**
@@ -83,42 +68,6 @@ public class Setup implements ContainerResponseFilter {
      */
     public Testosterone getTestosterone() {
         return testosterone;
-    }
-
-    /**
-     * Returns root setup.
-     *
-     * @return
-     */
-    public Setup getRoot() {
-        return root;
-    }
-
-    /**
-     * Sets root setup.
-     *
-     * @param root
-     */
-    public void setRoot(Setup root) {
-        this.root = this.root == null ? root : this.root;
-    }
-
-    /**
-     * Returns parent Setup. For now this is not used anywhere.
-     *
-     * @return
-     */
-    public Setup getParent() {
-        return parent;
-    }
-
-    /**
-     * Sets parent.
-     *
-     * @param parent
-     */
-    public void setParent(Setup parent) {
-        this.parent = parent;
     }
 
     /**

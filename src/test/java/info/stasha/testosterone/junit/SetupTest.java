@@ -6,7 +6,6 @@ import info.stasha.testosterone.configs.DefaultTestConfig;
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.junit4.PlaygroundTest;
 import org.glassfish.hk2.api.ServiceLocator;
-import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.times;
@@ -24,19 +23,12 @@ public class SetupTest {
     Setup setup = new Setup(config);
     Setup setup2 = new Setup(config);
 
-
-    @Test
-    public void setRootTest() {
-        setup.setRoot(setup);
-        setup.setRoot(setup2);
-        assertEquals("Setups should equal", setup, setup.getRoot());
-    }
-
     @Test
     public void beforeServerStartTest() throws Exception {
         setup.beforeServerStart(test);
         setup.beforeServerStart(test);
         Mockito.verify(test, times(1)).beforeServerStart();
+        setup.toString();
     }
 
     @Test

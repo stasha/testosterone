@@ -18,6 +18,15 @@ public class TaskDaoImpl implements TaskDao {
     @Context
     private Connection conn;
 
+    private Task getTask(ResultSet rs) throws SQLException {
+        Task t = new Task();
+        t.setId(rs.getLong(1));
+        t.setTitle(rs.getString(2));
+        t.setDescription(rs.getString(3));
+        t.setDone(rs.getBoolean(4));
+        return t;
+    }
+
     @Override
     public List<Task> getAllTasks() throws SQLException {
         List<Task> allTasks = new ArrayList<>();
@@ -71,15 +80,6 @@ public class TaskDaoImpl implements TaskDao {
             ps.setLong(1, task.getId());
             ps.executeUpdate();
         }
-    }
-
-    private Task getTask(ResultSet rs) throws SQLException {
-        Task t = new Task();
-        t.setId(rs.getLong(1));
-        t.setTitle(rs.getString(2));
-        t.setDescription(rs.getString(3));
-        t.setDone(rs.getBoolean(4));
-        return t;
     }
 
 }

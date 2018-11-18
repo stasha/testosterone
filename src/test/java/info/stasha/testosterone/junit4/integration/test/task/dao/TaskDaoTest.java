@@ -1,10 +1,15 @@
-package info.stasha.testosterone.junit4.integration.test.dao;
+package info.stasha.testosterone.junit4.integration.test.task.dao;
 
+import info.stasha.testosterone.StartServer;
+import info.stasha.testosterone.annotation.Configuration;
+import info.stasha.testosterone.annotation.Dependencies;
+import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.junit4.TestosteroneRunner;
 import info.stasha.testosterone.junit4.integration.app.task.Task;
 import info.stasha.testosterone.junit4.integration.app.task.dao.TaskDao;
 import info.stasha.testosterone.junit4.integration.app.task.dao.TaskDaoFactory;
+import info.stasha.testosterone.junit4.integration.test.user.dao.UserDaoTest;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -18,13 +23,28 @@ import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.jvnet.hk2.annotations.Service;
 
 /**
  *
  * @author stasha
  */
 @RunWith(TestosteroneRunner.class)
+@Dependencies(
+        UserDaoTest.class
+)
+@Configuration(startServer = StartServer.PER_TEST_METHOD)
+@Service
 public class TaskDaoTest implements Testosterone {
+
+    private final String create = "CREATE TABLE tasks (\n"
+            + "  id BIGINT(11) NOT NULL auto_increment PRIMARY KEY,\n"
+            + "  title VARCHAR(56) NOT NULL,\n"
+            + "  description VARCHAR(56) NOT NULL,\n"
+            + "  done BOOLEAN NOT NULL,\n"
+            + "  created_at DATETIME,\n"
+            + "  updated_at DATETIME\n"
+            + "  )";
 
     @Context
     Connection conn;
@@ -37,23 +57,21 @@ public class TaskDaoTest implements Testosterone {
         binder.bindFactory(TaskDaoFactory.class).to(TaskDao.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
     }
 
+    @Override
+    public void configure(DbConfig config) {
+        config.add("createTasksTable", create);
+    }
+
+    @Override
+    public void configureMocks(DbConfig config) {
+        config.add("addMockTasks", "insert into tasks (title, description, done) values "
+                + "('Create Task Test1', 'Testing TaskDao1', false),"
+                + "('Create Task Test2', 'Testing TaskDao2', true),"
+                + "('Create Task Test3', 'Testing TaskDao3', false)");
+    }
+
     @Before
     public void setUp() throws Exception {
-        String create = "CREATE TABLE tasks (\n"
-                + "  id BIGINT(11) NOT NULL auto_increment PRIMARY KEY,\n"
-                + "  title VARCHAR(56) NOT NULL,\n"
-                + "  description VARCHAR(56) NOT NULL,\n"
-                + "  done BOOLEAN NOT NULL,\n"
-                + "  created_at DATETIME,\n"
-                + "  updated_at DATETIME\n"
-                + "  )";
-
-        conn.prepareStatement(create).executeUpdate();
-
-        taskDao.createTask(new Task("Create Task Test1", "Testing TaskDao1", Boolean.FALSE));
-        taskDao.createTask(new Task("Create Task Test2", "Testing TaskDao2", Boolean.FALSE));
-        taskDao.createTask(new Task("Create Task Test3", "Testing TaskDao3", Boolean.FALSE));
-
         assertEquals("Task list should contain 1 task", 3, taskDao.getAllTasks().size());
     }
 

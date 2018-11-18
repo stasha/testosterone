@@ -2,8 +2,6 @@ package info.stasha.testosterone;
 
 import info.stasha.testosterone.jersey.Testosterone;
 import java.lang.reflect.Method;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 /**
  * Test that's currently executing.
@@ -20,8 +18,6 @@ public class TestInExecutionImpl implements TestInExecution {
     private boolean isTest;
     private boolean isRequest;
 
-    private final Set<TestEventListener> beforeTest = new LinkedHashSet<>();
-    private final Set<TestEventListener> afterTest = new LinkedHashSet<>();
 
     /**
      * Creates new TestInExecution instance.
@@ -139,25 +135,7 @@ public class TestInExecutionImpl implements TestInExecution {
         this.isRequest = isRequest;
     }
 
-    /**
-     * Adds event
-     *
-     * @param listener
-     */
-    @Override
-    public void addBeforeTestListeenr(TestEventListener listener) {
-        beforeTest.add(listener);
-    }
-
-    /**
-     * {@inheritDoc }
-     *
-     * @param listener
-     */
-    @Override
-    public void addAfterTestListener(TestEventListener listener) {
-        afterTest.add(listener);
-    }
+   
 
     /**
      * {@inheritDoc }
@@ -168,14 +146,6 @@ public class TestInExecutionImpl implements TestInExecution {
     public void beforeTest() throws Exception {
         isTest = true;
         isRequest = false;
-        while (beforeTest.iterator().hasNext()) {
-            TestEventListener listener = beforeTest.iterator().next();
-            try {
-                listener.trigger();
-            } finally {
-                beforeTest.remove(listener);
-            }
-        }
     }
 
     /**
@@ -187,14 +157,6 @@ public class TestInExecutionImpl implements TestInExecution {
     public void afterTest() throws Exception {
         isTest = false;
         isRequest = false;
-        while (afterTest.iterator().hasNext()) {
-            TestEventListener listener = afterTest.iterator().next();
-            try {
-                listener.trigger();
-            } finally {
-                afterTest.remove(listener);
-            }
-        }
     }
 
     /**
