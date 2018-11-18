@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -109,6 +110,7 @@ public class UserDaoTest implements Testosterone {
         assertNull("Returned user should be null", dbuser);
     }
 
+    @Ignore
     @Test(expected = NullPointerException.class)
     public void createSqlException() throws SQLException {
         this.userDao.createUser(new User());
