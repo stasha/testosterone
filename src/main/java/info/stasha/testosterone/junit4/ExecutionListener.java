@@ -4,7 +4,6 @@ import info.stasha.testosterone.TestInstrumentation;
 import info.stasha.testosterone.TestInterceptors;
 import info.stasha.testosterone.jersey.Testosterone;
 import org.junit.runner.Description;
-import org.junit.runner.Result;
 import org.junit.runner.notification.RunListener;
 
 /**
@@ -30,36 +29,9 @@ public class ExecutionListener extends RunListener {
                 new BeforeClassAnnotation(),
                 new AfterClassAnnotation()
         );
-        if (clazz != null && clazz != cls) {
-            // HACK BECAUSE TESTRUNFINISHED DOES NOT WORK
-            TestInterceptors.afterClass(clazz);
-        }
+        
         clazz = cls;
         TestInterceptors.beforeClass(clazz);
-    }
-
-    /**
-     * {@inheritDoc }
-     *
-     * !!! NOTE !!! THIS DOES NOT WORK SO WE MUST HACK IT USING STATIC CLAZZ,
-     * AND/OR WITH AFTERCLASS INTERCEPTOR :(
-     *
-     * @param description
-     * @throws Exception
-     */
-    @Override
-    public void testRunFinished(Result description) throws Exception {
-        TestInterceptors.afterClass(clazz);
-    }
-
-    /**
-     * {@inheritDoc }
-     *
-     * @param description
-     * @throws Exception
-     */
-    public void testRunFinished(Description description) throws Exception {
-        TestInterceptors.afterClass(clazz);
     }
 
     /**

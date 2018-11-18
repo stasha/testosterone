@@ -4,6 +4,7 @@ import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.junit4.TestosteroneRunner;
 import info.stasha.testosterone.annotation.Request;
 import info.stasha.testosterone.annotation.Requests;
+import info.stasha.testosterone.jersey.TestResponseBuilder.TestResponse;
 import info.stasha.testosterone.junit4.jersey.resource.Resource;
 import info.stasha.testosterone.junit4.jersey.service.Service;
 import info.stasha.testosterone.junit4.jersey.service.ServiceFactory;
@@ -196,6 +197,14 @@ public class RequestTest implements Testosterone {
     public void headerParamTest(@HeaderParam("Content-Type") String contentType) {
         System.out.println(contentType);
         assertEquals("Content type should equals", "application/json", contentType);
+    }
+
+    @Test
+    @GET
+    @Path("testResponse")
+    @Request(url = "testResponse")
+    public void testResponseTest(TestResponse resp) {
+        assertNotNull("TestResponse should not be null", resp);
     }
 
     @Test

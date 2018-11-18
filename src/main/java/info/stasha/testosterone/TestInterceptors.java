@@ -1,9 +1,11 @@
 package info.stasha.testosterone;
 
+import info.stasha.testosterone.annotation.Request;
 import info.stasha.testosterone.jersey.Testosterone;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
+import javax.ws.rs.Path;
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
@@ -288,7 +290,13 @@ public class TestInterceptors {
                             setup.setRequestsAlreadInvoked(true);
                             et.executeRequests();
                         } else {
-                            return Utils.invokeOriginalMethod(resourceMethod, orig, args);
+                            Request req = method.getAnnotation(Request.class);
+                            Path path = method.getAnnotation(Path.class);
+                            if (req != null && path != null && path.value().equals(req.url())) {
+
+                            } else {
+                                return Utils.invokeOriginalMethod(resourceMethod, orig, args);
+                            }
                         }
                     } catch (Throwable ex) {
                         if (ex instanceof InvocationTargetException) {

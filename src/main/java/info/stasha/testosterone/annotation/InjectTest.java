@@ -6,10 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Inject text from property files or from jersey configuration.
+ * Inject Testosterone test instance. Note that only classes that are specified in
+ * @Integration or @Dependencies annotations can be injected.
  *
- * @see info.stasha.testosterone.jersey.ValueInjectionResolver for
- * implementation.
  * @author stasha
  */
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD})

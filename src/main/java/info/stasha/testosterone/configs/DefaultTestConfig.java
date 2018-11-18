@@ -305,8 +305,8 @@ public class DefaultTestConfig implements TestConfig {
                 }
             });
         }
-        
-        if(!root.equals(dep)) {
+
+        if (!root.equals(dep)) {
             tests.add(dep.getTest());
         }
 
@@ -330,7 +330,8 @@ public class DefaultTestConfig implements TestConfig {
                         Testosterone t = cls.newInstance();
                         t.getTestConfig().init(root, t.getTestConfig(), tests);
                     } catch (InstantiationException | IllegalAccessException ex) {
-                        java.util.logging.Logger.getLogger(Testosterone.class.getName()).log(Level.SEVERE, null, ex);
+                        LOGGER.error("Failed to create Testosterone instance", ex);
+                        throw new RuntimeException(ex);
                     }
                 }
             }
