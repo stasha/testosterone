@@ -259,7 +259,7 @@ public class TestInterceptors {
                             throw ex.getCause();
                         } catch (Exception ex) {
                             LOGGER.error("Failed to execute test " + invoking, ex);
-                            throw ex.getCause();
+                            config.getExceptions().add(ex);
                         }
                         // if any, throw errors produced by test before
                         config.throwExceptions();
@@ -299,6 +299,9 @@ public class TestInterceptors {
                             }
                         }
                     } catch (Throwable ex) {
+                        ex.printStackTrace();
+                        System.out.println("-----");
+                        ex.getCause().printStackTrace();
                         if (ex instanceof InvocationTargetException) {
                             ex = ex.getCause();
                         }
