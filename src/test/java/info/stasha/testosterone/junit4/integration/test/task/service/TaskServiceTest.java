@@ -27,8 +27,8 @@ public class TaskServiceTest implements Testosterone {
     @Context
     private TaskService taskService;
 
-//    @Context
-//    private TaskDao taskDao;
+    @Context
+    private TaskDao taskDao;
 
     private final Task task = new Task("New Task", "New Task Description", false).setId(1L);
 
@@ -39,7 +39,7 @@ public class TaskServiceTest implements Testosterone {
 
     @Override
     public void configureMocks(AbstractBinder binder) {
-//        binder.bindFactory(FactoryUtils.mock(TaskDaoFactory.class)).to(TaskDao.class).in(Singleton.class);
+        binder.bindFactory(FactoryUtils.mock(TaskDaoFactory.class)).to(TaskDao.class).in(Singleton.class);
     }
 
     public <T> T verify(T mock, int invocations) {
@@ -59,7 +59,7 @@ public class TaskServiceTest implements Testosterone {
     @Test
     public void createTest3() throws Exception {
         taskService.createTask(task.setId(null));
-//        verify(taskDao, 1).createTask(task.setId(null));
+        verify(taskDao, 1).createTask(task.setId(null));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -75,7 +75,7 @@ public class TaskServiceTest implements Testosterone {
     @Test
     public void readTest3() throws Exception {
         taskService.getTask(task);
-//        Mockito.verify(taskDao, times(1)).getTask(task);
+        Mockito.verify(taskDao, times(1)).getTask(task);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -83,8 +83,7 @@ public class TaskServiceTest implements Testosterone {
         taskService.updateTask(new Task());
     }
 
-    @Test
-//    @Test(expected = NullPointerException.class)
+    @Test(expected = NullPointerException.class)
     public void updateTest2() throws Exception {
         taskService.updateTask(null);
     }
@@ -92,17 +91,15 @@ public class TaskServiceTest implements Testosterone {
     @Test
     public void updateTest3() throws Exception {
         taskService.updateTask(task);
-//        Mockito.verify(taskDao, times(1)).updateTask(task);
+        Mockito.verify(taskDao, times(1)).updateTask(task);
     }
 
-    @Test
-//    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void deleteTest() throws Exception {
         taskService.deleteTask(new Task());
     }
 
-    @Test
-//    @Test(expected = NullPointerException.class)
+    @Test(expected = NullPointerException.class)
     public void deleteTest2() throws Exception {
         taskService.deleteTask(null);
     }
@@ -110,7 +107,7 @@ public class TaskServiceTest implements Testosterone {
     @Test
     public void deleteTest3() throws Exception {
         taskService.deleteTask(task);
-//        Mockito.verify(taskDao, times(1)).deleteTask(task);
+        Mockito.verify(taskDao, times(1)).deleteTask(task);
     }
 
 }
