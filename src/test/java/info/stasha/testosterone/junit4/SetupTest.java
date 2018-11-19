@@ -2,7 +2,7 @@ package info.stasha.testosterone.junit4;
 
 import info.stasha.testosterone.Setup;
 import info.stasha.testosterone.TestConfig;
-import info.stasha.testosterone.configs.DefaultTestConfig;
+import info.stasha.testosterone.jersey.JerseyTestConfig;
 import info.stasha.testosterone.jersey.Testosterone;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.junit.Test;
@@ -16,7 +16,7 @@ import static org.mockito.Mockito.times;
 public class SetupTest {
 
     Testosterone test = Mockito.mock(PlaygroundTest.class);
-    TestConfig config = new DefaultTestConfig(test);
+    TestConfig config = new JerseyTestConfig(test);
     ServiceLocator locator = Mockito.mock(ServiceLocator.class);
 
     Setup setup = new Setup(config);

@@ -1,11 +1,6 @@
-package info.stasha.testosterone.configs;
+package info.stasha.testosterone.jersey;
 
-import info.stasha.testosterone.ServerConfig;
-import info.stasha.testosterone.Setup;
-import info.stasha.testosterone.StartServer;
-import info.stasha.testosterone.TestConfig;
-import info.stasha.testosterone.TestExecutor;
-import info.stasha.testosterone.TestExecutorImpl;
+import info.stasha.testosterone.servers.JettyServerConfig;
 import info.stasha.testosterone.TestInExecution;
 import info.stasha.testosterone.TestInstrumentation;
 import info.stasha.testosterone.Utils;
@@ -15,10 +10,8 @@ import info.stasha.testosterone.annotation.InjectTest;
 import info.stasha.testosterone.annotation.Integration;
 import info.stasha.testosterone.annotation.LoadFile;
 import info.stasha.testosterone.annotation.Value;
+import info.stasha.testosterone.DefaultTestConfig;
 import info.stasha.testosterone.db.DbConfig;
-import info.stasha.testosterone.db.H2Config;
-import info.stasha.testosterone.jersey.JettyServerConfig;
-import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.jersey.inject.InjectTestResolver;
 import info.stasha.testosterone.jersey.inject.InputStreamInjectionResolver;
 import info.stasha.testosterone.jersey.inject.MockInjectionResolver;
@@ -26,16 +19,13 @@ import info.stasha.testosterone.jersey.inject.SpyInjectionResolver;
 import info.stasha.testosterone.jersey.inject.ValueInjectionResolver;
 import info.stasha.testosterone.junit4.AfterClassAnnotation;
 import info.stasha.testosterone.junit4.BeforeClassAnnotation;
-import info.stasha.testosterone.servlet.ServletContainerConfig;
+import info.stasha.testosterone.servlet.Servlet;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import javax.inject.Singleton;
 import org.glassfish.hk2.api.Factory;
@@ -43,6 +33,8 @@ import org.glassfish.hk2.api.InjectionResolver;
 import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.servlet.ServletContainer;
 import static org.mockito.AdditionalAnswers.delegatesTo;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -51,127 +43,44 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Default test configuration.
+ * Jersey test configuration.
  *
  * @author stasha
  */
-public class DefaultTestConfig implements TestConfig {
+public class JerseyTestConfig extends DefaultTestConfig<JerseyTestConfig> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultTestConfig.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JerseyTestConfig.class);
+    public final JerseyClient client = new JerseyClient(this);
+    private ResourceConfig resourceConfig;
 
-    private final Set<Throwable> exceptions = new HashSet<>();
-
-    private final Testosterone testosterone;
-    private final Configuration config;
-    private ServerConfig serverConfig;
-    private ServletContainerConfig servletContainerConfig;
-    private DbConfig dbConfig;
-    private String baseUri;
-    private int httpPort;
-    private StartServer startServer;
-    private Setup setup;
-    private final String mainThreadName;
-
-    public DefaultTestConfig(Testosterone testosterone) {
-        this(testosterone, null);
+    public JerseyTestConfig(Testosterone testosterone) {
+        super(testosterone);
     }
 
-    public DefaultTestConfig(Testosterone testosterone, Configuration config) {
-        this.testosterone = testosterone;
-        this.config = config;
-        this.mainThreadName = Thread.currentThread().getName();
+    public JerseyTestConfig(Testosterone testosterone, Configuration config) {
+        super(testosterone, config);
     }
 
     @Override
-    public Testosterone getTest() {
-        return testosterone;
-    }
-
-    @Override
-    public ServerConfig getServerConfig() {
+    public JettyServerConfig getServerConfig() {
         if (serverConfig == null) {
             this.serverConfig = new JettyServerConfig(this);
         }
 
-        return this.serverConfig;
+        return (JettyServerConfig) this.serverConfig;
     }
 
-    @Override
-    public ServletContainerConfig getServletContainerConfig() {
-        if (this.servletContainerConfig == null) {
-            this.servletContainerConfig = new ServletContainerConfig(this);
-            this.serverConfig.setServletContainerConfig(servletContainerConfig);
+    /**
+     * Returns ResourceConfig.
+     *
+     * @return
+     */
+    public ResourceConfig getResourceConfig() {
+        if (this.resourceConfig == null) {
+            this.resourceConfig = new ResourceConfig();
         }
 
-        return this.servletContainerConfig;
-    }
-
-    @Override
-    public DbConfig getDbConfig() {
-        if (dbConfig == null) {
-            this.dbConfig = new H2Config(this);
-        }
-
-        return this.dbConfig;
-    }
-
-    @Override
-    public TestExecutor getTestExecutor(Method method, Testosterone test) {
-        return new TestExecutorImpl(method, test);
-    }
-
-    @Override
-    public String getBaseUri() {
-        if (this.baseUri == null) {
-            this.baseUri = config != null ? config.baseUri() : BASE_URI;
-        }
-
-        return this.baseUri;
-    }
-
-    @Override
-    public int getHttpPort() {
-        if (this.httpPort == 0) {
-            this.httpPort = config != null ? config.httpPort() : HTTP_PORT;
-        }
-
-        return this.httpPort;
-    }
-
-    @Override
-    public StartServer getStartServer() {
-        if (this.startServer == null) {
-            this.startServer = config != null ? config.startServer() : StartServer.PER_CLASS;
-        }
-
-        return this.startServer;
-    }
-
-    @Override
-    public Setup getSetup() {
-        if (this.setup == null) {
-            this.setup = new Setup(this);
-        }
-        return this.setup;
-    }
-
-    @Override
-    public String getMainThreadName() {
-        return this.mainThreadName;
-    }
-
-    @Override
-    public Set<Throwable> getExceptions() {
-        return exceptions;
-    }
-
-    @Override
-    public void throwExceptions() throws Throwable {
-        for (Throwable ex : exceptions) {
-            // this will come only to first exception,
-            // bot for now it is good enough
-            throw ex;
-        }
+        return this.resourceConfig;
     }
 
     /**
@@ -182,7 +91,7 @@ public class DefaultTestConfig implements TestConfig {
      * @param tests
      */
     @Override
-    public void init(TestConfig root, TestConfig dep, final List<Testosterone> tests) {
+    public void init(JerseyTestConfig root, JerseyTestConfig dep, final List<Testosterone> tests) {
 
         //The configuration order is:
         //
@@ -203,11 +112,11 @@ public class DefaultTestConfig implements TestConfig {
         Integration integration = root.getTest().getClass().getAnnotation(Integration.class);
         Dependencies dependencies = dep.getTest().getClass().getAnnotation(Dependencies.class);
 
-        dep.getTest().configure(root.getServerConfig().getResourceConfig());
+        dep.getTest().configure(root.getResourceConfig());
         dep.getTest().configure(root.getServletContainerConfig());
 
         if (root.equals(dep)) {
-            root.getServerConfig().getResourceConfig().register(new AbstractBinder() {
+            root.getResourceConfig().register(new AbstractBinder() {
 
                 @Override
                 protected void configure() {
@@ -297,10 +206,10 @@ public class DefaultTestConfig implements TestConfig {
         // Configure mocks only for root test. 
         // Skips configuring mocks for classes registered in @Intergration annotation
         if (integration == null || root.equals(dep)) {
-            dep.getTest().configureMocks(root.getServerConfig().getResourceConfig());
+            dep.getTest().configureMocks(root.getResourceConfig());
             dep.getTest().configureMocks(root.getServletContainerConfig());
 
-            root.getServerConfig().getResourceConfig().register(new AbstractBinder() {
+            root.getResourceConfig().register(new AbstractBinder() {
                 @Override
                 protected void configure() {
                     dep.getTest().configureMocks(this);
@@ -352,15 +261,15 @@ public class DefaultTestConfig implements TestConfig {
         if (root.equals(dep)) {
             if (Utils.isAnnotationPresent(root.getTest(), Singleton.class)) {
                 LOGGER.info("Adding test as Singleton to resources: {}", root.getTest());
-                root.getServerConfig().getResourceConfig().register(root.getTest());
+                root.getResourceConfig().register(root.getTest());
             } else {
                 LOGGER.info("Adding test to resources: {}", root.getTest());
-                this.getServerConfig().getResourceConfig().register(root.getTest().getClass());
+                root.getResourceConfig().register(root.getTest().getClass());
             }
-            
-            root.getServerConfig().getResourceConfig().register(InputStreamInjectionResolver.class);
 
-            root.getServerConfig().getResourceConfig().register(new AbstractBinder() {
+            root.getResourceConfig().register(InputStreamInjectionResolver.class);
+
+            root.getResourceConfig().register(new AbstractBinder() {
 
                 @Override
                 protected void configure() {
@@ -370,10 +279,15 @@ public class DefaultTestConfig implements TestConfig {
                 }
             });
             // registering setup so it can listen for application events
-            root.getServerConfig().getResourceConfig().register(root.getSetup());
+            root.getResourceConfig().register(root.getSetup());
+
+            // registering jersey servlet
+            Servlet s = new Servlet(new ServletContainer(root.getResourceConfig()),
+                    root.getServletContainerConfig().getJerseyServletPath()).setInitOrder(1);
+            root.getServletContainerConfig().addServlet(s);
 
             LOGGER.info("Configuration end:   {}", root.getTest().getClass().getName());
-            root.getServerConfig().init();
+            root.getServerConfig().setConfigurationObject(root.getResourceConfig());
         }
 
     }
@@ -389,19 +303,22 @@ public class DefaultTestConfig implements TestConfig {
         if (!getServerConfig().isRunning()) {
             init(this, this, new ArrayList<>());
 
-            setup.beforeServerStart(this.testosterone);
+            getSetup().beforeServerStart(getTest());
 
             LOGGER.info("Starting server with {} configuration", getStartServer());
 
-            dbConfig.start();
-            serverConfig.start();
+            getDbConfig().start();
+
+            client.start();
+
+            getServerConfig().start();
 
             LOGGER.info(this.toString());
             // Invoke afterServerStart only if resource is singleton.
             // If there is no Singleton annotation, afterServerStart is 
             // invoked by @PostConstruct interceptor
-            if (Utils.isAnnotationPresent(this.testosterone, Singleton.class)) {
-                setup.afterServerStart(this.testosterone);
+            if (Utils.isAnnotationPresent(getTest(), Singleton.class)) {
+                getSetup().afterServerStart(getTest());
             }
         }
     }
@@ -415,34 +332,26 @@ public class DefaultTestConfig implements TestConfig {
     public void stop() throws Exception {
         try {
             if (getServerConfig().isRunning()) {
-                setup.beforeServerStop(this.testosterone);
+                client.stop();
+
+                getSetup().beforeServerStop(getTest());
 
                 LOGGER.info("Stopping server configured with: {}", getStartServer());
-                serverConfig.stop();
-                dbConfig.stop();
-                setup.afterServerStop(this.testosterone);
-                setup.clearFlags();
+                getServerConfig().stop();
+                getDbConfig().stop();
+                getSetup().afterServerStop(getTest());
+                getSetup().clearFlags();
 
                 System.out.println("");
             }
         } finally {
-            Testosterone.TEST_CONFIGURATIONS.remove(Utils.getInstrumentedClassName(this.testosterone));
+            Testosterone.TEST_CONFIGURATIONS.remove(Utils.getInstrumentedClassName(getTest()));
         }
     }
 
     @Override
-    public String toString() {
-        return "DefaultTestConfig{"
-                + "startServer=" + startServer
-                + ", baseUri=" + baseUri
-                + ", httpPort=" + httpPort
-                + ", mainThreadName=" + mainThreadName
-                + ", testConfig=" + this.getClass().getName()
-                + ", testosterone=" + testosterone.getClass().getName()
-                + ", serverConfig=" + serverConfig.getClass().getName()
-                + ", servletContainerConfig=" + servletContainerConfig.getClass().getName()
-                + ", dbConfig=" + dbConfig.getClass().getName()
-                + "}";
+    public boolean isRunning() {
+        return getServerConfig().isRunning();
     }
 
 }

@@ -1,17 +1,14 @@
 package info.stasha.testosterone;
 
 import info.stasha.testosterone.servlet.ServletContainerConfig;
-import java.net.URI;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.WebTarget;
-import org.glassfish.jersey.server.ResourceConfig;
 
 /**
  * Testosterone configuration interface.
  *
  * @author stasha
+ * @param <T>
  */
-public interface ServerConfig {
+public interface ServerConfig<T> extends StartStop {
 
     /**
      * Returns test configuration.
@@ -19,41 +16,6 @@ public interface ServerConfig {
      * @return
      */
     TestConfig getTestConfig();
-
-    /**
-     * Returns ResourceConfig instance.
-     *
-     * @return
-     */
-    ResourceConfig getResourceConfig();
-
-    /**
-     * Sets ResourceConfig.
-     *
-     * @param resourceConfig
-     */
-    void setResourceConfig(ResourceConfig resourceConfig);
-
-    /**
-     * Returns Jersey Client instance.
-     *
-     * @return
-     */
-    Client client();
-
-    /**
-     * Returns WebTarget instance for invoking http requests.
-     *
-     * @return
-     */
-    WebTarget target();
-
-    /**
-     * Returns base uri.
-     *
-     * @return
-     */
-    URI getBaseUri();
 
     /**
      * Returns servlet configuration object where context params, listeners,
@@ -71,31 +33,10 @@ public interface ServerConfig {
     void setServletContainerConfig(ServletContainerConfig config);
 
     /**
-     * Initialize configuration.
+     * Any object needed for configuring and running application on the server.
      *
-     * @throws Exception
+     * @param configuration
      */
-    void init();
-
-    /**
-     * Returns true false if server is running.
-     *
-     * @return
-     */
-    boolean isRunning();
-
-    /**
-     * Starts server.
-     *
-     * @throws Exception
-     */
-    void start() throws Exception;
-
-    /**
-     * Stops server.
-     *
-     * @throws Exception
-     */
-    void stop() throws Exception;
+    void setConfigurationObject(T configuration);
 
 }

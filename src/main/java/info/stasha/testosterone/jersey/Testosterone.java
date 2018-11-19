@@ -4,14 +4,12 @@ import javax.ws.rs.client.WebTarget;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
-import info.stasha.testosterone.TestConfig;
 import info.stasha.testosterone.Utils;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.db.DbConfig;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import info.stasha.testosterone.configs.DefaultTestConfig;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -24,15 +22,15 @@ import java.util.HashMap;
 public interface Testosterone {
 
     static final Logger LOGGER = LoggerFactory.getLogger(Testosterone.class);
-    static final Map<String, TestConfig> TEST_CONFIGURATIONS = new HashMap<>();
+    static final Map<String, JerseyTestConfig> TEST_CONFIGURATIONS = new HashMap<>();
 
     /**
      * Returns testosterone configuration factory.
      *
      * @return
      */
-    default TestConfig getTestConfig() {
-        TestConfig config = TEST_CONFIGURATIONS.get(Utils.getInstrumentedClassName(this));
+    default JerseyTestConfig getTestConfig() {
+        JerseyTestConfig config = TEST_CONFIGURATIONS.get(Utils.getInstrumentedClassName(this));
 
         // returning existing config
         if (config != null) {
@@ -46,9 +44,9 @@ public interface Testosterone {
                 Constructor con = conf.configuration().
                         getDeclaredConstructor(Testosterone.class, Configuration.class);
 
-                config = (TestConfig) con.newInstance(this, conf);
+                config = (JerseyTestConfig) con.newInstance(this, conf);
             } else {
-                config = new DefaultTestConfig(this);
+                config = new JerseyTestConfig(this);
             }
 
             TEST_CONFIGURATIONS.put(Utils.getInstrumentedClassName(this), config);
@@ -66,7 +64,7 @@ public interface Testosterone {
      * @return
      */
     default WebTarget target() {
-        return getTestConfig().getServerConfig().target();
+        return getTestConfig().client.target();
     }
 
     /**

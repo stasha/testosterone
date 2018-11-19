@@ -2,7 +2,7 @@ package info.stasha.testosterone.annotation;
 
 import info.stasha.testosterone.StartServer;
 import info.stasha.testosterone.TestConfig;
-import info.stasha.testosterone.configs.DefaultTestConfig;
+import info.stasha.testosterone.jersey.JerseyTestConfig;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
@@ -26,7 +26,7 @@ public @interface Configuration {
 	 *
 	 * @return
 	 */
-	Class<? extends TestConfig> configuration() default DefaultTestConfig.class;
+	Class<? extends TestConfig> configuration() default JerseyTestConfig.class;
 
 	/**
 	 * Server base uri.

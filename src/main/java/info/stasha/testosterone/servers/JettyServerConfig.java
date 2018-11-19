@@ -1,6 +1,8 @@
-package info.stasha.testosterone.jersey;
+package info.stasha.testosterone.servers;
 
+import info.stasha.testosterone.ServerConfig;
 import info.stasha.testosterone.TestConfig;
+import info.stasha.testosterone.servlet.ServletContainerConfig;
 import java.util.EventListener;
 import javax.servlet.Filter;
 import javax.servlet.Servlet;
@@ -8,7 +10,6 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,16 +18,56 @@ import org.slf4j.LoggerFactory;
  *
  * @author stasha
  */
-public class JettyServerConfig extends GrizzlyServerConfig {
+public class JettyServerConfig implements ServerConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JettyServerConfig.class);
 
     protected Server server;
     private final TestConfig config;
+    private ServletContainerConfig servletContainerConfig;
 
     public JettyServerConfig(TestConfig config) {
-        super(config);
         this.config = config;
+    }
+
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public TestConfig getTestConfig() {
+        return this.config;
+    }
+
+    /**
+     * {@inheritDoc }
+     *
+     * @param configuration
+     */
+    @Override
+    public void setConfigurationObject(Object configuration) {
+
+    }
+
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public ServletContainerConfig getServletContainerConfig() {
+        return this.servletContainerConfig;
+    }
+
+    /**
+     * {@inheritDoc }
+     *
+     * @param config
+     */
+    @Override
+    public void setServletContainerConfig(ServletContainerConfig config) {
+        this.servletContainerConfig = config;
     }
 
     /**
@@ -37,15 +78,6 @@ public class JettyServerConfig extends GrizzlyServerConfig {
     @Override
     public boolean isRunning() {
         return server != null && server.isStarted();
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    protected void createServer() {
-        server = new Server(config.getHttpPort());
-        initializeServletContainer();
     }
 
     /**
@@ -130,24 +162,6 @@ public class JettyServerConfig extends GrizzlyServerConfig {
             }
         });
 
-        addRestServlet(context);
-
-    }
-
-    /**
-     * Registers Jersey servlet.
-     *
-     * @param context
-     */
-    protected void addRestServlet(ServletContextHandler context) {
-        // registering Jersey servlet
-        LOGGER.debug("Adding jersey servlet with path: {} to servlet container.", config.getServletContainerConfig().getJerseyServletPath());
-        ServletHolder holder = new ServletHolder();
-        holder.setServlet(new ServletContainer(this.getResourceConfig()));
-        holder.setInitOrder(1);
-//        holder.setInitParameter("com.sun.jersey.api.json.POJOMappingFeature", "true");
-        context.addServlet(holder, config.getServletContainerConfig().getJerseyServletPath());
-
     }
 
     /**
@@ -157,9 +171,9 @@ public class JettyServerConfig extends GrizzlyServerConfig {
      */
     @Override
     public void start() throws Exception {
-        prepare();
-
-        if (server != null && !server.isRunning()) {
+        server = new Server(config.getHttpPort());
+        initializeServletContainer();
+        if (!isRunning()) {
             try {
 //                LOGGER.info("Starting server at: {} for test {}", getBaseUri(), this.getMainThreadTestObject().getClass().getName());
                 server.start();
@@ -177,8 +191,7 @@ public class JettyServerConfig extends GrizzlyServerConfig {
      */
     @Override
     public void stop() throws Exception {
-        cleanUp();
-        if (server != null && server.isRunning()) {
+        if (isRunning()) {
 //            LOGGER.info("Stopping server at: {} for test {}", getBaseUri(), this.getMainThreadTestObject().getClass().getName());
             try {
                 server.stop();
