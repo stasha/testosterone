@@ -227,7 +227,7 @@ public class RequestTest implements Testosterone {
      */
     private void assertData(String service, String id, String firstName, String lastName) {
         assertTrue("Service should be string", service != null && !service.isEmpty());
-        assertTrue("Id should be number", (Integer) Integer.parseInt(id) instanceof Integer);
+        assertTrue("Id should be number", (Long) Long.parseLong(id) instanceof Long);
         assertEquals("FirstName should equal", "Jon", firstName);
         assertEquals("LastName should equal", "Doe", lastName);
     }

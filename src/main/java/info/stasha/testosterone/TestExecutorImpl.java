@@ -88,7 +88,6 @@ public class TestExecutorImpl implements TestExecutor {
 
         String uri = getPath(path.value());
 
-        
         // If path is not generic (instrumented paths start with "__generic__")
         // or if method has @Requests or @Request annotation
         // then we invoke __generic__ endpoint. This is needed to initialize test
@@ -279,7 +278,9 @@ public class TestExecutorImpl implements TestExecutor {
                 default:
                     resp = builder.get();
             }
-            LOGGER.info("Getting response {}", resp.toString());
+            if (!request.url().equals("__generic__")) {
+                LOGGER.info("Getting response {}", resp.toString());
+            }
 
             if (!request.url().contains("__generic__")) {
 

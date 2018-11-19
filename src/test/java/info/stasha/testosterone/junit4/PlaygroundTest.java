@@ -11,11 +11,9 @@ import org.junit.runner.RunWith;
 @RunWith(TestosteroneRunner.class)
 public class PlaygroundTest implements Testosterone {
 
-   
-
     @Test
     public void test() {
-        
+
     }
 
 }
