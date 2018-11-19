@@ -1,7 +1,6 @@
 package info.stasha.testosterone.jersey;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.concurrent.Callable;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.implementation.MethodDelegation;

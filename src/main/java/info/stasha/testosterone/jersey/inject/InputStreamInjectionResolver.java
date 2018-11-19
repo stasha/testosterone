@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import javax.inject.Provider;
 import javax.ws.rs.core.Context;
 import org.glassfish.jersey.server.CloseableService;
 import org.slf4j.Logger;
@@ -27,14 +28,15 @@ public class InputStreamInjectionResolver implements InjectionResolver<LoadFile>
     private static final Logger LOGGER = LoggerFactory.getLogger(InputStreamInjectionResolver.class);
 
     @Context
-    TestInExecution test;
+    Provider<TestInExecution> test;
 
     @Context
-    CloseableService closeableService;
+    Provider<CloseableService> closeableService;
 
     @Override
     public Object resolve(Injectee injectee, ServiceHandle<?> handle) {
-        if (!test.isTest() && !test.isRequest()) {
+        TestInExecution t = test.get();
+        if (!t.isTest() && !t.isRequest()) {
             return null;
         }
         AnnotatedElement el = injectee.getParent();
@@ -45,7 +47,7 @@ public class InputStreamInjectionResolver implements InjectionResolver<LoadFile>
         Object out = null;
         if (injectee.getRequiredType() == InputStream.class) {
             out = this.getClass().getResourceAsStream(path);
-            closeableService.add((Closeable) out);
+            closeableService.get().add((Closeable) out);
         } else if (cls == String.class) {
             try {
                 out = new String(Files.readAllBytes(Paths.get(this.getClass().getResource(path).getPath())));

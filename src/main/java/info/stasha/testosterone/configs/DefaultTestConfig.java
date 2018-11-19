@@ -13,12 +13,14 @@ import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.annotation.Dependencies;
 import info.stasha.testosterone.annotation.InjectTest;
 import info.stasha.testosterone.annotation.Integration;
+import info.stasha.testosterone.annotation.LoadFile;
 import info.stasha.testosterone.annotation.Value;
 import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.db.H2Config;
 import info.stasha.testosterone.jersey.JettyServerConfig;
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.jersey.inject.InjectTestResolver;
+import info.stasha.testosterone.jersey.inject.InputStreamInjectionResolver;
 import info.stasha.testosterone.jersey.inject.MockInjectionResolver;
 import info.stasha.testosterone.jersey.inject.SpyInjectionResolver;
 import info.stasha.testosterone.jersey.inject.ValueInjectionResolver;
@@ -248,7 +250,7 @@ public class DefaultTestConfig implements TestConfig {
                         @Override
                         public void dispose(TestInExecution instance) {
                         }
-                    }).to(TestInExecution.class).in(RequestScoped.class).proxy(true);
+                    }).to(TestInExecution.class).in(RequestScoped.class);
 
                     // injection resolvers
                     this.bind(ValueInjectionResolver.class)
@@ -263,10 +265,9 @@ public class DefaultTestConfig implements TestConfig {
                     this.bind(SpyInjectionResolver.class)
                             .to(new TypeLiteral<InjectionResolver<Spy>>() {
                             }).in(Singleton.class);
-                    // TODO: fix to support jersey 2.1...2.8
-//                    this.bind(InputStreamInjectionResolver.class)
-//                            .to(new TypeLiteral<InjectionResolver<LoadFile>>() {
-//                            }).in(Singleton.class);
+                    this.bind(InputStreamInjectionResolver.class)
+                            .to(new TypeLiteral<InjectionResolver<LoadFile>>() {
+                            }).in(Singleton.class);
 
                     root.getTest().configure(this);
                 }
@@ -356,6 +357,8 @@ public class DefaultTestConfig implements TestConfig {
                 LOGGER.info("Adding test to resources: {}", root.getTest());
                 this.getServerConfig().getResourceConfig().register(root.getTest().getClass());
             }
+            
+            root.getServerConfig().getResourceConfig().register(InputStreamInjectionResolver.class);
 
             root.getServerConfig().getResourceConfig().register(new AbstractBinder() {
 
