@@ -306,9 +306,7 @@ public class DefaultTestConfig implements TestConfig {
             });
         }
 
-        if (!root.equals(dep)) {
-            tests.add(dep.getTest());
-        }
+        tests.add(dep.getTest());
 
         if (integration != null || dependencies != null) {
             List<Class<? extends Testosterone>> testClasses = null;
@@ -350,6 +348,14 @@ public class DefaultTestConfig implements TestConfig {
         // After everything is configured, including @Dependencies na @Integration,
         // we initialize the server
         if (root.equals(dep)) {
+            if (Utils.isAnnotationPresent(root.getTest(), Singleton.class)) {
+                LOGGER.info("Adding test as Singleton to resources: {}", root.getTest());
+                root.getServerConfig().getResourceConfig().register(root.getTest());
+            } else {
+                LOGGER.info("Adding test to resources: {}", root.getTest());
+                this.getServerConfig().getResourceConfig().register(root.getTest().getClass());
+            }
+
             root.getServerConfig().getResourceConfig().register(new AbstractBinder() {
 
                 @Override

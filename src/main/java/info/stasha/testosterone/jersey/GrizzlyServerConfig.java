@@ -225,11 +225,7 @@ public class GrizzlyServerConfig implements ServerConfig {
      */
     @Override
     public void init() {
-        if (Utils.isAnnotationPresent(config.getTest(), Singleton.class)) {
-            this.resourceConfig.register(config.getTest());
-        } else {
-            this.resourceConfig.register(config.getTest().getClass());
-        }
+       
 
         try {
             createServer();
