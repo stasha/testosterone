@@ -24,7 +24,7 @@ import static org.mockito.Mockito.times;
  * @author stasha
  */
 @RunWith(TestosteroneRunner.class)
-@Configuration(startServer = StartServer.PER_TEST_METHOD)
+//@Configuration(startServer = StartServer.PER_TEST_METHOD)
 public class TaskServiceTest implements Testosterone {
 
     @Context
