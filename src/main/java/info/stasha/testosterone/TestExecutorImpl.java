@@ -81,14 +81,14 @@ public class TestExecutorImpl implements TestExecutor {
      */
     @Override
     public void executeTest() throws Throwable {
+        LOGGER.info("Executing test {}:{}", method.getDeclaringClass(), method.getName());
         Path root = Utils.getAnnotation(target, Path.class);
         Method resourceMethod = target.getTestConfig().getSetup().getTestInExecution().getMainThreadTest().getClass().getMethod(method.getName(), method.getParameterTypes());
         Path path = resourceMethod.getAnnotation(Path.class);
 
         String uri = getPath(path.value());
 
-        if (Utils.hasRequestAnnotation(method)) {
-        }
+        
         // If path is not generic (instrumented paths start with "__generic__")
         // or if method has @Requests or @Request annotation
         // then we invoke __generic__ endpoint. This is needed to initialize test
