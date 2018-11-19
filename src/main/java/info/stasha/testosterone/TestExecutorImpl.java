@@ -259,6 +259,7 @@ public class TestExecutorImpl implements TestExecutor {
                 builder = builder.header(keyValue[0].trim(), keyValue[1].trim());
             }
 
+            LOGGER.info("Sending request {}", request.toString());
             switch (requestMethod) {
                 case HttpMethod.POST:
                     resp = builder.post(entity);
@@ -278,9 +279,9 @@ public class TestExecutorImpl implements TestExecutor {
                 default:
                     resp = builder.get();
             }
+            LOGGER.info("Getting response {}", resp.toString());
 
             if (!request.url().contains("__generic__")) {
-                LOGGER.info(resp.toString());
 
                 // asserting response status if it was set on request
                 int status = resp.getStatus();
