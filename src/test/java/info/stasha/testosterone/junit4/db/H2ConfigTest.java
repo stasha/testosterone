@@ -1,7 +1,10 @@
-package info.stasha.testosterone.db;
+package info.stasha.testosterone.junit4.db;
 
 import info.stasha.testosterone.TestConfig;
 import info.stasha.testosterone.annotation.DontIntercept;
+import info.stasha.testosterone.db.DbConfig;
+import info.stasha.testosterone.db.H2Config;
+import info.stasha.testosterone.db.H2ConnectionFactory;
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.junit4.TestosteroneRunner;
 import java.sql.SQLException;

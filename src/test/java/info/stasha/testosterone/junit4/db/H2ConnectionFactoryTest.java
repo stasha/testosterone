@@ -1,5 +1,6 @@
-package info.stasha.testosterone.db;
+package info.stasha.testosterone.junit4.db;
 
+import info.stasha.testosterone.db.H2ConnectionFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
 import org.junit.Test;

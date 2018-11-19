@@ -1,10 +1,9 @@
-package info.stasha.testosterone.junit;
+package info.stasha.testosterone.junit4;
 
 import info.stasha.testosterone.Setup;
 import info.stasha.testosterone.TestConfig;
 import info.stasha.testosterone.configs.DefaultTestConfig;
 import info.stasha.testosterone.jersey.Testosterone;
-import info.stasha.testosterone.junit4.PlaygroundTest;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.junit.Test;
 import org.mockito.Mockito;

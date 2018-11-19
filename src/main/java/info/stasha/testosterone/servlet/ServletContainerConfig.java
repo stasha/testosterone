@@ -1,13 +1,13 @@
 package info.stasha.testosterone.servlet;
 
 import info.stasha.testosterone.TestConfig;
+import java.util.EnumSet;
 import java.util.EventListener;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.servlet.DispatcherType;
 
 /**
  * "DTO" container used for configuring real servlet container/s.
@@ -61,6 +61,17 @@ public class ServletContainerConfig {
         Servlet s = new Servlet(clazz, urlPattern);
         servlets.add(s);
         return s;
+    }
+
+    /**
+     * Adds Servlet instance.
+     *
+     * @param servlet
+     * @return
+     */
+    public Servlet addServlet(Servlet servlet) {
+        servlets.add(servlet);
+        return servlet;
     }
 
     /**
@@ -129,6 +140,21 @@ public class ServletContainerConfig {
     }
 
     /**
+     * Adds javax.servlet.Filter class and url patterns.
+     *
+     * @param clazz
+     * @param urlPattern
+     * @param dispatchers
+     * @return
+     */
+    public Filter addFilter(Class<? extends javax.servlet.Filter> clazz, String[] urlPattern, EnumSet<DispatcherType> dispatchers) {
+        Filter f = new Filter(clazz, urlPattern);
+        f.setDispatchers(dispatchers);
+        filters.add(f);
+        return f;
+    }
+
+    /**
      * Adds javax.servlet.Filter instance and url pattern.
      *
      * @param filter
@@ -155,18 +181,39 @@ public class ServletContainerConfig {
     }
 
     /**
+     * Adds javax.servlet.Filter instance, url patterns and dispatcher types.
+     *
+     * @param filter
+     * @param urlPattern
+     * @param dispatchers
+     * @return
+     */
+    public Filter addFilter(javax.servlet.Filter filter, String[] urlPattern, EnumSet<DispatcherType> dispatchers) {
+        Filter f = new Filter(filter, urlPattern);
+        f.setDispatchers(dispatchers);
+        filters.add(f);
+        return f;
+    }
+
+    /**
+     * AddsFilter instance.
+     *
+     * @param filter
+     * @return
+     */
+    public Filter addFilter(Filter filter) {
+        filters.add(filter);
+        return filter;
+    }
+
+    /**
      * Adds servlet EventListener class.
      *
      * @param clazz
      * @return
      */
     public ServletContainerConfig addListener(Class<? extends EventListener> clazz) {
-        try {
-            listeners.add(new Listener(clazz.newInstance()));
-        } catch (InstantiationException | IllegalAccessException ex) {
-            Logger.getLogger(ServletContainerConfig.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex);
-        }
+        listeners.add(new Listener(clazz));
         return this;
     }
 
@@ -178,6 +225,17 @@ public class ServletContainerConfig {
      */
     public ServletContainerConfig addListener(EventListener listener) {
         listeners.add(new Listener(listener));
+        return this;
+    }
+
+    /**
+     * Adds Listener instance.
+     *
+     * @param listener
+     * @return
+     */
+    public ServletContainerConfig addListener(Listener listener) {
+        listeners.add(listener);
         return this;
     }
 

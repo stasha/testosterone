@@ -3,8 +3,13 @@ package info.stasha.testosterone.junit4.servlet.servletfilter;
 import info.stasha.testosterone.annotation.Request;
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.junit4.TestosteroneRunner;
+import info.stasha.testosterone.servlet.Filter;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
 import java.io.IOException;
+import java.util.EnumSet;
+import static javax.servlet.DispatcherType.FORWARD;
+import static javax.servlet.DispatcherType.INCLUDE;
+import static javax.servlet.DispatcherType.REQUEST;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
@@ -18,7 +23,7 @@ import org.mockito.Mockito;
 import static org.mockito.Mockito.times;
 
 /**
- * Servlet filter test
+ * Just a basic servlet filter test
  *
  * @author stasha
  */
@@ -26,10 +31,18 @@ import static org.mockito.Mockito.times;
 public class ServletFilterTest implements Testosterone {
 
     private AccessFilter filter = Mockito.spy(new AccessFilter());
+    private AccessFilter filter2 = Mockito.spy(new AccessFilter());
 
     @Override
     public void configure(ServletContainerConfig sc) {
         sc.addFilter(filter, "/*");
+        sc.addFilter(filter2, new String[]{"/*"});
+        sc.addFilter(AccessFilter.class, "/*");
+        sc.addFilter(AccessFilter.class, new String[]{"/*"});
+        sc.addFilter(filter2, new String[]{"/test/*"}, EnumSet.of(FORWARD, INCLUDE, REQUEST));
+        sc.addFilter(AccessFilter.class, new String[]{"/home/*", "/user/*"});
+        sc.addFilter(AccessFilter.class, new String[]{"/home/*", "/user/*"}, EnumSet.of(FORWARD, INCLUDE, REQUEST));
+        sc.addFilter(new Filter(AccessFilter.class));
     }
 
     @Override

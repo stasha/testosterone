@@ -1,5 +1,7 @@
-package info.stasha.testosterone.annotation;
+package info.stasha.testosterone.junit4.annotations;
 
+import info.stasha.testosterone.annotation.Request;
+import info.stasha.testosterone.annotation.RequestAnnotation;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

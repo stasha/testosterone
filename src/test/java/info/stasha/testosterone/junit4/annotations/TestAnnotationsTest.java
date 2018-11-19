@@ -1,4 +1,4 @@
-package info.stasha.testosterone.junit;
+package info.stasha.testosterone.junit4.annotations;
 
 import info.stasha.testosterone.TestAnnotations;
 import java.lang.reflect.InvocationTargetException;
