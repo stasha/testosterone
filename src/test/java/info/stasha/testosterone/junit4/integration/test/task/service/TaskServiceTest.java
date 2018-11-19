@@ -1,5 +1,7 @@
 package info.stasha.testosterone.junit4.integration.test.task.service;
 
+import info.stasha.testosterone.StartServer;
+import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.jersey.FactoryUtils;
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.junit4.TestosteroneRunner;
@@ -22,6 +24,7 @@ import static org.mockito.Mockito.times;
  * @author stasha
  */
 @RunWith(TestosteroneRunner.class)
+@Configuration(startServer = StartServer.PER_TEST_METHOD)
 public class TaskServiceTest implements Testosterone {
 
     @Context
