@@ -26,6 +26,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -205,6 +206,10 @@ public class RequestTest implements Testosterone {
     @Request(url = "testResponse")
     public void testResponseTest(TestResponse resp) {
         assertNotNull("TestResponse should not be null", resp);
+        assertNotNull("Request should not be null", resp.getRequest());
+        assertNotNull("Response should not be null", resp.getResponse());
+        assertNotNull("WebTarget should not be null", resp.getWebTarget());
+        assertEquals("Repeat index should be 1", 1, resp.getRepeatIndex());
     }
 
     @Test
@@ -215,6 +220,27 @@ public class RequestTest implements Testosterone {
 
         assertEquals("Content-Type should equals", "application/json", contentType);
         assertEquals("User-Agent should equals", "testosterone", userAgent);
+    }
+    
+    @Request
+    @Requests
+    @Test(expected = IllegalStateException.class)
+    public void requestAndRequestsTest(){
+        
+    }
+    
+    @Requests
+    @Test(expected = IllegalStateException.class)
+    public void requestsEmptyTest(){
+        
+    }
+    
+    @Ignore
+    @Test
+    @POST
+    @Path("post")
+    public void postRequest(TestResponse resp){
+        assertEquals("Method should be post", HttpMethod.POST, resp.getRequest().method());
     }
 
     /**
