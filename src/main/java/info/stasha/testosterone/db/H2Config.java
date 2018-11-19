@@ -89,7 +89,7 @@ public class H2Config implements DbConfig {
     public Connection getConnection() {
         try {
             return connectionPool.getConnection();
-        } catch (SQLException ex) {
+        } catch (Exception ex) {
             LOGGER.error("Failed to obtain new connection from connection pool.");
             throw new RuntimeException(ex);
         }
@@ -102,7 +102,6 @@ public class H2Config implements DbConfig {
      */
     @Override
     public Class<? extends Factory<Connection>> getConnectionFactory() {
-        getDataSource();
         return H2ConnectionFactory.class;
     }
 
