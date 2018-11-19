@@ -41,7 +41,7 @@ public class TaskServiceTest implements Testosterone {
 
     @Override
     public void configureMocks(AbstractBinder binder) {
-        binder.bindFactory(FactoryUtils.mock(TaskDaoFactory.class)).to(TaskDao.class).in(Singleton.class);
+        binder.bindFactory(FactoryUtils.<TaskDao>mock(TaskDaoFactory.class)).to(TaskDao.class).in(Singleton.class);
     }
 
     public <T> T verify(T mock, int invocations) {

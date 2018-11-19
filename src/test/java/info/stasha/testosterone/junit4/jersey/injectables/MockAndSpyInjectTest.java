@@ -74,10 +74,10 @@ public class MockAndSpyInjectTest implements Testosterone {
         binder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
         // global service mock factory !!! NOTE !!! proxy must be set to "false" 
         // otherwise Proxy will be injected instead of mock. This is how Jersey operates.
-        binder.bindFactory(FactoryUtils.mock(ServiceFactory.class)).to(MyService.class).in(RequestScoped.class).proxy(false);
+        binder.bindFactory(FactoryUtils.<MyService>mock(ServiceFactory.class)).to(MyService.class).in(RequestScoped.class).proxy(false);
         // global service spy factory !!! NOTE !!! proxy must be set to "false" 
         // otherwise Proxy will be injected instead of mock. This is how Jersey operates.
-        binder.bindFactory(FactoryUtils.spy(ServiceFactory.class)).to(GreetService.class).in(RequestScoped.class).proxy(false);
+        binder.bindFactory(FactoryUtils.<GreetService>spy(ServiceFactory.class)).to(GreetService.class).in(RequestScoped.class).proxy(false);
     }
 
     @Before

@@ -51,7 +51,7 @@ public class ExtendingTaskResourceTest extends TaskResource implements Testoster
 
     @Override
     public void configureMocks(AbstractBinder binder) {
-        binder.bindFactory(FactoryUtils.mock(TaskServiceFactory.class)).to(TaskService.class).in(Singleton.class);
+        binder.bindFactory(FactoryUtils.<TaskService>mock(TaskServiceFactory.class)).to(TaskService.class).in(Singleton.class);
     }
 
     @Override

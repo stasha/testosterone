@@ -13,18 +13,17 @@ import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.annotation.Dependencies;
 import info.stasha.testosterone.annotation.InjectTest;
 import info.stasha.testosterone.annotation.Integration;
-import info.stasha.testosterone.annotation.LoadFile;
 import info.stasha.testosterone.annotation.Value;
 import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.db.H2Config;
-import info.stasha.testosterone.db.H2ConnectionFactory;
 import info.stasha.testosterone.jersey.JettyServerConfig;
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.jersey.inject.InjectTestResolver;
-import info.stasha.testosterone.jersey.inject.InputStreamInjectionResolver;
 import info.stasha.testosterone.jersey.inject.MockInjectionResolver;
 import info.stasha.testosterone.jersey.inject.SpyInjectionResolver;
 import info.stasha.testosterone.jersey.inject.ValueInjectionResolver;
+import info.stasha.testosterone.junit4.AfterClassAnnotation;
+import info.stasha.testosterone.junit4.BeforeClassAnnotation;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -223,7 +222,7 @@ public class DefaultTestConfig implements TestConfig {
                         }
                     }).to(Testosterone.class).in(Singleton.class);
 
-                    this.bindFactory(H2ConnectionFactory.class)
+                    this.bindFactory(root.getDbConfig().getConnectionFactory())
                             .to(Connection.class)
                             .in(RequestScoped.class)
                             .proxy(true)
@@ -264,9 +263,10 @@ public class DefaultTestConfig implements TestConfig {
                     this.bind(SpyInjectionResolver.class)
                             .to(new TypeLiteral<InjectionResolver<Spy>>() {
                             }).in(Singleton.class);
-                    this.bind(InputStreamInjectionResolver.class)
-                            .to(new TypeLiteral<InjectionResolver<LoadFile>>() {
-                            }).in(Singleton.class);
+                    // TODO: fix to support jersey 2.1...2.8
+//                    this.bind(InputStreamInjectionResolver.class)
+//                            .to(new TypeLiteral<InjectionResolver<LoadFile>>() {
+//                            }).in(Singleton.class);
 
                     root.getTest().configure(this);
                 }
@@ -326,7 +326,7 @@ public class DefaultTestConfig implements TestConfig {
 
                 for (Class<? extends Testosterone> cls : testClasses) {
                     try {
-                        Testosterone t = TestInstrumentation.getInstrumentedClass(cls).newInstance();
+                        Testosterone t = TestInstrumentation.testClass(cls, new BeforeClassAnnotation(), new AfterClassAnnotation()).newInstance();
                         t.getTestConfig().init(root, t.getTestConfig(), tests);
                     } catch (InstantiationException | IllegalAccessException ex) {
                         LOGGER.error("Failed to create Testosterone instance", ex);

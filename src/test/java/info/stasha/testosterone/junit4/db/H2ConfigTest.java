@@ -57,12 +57,6 @@ public class H2ConfigTest implements Testosterone {
         assertEquals("Query should equal", "select * from test", CONFIG.getInitSqls().get("testQuery"));
     }
 
-    @Test
-    @DontIntercept
-    public void getH2FactoryTest() throws SQLException {
-        assertEquals("Factory should equal", H2ConnectionFactory.class, CONFIG.getConnectionFactory());
-    }
-
     @Test(expected = NullPointerException.class)
     @DontIntercept
     public void getConnectionTest() throws Throwable {

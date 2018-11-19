@@ -1,6 +1,7 @@
 package info.stasha.testosterone.jersey;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.concurrent.Callable;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.implementation.MethodDelegation;
@@ -52,7 +53,7 @@ public class FactoryUtils {
      * @param clazz
      * @return
      */
-    public static Class<? extends Factory<Object>> mock(Class<? extends Factory<?>> clazz) {
+    public static <T> Class<? extends Factory<T>> mock(Class<? extends Factory<?>> clazz) {
         return create(clazz, new MockProvider<>());
     }
 
@@ -63,7 +64,7 @@ public class FactoryUtils {
      * @param clazz
      * @return
      */
-    public static Class<? extends Factory<Object>> spy(Class<? extends Factory<?>> clazz) {
+    public static <T> Class<? extends Factory<T>> spy(Class<? extends Factory<?>> clazz) {
         return create(clazz, new SpyProvider<>());
     }
 
@@ -74,8 +75,8 @@ public class FactoryUtils {
      * @param provider
      * @return
      */
-    private static Class<? extends Factory<Object>> create(Class<? extends Factory<?>> clazz, Object provider) {
-        return (Class<? extends Factory<Object>>) new ByteBuddy()
+    private static <T> Class<? extends Factory<T>> create(Class<? extends Factory<?>> clazz, Object provider) {
+        return (Class<? extends Factory<T>>) new ByteBuddy()
                 .subclass(clazz)
                 .name(clazz.getName() + "_")
                 .method(named("provide"))

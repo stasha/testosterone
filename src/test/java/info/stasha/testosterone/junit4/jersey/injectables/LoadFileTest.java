@@ -15,12 +15,14 @@ import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import org.junit.Ignore;
 
 /**
  * Test @LoadFile annotation.
  *
  * @author stasha
  */
+@Ignore("Not supported in jersey 2.1...2.8")
 @RunWith(TestosteroneRunner.class)
 public class LoadFileTest implements Testosterone {
 
