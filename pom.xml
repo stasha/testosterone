@@ -208,7 +208,17 @@
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>3.0.0-M1</version>
             </plugin>
-<!--                        <plugin>
+            <plugin>
+                <!-- mvn cobertura:cobertura coveralls:report -->
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>4.3.0</version>
+                <configuration>
+                    <!-- env variable -->
+                    <repoToken>${COVERALLS_KEY}</repoToken>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
                 <version>3.0.0</version>
@@ -224,20 +234,13 @@
                     <quiet>true</quiet>
                     <formats>
                         <format>html</format>
+                        <format>xml</format>
                     </formats>
                     <instrumentation>
                         <ignoreTrivial>true</ignoreTrivial>
                     </instrumentation>
                 </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>cobertura</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>-->
+            </plugin>
 
         </plugins>
     </build>
