@@ -281,7 +281,7 @@ public class TestExecutorImpl implements TestExecutor {
             }
             LOGGER.info("Getting response {}", resp.toString());
 
-            if (!request.url().contains("__generic__")) {
+            if (!request.url().equals("__generic__")) {
 
                 // asserting response status if it was set on request
                 int status = resp.getStatus();

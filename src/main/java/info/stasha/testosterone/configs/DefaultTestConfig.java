@@ -7,6 +7,7 @@ import info.stasha.testosterone.TestConfig;
 import info.stasha.testosterone.TestExecutor;
 import info.stasha.testosterone.TestExecutorImpl;
 import info.stasha.testosterone.TestInExecution;
+import info.stasha.testosterone.TestInstrumentation;
 import info.stasha.testosterone.Utils;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.annotation.Dependencies;
@@ -325,7 +326,7 @@ public class DefaultTestConfig implements TestConfig {
 
                 for (Class<? extends Testosterone> cls : testClasses) {
                     try {
-                        Testosterone t = cls.newInstance();
+                        Testosterone t = TestInstrumentation.getInstrumentedClass(cls).newInstance();
                         t.getTestConfig().init(root, t.getTestConfig(), tests);
                     } catch (InstantiationException | IllegalAccessException ex) {
                         LOGGER.error("Failed to create Testosterone instance", ex);
