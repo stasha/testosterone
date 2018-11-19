@@ -299,9 +299,6 @@ public class TestInterceptors {
                             }
                         }
                     } catch (Throwable ex) {
-                        ex.printStackTrace();
-                        System.out.println("-----");
-                        ex.getCause().printStackTrace();
                         if (ex instanceof InvocationTargetException) {
                             ex = ex.getCause();
                         }
