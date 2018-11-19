@@ -110,7 +110,6 @@ public class UserDaoTest implements Testosterone {
         assertNull("Returned user should be null", dbuser);
     }
 
-    @Ignore
     @Test(expected = NullPointerException.class)
     public void createSqlException() throws SQLException {
         this.userDao.createUser(new User());
