@@ -1,6 +1,6 @@
 package info.stasha.testosterone.jersey.inject;
 
-import info.stasha.testosterone.jersey.Testosterone;
+import info.stasha.testosterone.jersey.junit4.Testosterone;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import javax.inject.Singleton;

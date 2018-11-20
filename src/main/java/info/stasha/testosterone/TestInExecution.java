@@ -1,6 +1,5 @@
 package info.stasha.testosterone;
 
-import info.stasha.testosterone.jersey.Testosterone;
 import java.lang.reflect.Method;
 
 /**
@@ -25,21 +24,6 @@ public interface TestInExecution extends TestExecutor {
     void beforeTest() throws Exception;
 
     /**
-     * Executes Test method that is annotated with @Requests or @Request
-     * annotations.
-     *
-     * @throws Throwable
-     */
-    void executeRequests() throws Throwable;
-
-    /**
-     * Executes Test method.
-     *
-     * @throws Throwable
-     */
-    void executeTest() throws Throwable;
-
-    /**
      * Passed arguments to test method.
      *
      * @return
@@ -58,7 +42,7 @@ public interface TestInExecution extends TestExecutor {
      *
      * @return
      */
-    Testosterone getMainThreadTest();
+    SuperTestosterone getMainThreadTest();
 
     /**
      * Original test method that's not intercepted.
@@ -72,7 +56,7 @@ public interface TestInExecution extends TestExecutor {
      *
      * @return
      */
-    Testosterone getServerThreadTest();
+    SuperTestosterone getServerThreadTest();
 
     /**
      * Returns true if invoking method is really test method. There are two

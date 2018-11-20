@@ -1,5 +1,7 @@
 package info.stasha.testosterone.junit5;
 
+import info.stasha.testosterone.jersey.junit5.Testosterone;
+import info.stasha.testosterone.SuperTestosterone;
 import info.stasha.testosterone.TestInstrumentation;
 import info.stasha.testosterone.TestInterceptors;
 import info.stasha.testosterone.Utils;
@@ -33,7 +35,7 @@ public class ExecutionListener implements TestExecutionListener {
      * @param ti
      * @return
      */
-    private Class<? extends Testosterone> getClass(TestIdentifier ti) {
+    private Class<? extends SuperTestosterone> getClass(TestIdentifier ti) {
         TestSource ts = ti.getSource().orElse(null);
         if (ts != null) {
             Class<?> cls = null;
@@ -49,8 +51,8 @@ public class ExecutionListener implements TestExecutionListener {
                 }
             }
             if (Testosterone.class.isAssignableFrom(cls)) {
-                return (Class<? extends Testosterone>) TestInstrumentation.testClass(
-                        (Class<? extends Testosterone>) cls, new BeforeAllAnnotation(), new AfterAllAnnotation());
+                return (Class<? extends SuperTestosterone>) TestInstrumentation.testClass(
+                        (Class<? extends SuperTestosterone>) cls, new BeforeAllAnnotation(), new AfterAllAnnotation());
             }
         }
 
@@ -64,7 +66,7 @@ public class ExecutionListener implements TestExecutionListener {
      */
     @Override
     public void executionStarted(TestIdentifier testIdentifier) {
-        Class<? extends Testosterone> cls = getClass(testIdentifier);
+        Class<? extends SuperTestosterone> cls = getClass(testIdentifier);
         if (cls != null && Utils.isTestosterone(cls)) {
             if (testIdentifier.isContainer()) {
                 try {
@@ -93,7 +95,7 @@ public class ExecutionListener implements TestExecutionListener {
     @Override
     public void executionFinished(TestIdentifier testIdentifier, TestExecutionResult testExecutionResult) {
 
-        Class<? extends Testosterone> cls = getClass(testIdentifier);
+        Class<? extends SuperTestosterone> cls = getClass(testIdentifier);
         if (cls != null && Utils.isTestosterone(cls)) {
             if (testIdentifier.isContainer()) {
                 try {

@@ -1,7 +1,7 @@
 package info.stasha.testosterone.db;
 
+import info.stasha.testosterone.SuperTestosterone;
 import info.stasha.testosterone.TestConfig;
-import info.stasha.testosterone.jersey.Testosterone;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -28,13 +28,13 @@ public class H2Config implements DbConfig {
     private DataSource dataSource;
     private JdbcConnectionPool connectionPool;
 
-    protected Testosterone test;
+    protected SuperTestosterone test;
 
     private final TestConfig config;
 
     public H2Config(TestConfig config) {
         this.config = config;
-        this.test = config.getTest();
+        this.test = (SuperTestosterone) config.getTest();
     }
 
     /**

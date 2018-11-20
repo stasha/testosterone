@@ -1,5 +1,6 @@
 package info.stasha.testosterone.testng;
 
+import info.stasha.testosterone.SuperTestosterone;
 import info.stasha.testosterone.TestInstrumentation;
 import info.stasha.testosterone.TestInterceptors;
 import info.stasha.testosterone.Utils;
@@ -20,8 +21,8 @@ public class ExecutionListener implements ITestListener, IClassListener {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ExecutionListener.class);
 
-    private Class<? extends Testosterone> getClass(Class<?> obj) {
-        return (Class<? extends Testosterone>) TestInstrumentation.getInstrumentedClass((Class<? extends info.stasha.testosterone.jersey.Testosterone>) obj);
+    private Class<? extends SuperTestosterone> getClass(Class<?> obj) {
+        return (Class<? extends SuperTestosterone>) TestInstrumentation.getInstrumentedClass((Class<? extends SuperTestosterone>) obj);
     }
 
     /**
@@ -55,7 +56,7 @@ public class ExecutionListener implements ITestListener, IClassListener {
             return;
         }
         try {
-            TestInterceptors.before((Testosterone) itr.getInstance());
+            TestInterceptors.before((SuperTestosterone) itr.getInstance());
         } catch (Exception ex) {
             LOGGER.error("Failed to start test", ex);
             throw new RuntimeException(ex);
@@ -73,7 +74,7 @@ public class ExecutionListener implements ITestListener, IClassListener {
             return;
         }
         try {
-            TestInterceptors.after((Testosterone) itr.getInstance());
+            TestInterceptors.after((SuperTestosterone) itr.getInstance());
         } catch (Exception ex) {
             LOGGER.error("Failed to finish test", ex);
             throw new RuntimeException(ex);
@@ -91,7 +92,7 @@ public class ExecutionListener implements ITestListener, IClassListener {
             return;
         }
         try {
-            TestInterceptors.after((Testosterone) itr.getInstance());
+            TestInterceptors.after((SuperTestosterone) itr.getInstance());
         } catch (Exception ex) {
             LOGGER.error("Failed to finish test", ex);
             throw new RuntimeException(ex);
@@ -119,7 +120,7 @@ public class ExecutionListener implements ITestListener, IClassListener {
             return;
         }
         try {
-            TestInterceptors.after((Testosterone) itr.getInstance());
+            TestInterceptors.after((SuperTestosterone) itr.getInstance());
         } catch (Exception ex) {
             LOGGER.error("Failed to finish test", ex);
             throw new RuntimeException(ex);

@@ -1,6 +1,5 @@
 package info.stasha.testosterone;
 
-import info.stasha.testosterone.jersey.Testosterone;
 import java.lang.reflect.Method;
 
 /**
@@ -10,8 +9,8 @@ import java.lang.reflect.Method;
  */
 public class TestInExecutionImpl implements TestInExecution {
 
-    private final Testosterone mainThreadTest;
-    private final Testosterone serverThreadTest;
+    private final SuperTestosterone mainThreadTest;
+    private final SuperTestosterone serverThreadTest;
     private final Method mainThreadTestMethod;
     private final Method originMainThreadTestMethod;
     private final Object[] arguments;
@@ -28,8 +27,8 @@ public class TestInExecutionImpl implements TestInExecution {
      * @param originMainThreadTestMethod
      * @param arguments
      */
-    public TestInExecutionImpl(Testosterone mainThreadTest,
-            Testosterone serverTrhreadTest,
+    public TestInExecutionImpl(SuperTestosterone mainThreadTest,
+            SuperTestosterone serverTrhreadTest,
             Method mainThreadTestMethod,
             Method originMainThreadTestMethod,
             Object[] arguments) {
@@ -46,7 +45,7 @@ public class TestInExecutionImpl implements TestInExecution {
      * @return
      */
     @Override
-    public Testosterone getMainThreadTest() {
+    public SuperTestosterone getMainThreadTest() {
         return mainThreadTest;
     }
 
@@ -56,7 +55,7 @@ public class TestInExecutionImpl implements TestInExecution {
      * @return
      */
     @Override
-    public Testosterone getServerThreadTest() {
+    public SuperTestosterone getServerThreadTest() {
         return serverThreadTest;
     }
 

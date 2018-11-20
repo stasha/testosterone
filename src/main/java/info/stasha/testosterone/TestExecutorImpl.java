@@ -2,10 +2,8 @@ package info.stasha.testosterone;
 
 import info.stasha.testosterone.annotation.Request;
 import com.mifmif.common.regex.Generex;
-import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.annotation.RequestAnnotation;
 import info.stasha.testosterone.annotation.Requests;
-import info.stasha.testosterone.jersey.TestResponseBuilder;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -45,7 +43,7 @@ public class TestExecutorImpl implements TestExecutor {
     private static final String EXECUTION_ERROR_MESSAGE = "Test failed with message: ";
 
     private final Method method;
-    private final Testosterone target;
+    private final SuperTestosterone target;
 
     /**
      * Creates new InvokeTest instance.
@@ -55,7 +53,7 @@ public class TestExecutorImpl implements TestExecutor {
      */
     public TestExecutorImpl(Method method, Object target) {
         this.method = method;
-        this.target = (Testosterone) target;
+        this.target = (SuperTestosterone) target;
     }
 
     /**

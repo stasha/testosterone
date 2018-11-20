@@ -1,8 +1,8 @@
 package info.stasha.testosterone.junit4;
 
+import info.stasha.testosterone.SuperTestosterone;
 import info.stasha.testosterone.TestInstrumentation;
 import info.stasha.testosterone.TestInterceptors;
-import info.stasha.testosterone.jersey.Testosterone;
 import org.junit.runner.Description;
 import org.junit.runner.notification.RunListener;
 
@@ -14,7 +14,7 @@ import org.junit.runner.notification.RunListener;
 public class ExecutionListener extends RunListener {
 
     // HACK BECAUSE TESTRUNFINISHED DOES NOT WORK
-    private static Class<? extends Testosterone> clazz;
+    private static Class<? extends SuperTestosterone> clazz;
 
     /**
      * {@inheritDoc }
@@ -24,8 +24,8 @@ public class ExecutionListener extends RunListener {
      */
     @Override
     public void testRunStarted(Description description) throws Exception {
-        Class<? extends Testosterone> cls = TestInstrumentation.testClass(
-                (Class<? extends Testosterone>) description.getChildren().get(0).getTestClass(),
+        Class<? extends SuperTestosterone> cls = TestInstrumentation.testClass(
+                (Class<? extends SuperTestosterone>) description.getChildren().get(0).getTestClass(),
                 new BeforeClassAnnotation(),
                 new AfterClassAnnotation()
         );

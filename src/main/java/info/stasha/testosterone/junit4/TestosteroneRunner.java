@@ -1,5 +1,6 @@
 package info.stasha.testosterone.junit4;
 
+import info.stasha.testosterone.SuperTestosterone;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
@@ -9,7 +10,6 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 
 import info.stasha.testosterone.TestInstrumentation;
-import info.stasha.testosterone.jersey.Testosterone;
 import org.junit.runner.notification.RunListener;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.Statement;
@@ -25,17 +25,17 @@ public class TestosteroneRunner extends BlockJUnit4ClassRunner {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TestosteroneRunner.class);
 
-	protected Class<? extends Testosterone> testClass;
-	protected Class<? extends Testosterone> cls;
+	protected Class<? extends SuperTestosterone> testClass;
+	protected Class<? extends SuperTestosterone> cls;
 
 	public static class Invoker extends Statement {
 
 		private final FrameworkMethod method;
-		private final Testosterone target;
+		private final SuperTestosterone target;
 
 		public Invoker(FrameworkMethod method, Object target) {
 			this.method = method;
-			this.target = (Testosterone) target;
+			this.target = (SuperTestosterone) target;
 		}
 
 		@Override
@@ -51,7 +51,7 @@ public class TestosteroneRunner extends BlockJUnit4ClassRunner {
 
 	}
 
-	public TestosteroneRunner(Class<? extends Testosterone> clazz) throws Throwable {
+	public TestosteroneRunner(Class<? extends SuperTestosterone> clazz) throws Throwable {
 		super(TestInstrumentation.testClass(
                 clazz, 
                 new BeforeClassAnnotation(),

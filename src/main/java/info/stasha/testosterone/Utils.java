@@ -3,7 +3,6 @@ package info.stasha.testosterone;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.annotation.Request;
 import info.stasha.testosterone.annotation.Requests;
-import info.stasha.testosterone.jersey.Testosterone;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -51,7 +50,7 @@ public class Utils {
     }
 
     /**
-     * Returns true/false if passed class is Testosterone class.
+     * Returns true/false if passed class is SuperTestosterone class.
      *
      * @param clazz
      * @return
@@ -60,11 +59,11 @@ public class Utils {
         if (clazz == null) {
             return false;
         }
-        return Testosterone.class.isAssignableFrom(clazz);
+        return SuperTestosterone.class.isAssignableFrom(clazz);
     }
 
     /**
-     * Returns true/false if passed object is Testosterone object.
+     * Returns true/false if passed object is SuperTestosterone object.
      *
      * @param obj
      * @return
@@ -73,7 +72,7 @@ public class Utils {
         if (obj == null) {
             return false;
         }
-        return obj instanceof Testosterone;
+        return obj instanceof SuperTestosterone;
     }
 
     /**
@@ -82,7 +81,7 @@ public class Utils {
      * @param clazz
      * @return
      */
-    public static String getInstrumentedClassName(Class<? extends Testosterone> clazz) {
+    public static String getInstrumentedClassName(Class<? extends SuperTestosterone> clazz) {
         String name = clazz.getName();
         if (!name.endsWith("_")) {
             return name + "_";
@@ -96,7 +95,7 @@ public class Utils {
      * @param obj
      * @return
      */
-    public static String getInstrumentedClassName(Testosterone obj) {
+    public static String getInstrumentedClassName(SuperTestosterone obj) {
         return getInstrumentedClassName(obj.getClass());
     }
 
@@ -106,13 +105,13 @@ public class Utils {
      * @param clazz
      * @return
      */
-    public static Testosterone getTestosterone(Class<? extends Testosterone> clazz) {
-        Testosterone t = null;
+    public static SuperTestosterone getTestosterone(Class<? extends SuperTestosterone> clazz) {
+        SuperTestosterone t = null;
         try {
             TestConfig config = TestConfigFactory.TEST_CONFIGURATIONS.get(getInstrumentedClassName(clazz));
-            t = config == null ? (Testosterone) clazz.newInstance() : config.getTest();
+            t = config == null ? (SuperTestosterone) clazz.newInstance() : (SuperTestosterone) config.getTest();
         } catch (InstantiationException | IllegalAccessException ex) {
-            LOGGER.error("Failed to initialize new Testosterone object.", ex);
+            LOGGER.error("Failed to initialize new SuperTestosterone object.", ex);
             throw new RuntimeException(ex);
         }
         return t;
@@ -250,7 +249,7 @@ public class Utils {
      * @param clazz
      * @return
      */
-    public static StartServer getServerStarts(Class<? extends Testosterone> clazz) {
+    public static StartServer getServerStarts(Class<? extends SuperTestosterone> clazz) {
         TestConfig config = TestConfigFactory.TEST_CONFIGURATIONS.get(getInstrumentedClassName(clazz));
 
         if (config == null) {
@@ -286,7 +285,7 @@ public class Utils {
      * @throws java.lang.IllegalAccessException
      * @throws java.lang.reflect.InvocationTargetException
      */
-    public static Object invokeOriginalMethod(Method method, Testosterone target, Object[] data) throws IllegalAccessException, InvocationTargetException {
+    public static Object invokeOriginalMethod(Method method, SuperTestosterone target, Object[] data) throws IllegalAccessException, InvocationTargetException {
         Method me = Utils.getOriginalMethod(target.getClass(), method.getName(), method.getParameterTypes());
         try {
             me.setAccessible(true);

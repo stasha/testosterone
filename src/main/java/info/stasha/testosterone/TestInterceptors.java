@@ -1,7 +1,6 @@
 package info.stasha.testosterone;
 
 import info.stasha.testosterone.annotation.Request;
-import info.stasha.testosterone.jersey.Testosterone;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
@@ -29,7 +28,7 @@ public class TestInterceptors {
      *
      * @param t
      */
-    private static void start(Testosterone t) throws Exception {
+    private static void start(SuperTestosterone t) throws Exception {
         t.getTestConfig().start();
     }
 
@@ -38,7 +37,7 @@ public class TestInterceptors {
      *
      * @param t
      */
-    private static void stop(Testosterone t) throws Exception {
+    private static void stop(SuperTestosterone t) throws Exception {
         t.getTestConfig().stop();
     }
 
@@ -47,7 +46,7 @@ public class TestInterceptors {
      *
      * @param clazz
      */
-    public static void beforeClass(Class<? extends Testosterone> clazz) throws Exception {
+    public static void beforeClass(Class<? extends SuperTestosterone> clazz) throws Exception {
         StartServer s = Utils.getServerStarts(clazz);
         if (Utils.isTestosterone(clazz) && s == StartServer.PER_CLASS) {
             start(Utils.getTestosterone(clazz));
@@ -60,7 +59,7 @@ public class TestInterceptors {
      * @param clazz
      * @throws java.lang.Exception
      */
-    public static void afterClass(Class<? extends Testosterone> clazz) throws Exception {
+    public static void afterClass(Class<? extends SuperTestosterone> clazz) throws Exception {
         StartServer s = Utils.getServerStarts(clazz);
         if (Utils.isTestosterone(clazz) && s == StartServer.PER_CLASS) {
             stop(Utils.getTestosterone(clazz));
@@ -73,7 +72,7 @@ public class TestInterceptors {
      * @param clazz
      * @throws java.lang.Exception
      */
-    public static void before(Class<? extends Testosterone> clazz) throws Exception {
+    public static void before(Class<? extends SuperTestosterone> clazz) throws Exception {
         before(Utils.getTestosterone(clazz));
     }
 
@@ -83,7 +82,7 @@ public class TestInterceptors {
      * @param orig
      * @throws java.lang.Exception
      */
-    public static void before(@This Testosterone orig) throws Exception {
+    public static void before(@This SuperTestosterone orig) throws Exception {
         if (Utils.isTestosterone(orig) && orig.getTestConfig().getStartServer() == StartServer.PER_TEST_METHOD) {
             start(orig);
         }
@@ -95,7 +94,7 @@ public class TestInterceptors {
      * @param clazz
      * @throws java.lang.Exception
      */
-    public static void after(Class<? extends Testosterone> clazz) throws Exception {
+    public static void after(Class<? extends SuperTestosterone> clazz) throws Exception {
         after(Utils.getTestosterone(clazz));
     }
 
@@ -105,7 +104,7 @@ public class TestInterceptors {
      * @param orig
      * @throws java.lang.Exception
      */
-    public static void after(@This Testosterone orig) throws Exception {
+    public static void after(@This SuperTestosterone orig) throws Exception {
         if (Utils.isTestosterone(orig) && orig.getTestConfig().getStartServer() == StartServer.PER_TEST_METHOD) {
             stop(orig);
         }
@@ -127,8 +126,8 @@ public class TestInterceptors {
              * @throws java.lang.NoSuchFieldException
              */
             @RuntimeType
-            public static void constructor(@This Testosterone orig) throws IllegalAccessException, InvocationTargetException, IllegalArgumentException, NoSuchFieldException {
-                Testosterone main = orig.getTestConfig().getTest();
+            public static void constructor(@This SuperTestosterone orig) throws IllegalAccessException, InvocationTargetException, IllegalArgumentException, NoSuchFieldException {
+                SuperTestosterone main = (SuperTestosterone) orig.getTestConfig().getTest();
                 if (!orig.equals(main)) {
                     Utils.copyFields(main, orig);
                 }
@@ -141,7 +140,7 @@ public class TestInterceptors {
         public static class PostConstruct {
 
             @RuntimeType
-            public static void postConstruct(@This Testosterone orig) throws Exception {
+            public static void postConstruct(@This SuperTestosterone orig) throws Exception {
                 LOGGER.debug("Invoking @PostConstruct");
                 orig.getTestConfig().getSetup().afterServerStart(orig);
             }
@@ -153,7 +152,7 @@ public class TestInterceptors {
         public static class GenericUrl {
 
             @RuntimeType
-            public static Void generic(@This Testosterone orig) throws Exception, Throwable {
+            public static Void generic(@This SuperTestosterone orig) throws Exception, Throwable {
                 TestInExecution et = orig.getTestConfig().getSetup().getTestInExecution();
                 et.setIsRequest(false);
                 PathAndTest.test(null, null, et.getMainThreadTestMethod(), et.getMainThreadTest());
@@ -169,7 +168,7 @@ public class TestInterceptors {
              * @param method
              * @param orig
              */
-            public static void before(@SuperCall Callable<?> zuper, @Origin Method method, @This Testosterone orig) {
+            public static void before(@SuperCall Callable<?> zuper, @Origin Method method, @This SuperTestosterone orig) {
                 // do nothing
                 // it's called later manually in http request scope
             }
@@ -183,7 +182,7 @@ public class TestInterceptors {
              * @param method
              * @param orig
              */
-            public static void after(@SuperCall Callable<?> zuper, @Origin Method method, @This Testosterone orig) {
+            public static void after(@SuperCall Callable<?> zuper, @Origin Method method, @This SuperTestosterone orig) {
                 // do nothing
                 // it's called later manually in http request scope
             }
@@ -196,7 +195,7 @@ public class TestInterceptors {
 
             @RuntimeType
             public static void afterClass(@Origin Method method) throws Exception {
-                TestInterceptors.afterClass((Class<? extends Testosterone>) method.getDeclaringClass());
+                TestInterceptors.afterClass((Class<? extends SuperTestosterone>) method.getDeclaringClass());
             }
         }
 
@@ -207,7 +206,7 @@ public class TestInterceptors {
 
             @RuntimeType
             public static void beforeClass(@Origin Method method) throws Exception {
-                TestInterceptors.beforeClass((Class<? extends Testosterone>) method.getDeclaringClass());
+                TestInterceptors.beforeClass((Class<? extends SuperTestosterone>) method.getDeclaringClass());
             }
         }
 
@@ -228,14 +227,14 @@ public class TestInterceptors {
              * @throws Exception
              */
             @RuntimeType
-            public static Object test(@SuperCall Callable<?> zuper, @AllArguments Object[] args, @Origin Method method, @This Testosterone orig) throws Throwable {
+            public static Object test(@SuperCall Callable<?> zuper, @AllArguments Object[] args, @Origin Method method, @This SuperTestosterone orig) throws Throwable {
 
                 String invoking = orig.getClass().getName() + ":" + method.getName();
 
                 TestConfig config = orig.getTestConfig();
                 Setup setup = config.getSetup();
                 ServiceLocator locator = setup.getServiceLocator();
-                Testosterone mainThreadTest = config.getTest();
+                SuperTestosterone mainThreadTest = (SuperTestosterone) config.getTest();
 
                 Utils.copyFields(mainThreadTest, orig);
                 // Flag if this is the main thread in which JUnit test runs
@@ -279,7 +278,7 @@ public class TestInterceptors {
                         et.setIsRequest(true);
                     }
 
-                    locator.inject(orig);
+//                    locator.inject(orig);
                     try {
                         LOGGER.info("Invoking {}", invoking);
                         for (Method m : Utils.getAnnotatedMethods(orig.getClass(), TestAnnotations.BEFORE)) {

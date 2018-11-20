@@ -23,8 +23,13 @@ public class JettyServerConfig implements ServerConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(JettyServerConfig.class);
 
     protected Server server;
-    private final TestConfig config;
+    private TestConfig config;
     private ServletContainerConfig servletContainerConfig;
+
+    public JettyServerConfig() {
+    }
+    
+    
 
     public JettyServerConfig(TestConfig config) {
         this.config = config;

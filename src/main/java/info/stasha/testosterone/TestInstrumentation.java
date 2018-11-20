@@ -7,10 +7,9 @@ import static net.bytebuddy.matcher.ElementMatchers.not;
 import javax.ws.rs.Path;
 
 import info.stasha.testosterone.annotation.DontIntercept;
-import info.stasha.testosterone.jersey.GetAnnotation;
-import info.stasha.testosterone.jersey.PathAnnotation;
-import info.stasha.testosterone.jersey.PostConstructAnnotation;
-import info.stasha.testosterone.jersey.Testosterone;
+import info.stasha.testosterone.javax.GetAnnotation;
+import info.stasha.testosterone.javax.PathAnnotation;
+import info.stasha.testosterone.javax.PostConstructAnnotation;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +29,7 @@ import net.bytebuddy.matcher.ElementMatchers;
  */
 public class TestInstrumentation {
 
-    private static final Map<Class<? extends Testosterone>, Class<? extends Testosterone>> CLASSES = new HashMap<>();
+    private static final Map<Class<? extends SuperTestosterone>, Class<? extends SuperTestosterone>> CLASSES = new HashMap<>();
 
     /**
      * Returns already instrumented class.
@@ -38,7 +37,7 @@ public class TestInstrumentation {
      * @param clazz
      * @return
      */
-    public static Class<? extends Testosterone> getInstrumentedClass(Class<? extends Testosterone> clazz) {
+    public static Class<? extends SuperTestosterone> getInstrumentedClass(Class<? extends SuperTestosterone> clazz) {
         return CLASSES.get(clazz);
     }
 
@@ -50,14 +49,14 @@ public class TestInstrumentation {
      * @param afterClassAnnotation
      * @return
      */
-    public static Class<? extends Testosterone> testClass(
-            Class<? extends Testosterone> clazz,
+    public static Class<? extends SuperTestosterone> testClass(
+            Class<? extends SuperTestosterone> clazz,
             Annotation beforeClassAnnotation,
             Annotation afterClassAnnotation) {
 
         if (!CLASSES.containsKey(clazz)) {
 
-            Class<? extends Testosterone> cls = new ByteBuddy()
+            Class<? extends SuperTestosterone> cls = new ByteBuddy()
                     .subclass(clazz)
                     .name(Utils.getInstrumentedClassName(clazz))
                     .defineMethod("__created__", Void.class, Visibility.PUBLIC)

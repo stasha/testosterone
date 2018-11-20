@@ -1,6 +1,6 @@
 package info.stasha.testosterone.annotation;
 
-import info.stasha.testosterone.jersey.Testosterone;
+import info.stasha.testosterone.jersey.junit4.Testosterone;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;

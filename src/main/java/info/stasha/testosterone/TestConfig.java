@@ -1,8 +1,6 @@
 package info.stasha.testosterone;
 
 import info.stasha.testosterone.db.DbConfig;
-import info.stasha.testosterone.jersey.RestClient;
-import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -13,18 +11,18 @@ import javax.ws.rs.core.Application;
 /**
  *
  * @author stasha
- * @param <T>
+ * @param <C>
  */
-public interface TestConfig<T> extends StartStop {
+public interface TestConfig<T, C> extends StartStop {
 
     public static final String BASE_URI = "http://localhost/";
     public static final int HTTP_PORT = 9998;
     public static StartServer START_SERVER = StartServer.PER_CLASS;
 
-    Testosterone getTest();
-    
+    T getTest();
+
     Application getApplication();
-    
+
     RestClient getClient();
 
     ServerConfig getServerConfig();
@@ -33,7 +31,7 @@ public interface TestConfig<T> extends StartStop {
 
     DbConfig getDbConfig();
 
-    TestExecutor getTestExecutor(Method method, Testosterone test);
+    TestExecutor getTestExecutor(Method method, SuperTestosterone test);
 
     URI getBaseUri();
 
@@ -49,6 +47,6 @@ public interface TestConfig<T> extends StartStop {
 
     void throwExceptions() throws Throwable;
 
-    void init(T root, T dep, List<Testosterone> tests);
+    void init(C root, C dep, List<T> tests);
 
 }

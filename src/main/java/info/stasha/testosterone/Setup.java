@@ -1,9 +1,6 @@
 package info.stasha.testosterone;
 
-import info.stasha.testosterone.annotation.Integration;
-import info.stasha.testosterone.jersey.Testosterone;
 import java.io.IOException;
-import java.util.Map;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
@@ -28,9 +25,7 @@ public class Setup implements ContainerResponseFilter {
     private ServiceLocator locator;
 
     private final TestConfig config;
-    private final Testosterone testosterone;
 
-    private Map<String, Testosterone> tests;
     private boolean beforeServerStart;
     private boolean afterServerStart;
     private boolean beforeServerStop;
@@ -40,34 +35,6 @@ public class Setup implements ContainerResponseFilter {
 
     public Setup(TestConfig config) {
         this.config = config;
-        this.testosterone = config.getTest();
-    }
-
-    /**
-     * List of test objects that are in integration.
-     *
-     * @return
-     */
-    public Map<String, Testosterone> getTests() {
-        return tests;
-    }
-
-    /**
-     * Sets list of test objects that are in integration.
-     *
-     * @param tests
-     */
-    public void setTests(Map<String, Testosterone> tests) {
-        this.tests = tests;
-    }
-
-    /**
-     * Returns testosterone test instance.
-     *
-     * @return
-     */
-    public Testosterone getTestosterone() {
-        return testosterone;
     }
 
     /**
@@ -157,7 +124,7 @@ public class Setup implements ContainerResponseFilter {
      * @param orig
      * @throws Exception
      */
-    public void beforeServerStart(Testosterone orig) throws Exception {
+    public void beforeServerStart(SuperTestosterone orig) throws Exception {
         if (!this.beforeServerStart) {
             this.beforeServerStart = true;
             LOGGER.info("Invoking beforeServerStart.");
@@ -171,7 +138,7 @@ public class Setup implements ContainerResponseFilter {
      * @param orig
      * @throws Exception
      */
-    public void afterServerStart(Testosterone orig) throws Exception {
+    public void afterServerStart(SuperTestosterone orig) throws Exception {
         if (!this.afterServerStart) {
             this.afterServerStart = true;
             LOGGER.info("Invoking afterServerStart.");
@@ -185,7 +152,7 @@ public class Setup implements ContainerResponseFilter {
      * @param orig
      * @throws Exception
      */
-    public void beforeServerStop(Testosterone orig) throws Exception {
+    public void beforeServerStop(SuperTestosterone orig) throws Exception {
         if (!this.beforeServerStop) {
             this.beforeServerStop = true;
             LOGGER.info("Invoking beforeServerStop.");
@@ -199,7 +166,7 @@ public class Setup implements ContainerResponseFilter {
      * @param orig
      * @throws Exception
      */
-    public void afterServerStop(Testosterone orig) throws Exception {
+    public void afterServerStop(SuperTestosterone orig) throws Exception {
         if (!this.afterServerStop) {
             this.afterServerStop = true;
             LOGGER.info("Invoking afterServerStop.");
@@ -227,7 +194,7 @@ public class Setup implements ContainerResponseFilter {
      */
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
-        locator.inject(testosterone);
+        locator.inject(config.getTest());
     }
 
     @Override

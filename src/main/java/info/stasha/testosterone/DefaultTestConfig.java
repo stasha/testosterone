@@ -3,27 +3,34 @@ package info.stasha.testosterone;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.db.H2Config;
-import info.stasha.testosterone.jersey.Testosterone;
+import info.stasha.testosterone.servers.JettyServerConfig;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
+import javax.inject.Singleton;
 import javax.ws.rs.core.UriBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default test configuration.
  *
  * @author stasha
  * @param <T>
+ * @param <C>
  */
-public abstract class DefaultTestConfig<T> implements TestConfig<T> {
+public abstract class DefaultTestConfig<T, C> implements TestConfig<T, C> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultTestConfig.class);
+
+    private final RestClient client = new RestClient(this);
     private final Set<Throwable> exceptions = new HashSet<>();
 
-    private final Testosterone testosterone;
-    private final Configuration config;
+    protected final T testosterone;
     protected ServerConfig serverConfig;
+    private final Configuration config;
     private ServletContainerConfig servletContainerConfig;
     private DbConfig dbConfig;
     private URI baseUri;
@@ -32,19 +39,33 @@ public abstract class DefaultTestConfig<T> implements TestConfig<T> {
     private Setup setup;
     private final String mainThreadName;
 
-    public DefaultTestConfig(Testosterone testosterone) {
+    public DefaultTestConfig(T testosterone) {
         this(testosterone, null);
     }
 
-    public DefaultTestConfig(Testosterone testosterone, Configuration config) {
+    public DefaultTestConfig(T testosterone, Configuration config) {
         this.testosterone = testosterone;
         this.config = config;
         this.mainThreadName = Thread.currentThread().getName();
     }
 
     @Override
-    public Testosterone getTest() {
+    public T getTest() {
         return testosterone;
+    }
+
+    @Override
+    public ServerConfig getServerConfig() {
+        if (serverConfig == null) {
+            this.serverConfig = new JettyServerConfig(this);
+        }
+
+        return this.serverConfig;
+    }
+
+    @Override
+    public RestClient getClient() {
+        return this.client;
     }
 
     @Override
@@ -67,7 +88,7 @@ public abstract class DefaultTestConfig<T> implements TestConfig<T> {
     }
 
     @Override
-    public TestExecutor getTestExecutor(Method method, Testosterone test) {
+    public TestExecutor getTestExecutor(Method method, SuperTestosterone test) {
         return new TestExecutorImpl(method, test);
     }
 
@@ -124,6 +145,62 @@ public abstract class DefaultTestConfig<T> implements TestConfig<T> {
             // bot for now it is good enough
             throw ex;
         }
+    }
+
+    /**
+     * Starts server.
+     *
+     * @throws Exception
+     */
+    @Override
+    public void start() throws Exception {
+
+        if (!getServerConfig().isRunning()) {
+            getSetup().beforeServerStart((SuperTestosterone) getTest());
+            LOGGER.info("Starting server with {} configuration", getStartServer());
+
+            getDbConfig().start();
+            getClient().start();
+            getServerConfig().start();
+
+            LOGGER.info(this.toString());
+            // Invoke afterServerStart only if resource is singleton.
+            // If there is no Singleton annotation, afterServerStart is 
+            // invoked by @PostConstruct interceptor
+            if (Utils.isAnnotationPresent(getTest(), Singleton.class)) {
+                getSetup().afterServerStart((SuperTestosterone) getTest());
+            }
+        }
+    }
+
+    /**
+     * Stops server.
+     *
+     * @throws Exception
+     */
+    @Override
+    public void stop() throws Exception {
+        try {
+            if (getServerConfig().isRunning()) {
+                getClient().stop();
+                getSetup().beforeServerStop((SuperTestosterone) getTest());
+
+                LOGGER.info("Stopping server configured with: {}", getStartServer());
+                getServerConfig().stop();
+                getDbConfig().stop();
+                getSetup().afterServerStop((SuperTestosterone) getTest());
+                getSetup().clearFlags();
+
+                System.out.println("");
+            }
+        } finally {
+            TestConfigFactory.TEST_CONFIGURATIONS.remove(Utils.getInstrumentedClassName((SuperTestosterone) getTest()));
+        }
+    }
+
+    @Override
+    public boolean isRunning() {
+        return getServerConfig().isRunning();
     }
 
     @Override

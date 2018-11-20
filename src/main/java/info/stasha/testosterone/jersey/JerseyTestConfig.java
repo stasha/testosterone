@@ -1,6 +1,6 @@
 package info.stasha.testosterone.jersey;
 
-import info.stasha.testosterone.servers.JettyServerConfig;
+import info.stasha.testosterone.jersey.junit4.Testosterone;
 import info.stasha.testosterone.TestInExecution;
 import info.stasha.testosterone.TestInstrumentation;
 import info.stasha.testosterone.Utils;
@@ -11,7 +11,7 @@ import info.stasha.testosterone.annotation.Integration;
 import info.stasha.testosterone.annotation.LoadFile;
 import info.stasha.testosterone.annotation.Value;
 import info.stasha.testosterone.DefaultTestConfig;
-import info.stasha.testosterone.TestConfigFactory;
+import info.stasha.testosterone.SuperTestosterone;
 import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.jersey.inject.InjectTestResolver;
 import info.stasha.testosterone.jersey.inject.InputStreamInjectionResolver;
@@ -48,10 +48,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author stasha
  */
-public class JerseyTestConfig extends DefaultTestConfig<JerseyTestConfig> {
+public class JerseyTestConfig extends DefaultTestConfig<Testosterone, JerseyTestConfig> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JerseyTestConfig.class);
-    private final RestClient client = new RestClient(this);
+
     private ResourceConfig resourceConfig;
 
     public JerseyTestConfig(Testosterone testosterone) {
@@ -60,20 +60,6 @@ public class JerseyTestConfig extends DefaultTestConfig<JerseyTestConfig> {
 
     public JerseyTestConfig(Testosterone testosterone, Configuration config) {
         super(testosterone, config);
-    }
-
-    @Override
-    public JettyServerConfig getServerConfig() {
-        if (serverConfig == null) {
-            this.serverConfig = new JettyServerConfig(this);
-        }
-
-        return (JettyServerConfig) this.serverConfig;
-    }
-
-    @Override
-    public RestClient getClient() {
-        return this.client;
     }
 
     /**
@@ -204,7 +190,7 @@ public class JerseyTestConfig extends DefaultTestConfig<JerseyTestConfig> {
                     }
 
                 } catch (IllegalArgumentException | IllegalAccessException ex) {
-                    java.util.logging.Logger.getLogger(Testosterone.class.getName()).log(Level.SEVERE, null, ex);
+                    java.util.logging.Logger.getLogger(SuperTestosterone.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
 
@@ -227,7 +213,7 @@ public class JerseyTestConfig extends DefaultTestConfig<JerseyTestConfig> {
         tests.add(dep.getTest());
 
         if (integration != null || dependencies != null) {
-            List<Class<? extends Testosterone>> testClasses = null;
+            List<Class<? extends SuperTestosterone>> testClasses = null;
 
             if (integration != null && root.equals(dep)) {
                 testClasses = Arrays.asList(integration.value());
@@ -241,12 +227,12 @@ public class JerseyTestConfig extends DefaultTestConfig<JerseyTestConfig> {
 
                 Collections.reverse(testClasses);
 
-                for (Class<? extends Testosterone> cls : testClasses) {
+                for (Class<? extends SuperTestosterone> cls : testClasses) {
                     try {
-                        Testosterone t = TestInstrumentation.testClass(cls, new BeforeClassAnnotation(), new AfterClassAnnotation()).newInstance();
+                        SuperTestosterone t = TestInstrumentation.testClass(cls, new BeforeClassAnnotation(), new AfterClassAnnotation()).newInstance();
                         t.getTestConfig().init(root, t.getTestConfig(), tests);
                     } catch (InstantiationException | IllegalAccessException ex) {
-                        LOGGER.error("Failed to create Testosterone instance", ex);
+                        LOGGER.error("Failed to create SuperTestosterone instance", ex);
                         throw new RuntimeException(ex);
                     }
                 }
@@ -310,55 +296,8 @@ public class JerseyTestConfig extends DefaultTestConfig<JerseyTestConfig> {
         if (!getServerConfig().isRunning()) {
             init(this, this, new ArrayList<>());
 
-            getSetup().beforeServerStart(getTest());
-
-            LOGGER.info("Starting server with {} configuration", getStartServer());
-
-            getDbConfig().start();
-
-            client.start();
-
-            getServerConfig().start();
-
-            LOGGER.info(this.toString());
-            // Invoke afterServerStart only if resource is singleton.
-            // If there is no Singleton annotation, afterServerStart is 
-            // invoked by @PostConstruct interceptor
-            if (Utils.isAnnotationPresent(getTest(), Singleton.class)) {
-                getSetup().afterServerStart(getTest());
-            }
+            super.start();
         }
-    }
-
-    /**
-     * Stops server.
-     *
-     * @throws Exception
-     */
-    @Override
-    public void stop() throws Exception {
-        try {
-            if (getServerConfig().isRunning()) {
-                client.stop();
-
-                getSetup().beforeServerStop(getTest());
-
-                LOGGER.info("Stopping server configured with: {}", getStartServer());
-                getServerConfig().stop();
-                getDbConfig().stop();
-                getSetup().afterServerStop(getTest());
-                getSetup().clearFlags();
-
-                System.out.println("");
-            }
-        } finally {
-            TestConfigFactory.TEST_CONFIGURATIONS.remove(Utils.getInstrumentedClassName(getTest()));
-        }
-    }
-
-    @Override
-    public boolean isRunning() {
-        return getServerConfig().isRunning();
     }
 
 }
