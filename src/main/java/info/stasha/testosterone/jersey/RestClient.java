@@ -6,19 +6,18 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
-import org.glassfish.jersey.client.ClientConfig;
 
 /**
  * Jersey Client
  *
  * @author stasha
  */
-public class JerseyClient implements StartStop {
+public class RestClient implements StartStop {
 
     private final TestConfig config;
     private final AtomicReference<Client> client = new AtomicReference<>(null);
 
-    public JerseyClient(TestConfig config) {
+    public RestClient(TestConfig config) {
         this.config = config;
     }
 
@@ -30,8 +29,7 @@ public class JerseyClient implements StartStop {
     }
 
     protected Client getClient() {
-        ClientConfig clientConfig = new ClientConfig();
-        return ClientBuilder.newClient(clientConfig);
+        return ClientBuilder.newClient();
     }
 
     public WebTarget target() {

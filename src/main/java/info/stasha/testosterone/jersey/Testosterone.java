@@ -1,18 +1,14 @@
 package info.stasha.testosterone.jersey;
 
+import info.stasha.testosterone.TestConfig;
+import info.stasha.testosterone.TestConfigFactory;
 import javax.ws.rs.client.WebTarget;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
-import info.stasha.testosterone.Utils;
-import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.db.DbConfig;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 
 /**
  * Testosterone
@@ -22,40 +18,14 @@ import java.util.HashMap;
 public interface Testosterone {
 
     static final Logger LOGGER = LoggerFactory.getLogger(Testosterone.class);
-    static final Map<String, JerseyTestConfig> TEST_CONFIGURATIONS = new HashMap<>();
 
     /**
      * Returns testosterone configuration factory.
      *
      * @return
      */
-    default JerseyTestConfig getTestConfig() {
-        JerseyTestConfig config = TEST_CONFIGURATIONS.get(Utils.getInstrumentedClassName(this));
-
-        // returning existing config
-        if (config != null) {
-            return config;
-        }
-
-        Configuration conf = Testosterone.this.getClass().getAnnotation(Configuration.class);
-
-        try {
-            if (conf != null) {
-                Constructor con = conf.configuration().
-                        getDeclaredConstructor(Testosterone.class, Configuration.class);
-
-                config = (JerseyTestConfig) con.newInstance(this, conf);
-            } else {
-                config = new JerseyTestConfig(this);
-            }
-
-            TEST_CONFIGURATIONS.put(Utils.getInstrumentedClassName(this), config);
-
-            return config;
-        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            LOGGER.error("Failed to create Test Configuration.", ex);
-            throw new RuntimeException(ex);
-        }
+    default TestConfig getTestConfig() {
+        return TestConfigFactory.getConfig(this);
     }
 
     /**
@@ -64,7 +34,7 @@ public interface Testosterone {
      * @return
      */
     default WebTarget target() {
-        return getTestConfig().client.target();
+        return getTestConfig().getClient().target();
     }
 
     /**

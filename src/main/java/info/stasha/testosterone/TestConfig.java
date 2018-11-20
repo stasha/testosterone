@@ -1,12 +1,14 @@
 package info.stasha.testosterone;
 
 import info.stasha.testosterone.db.DbConfig;
+import info.stasha.testosterone.jersey.RestClient;
 import info.stasha.testosterone.jersey.Testosterone;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.List;
 import java.util.Set;
+import javax.ws.rs.core.Application;
 
 /**
  *
@@ -20,6 +22,10 @@ public interface TestConfig<T> extends StartStop {
     public static StartServer START_SERVER = StartServer.PER_CLASS;
 
     Testosterone getTest();
+    
+    Application getApplication();
+    
+    RestClient getClient();
 
     ServerConfig getServerConfig();
 

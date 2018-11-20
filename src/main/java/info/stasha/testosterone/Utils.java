@@ -109,7 +109,7 @@ public class Utils {
     public static Testosterone getTestosterone(Class<? extends Testosterone> clazz) {
         Testosterone t = null;
         try {
-            TestConfig config = Testosterone.TEST_CONFIGURATIONS.get(getInstrumentedClassName(clazz));
+            TestConfig config = TestConfigFactory.TEST_CONFIGURATIONS.get(getInstrumentedClassName(clazz));
             t = config == null ? (Testosterone) clazz.newInstance() : config.getTest();
         } catch (InstantiationException | IllegalAccessException ex) {
             LOGGER.error("Failed to initialize new Testosterone object.", ex);
@@ -251,7 +251,7 @@ public class Utils {
      * @return
      */
     public static StartServer getServerStarts(Class<? extends Testosterone> clazz) {
-        TestConfig config = Testosterone.TEST_CONFIGURATIONS.get(getInstrumentedClassName(clazz));
+        TestConfig config = TestConfigFactory.TEST_CONFIGURATIONS.get(getInstrumentedClassName(clazz));
 
         if (config == null) {
             Configuration cf = clazz.getAnnotation(Configuration.class);

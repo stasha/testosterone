@@ -11,6 +11,7 @@ import info.stasha.testosterone.annotation.Integration;
 import info.stasha.testosterone.annotation.LoadFile;
 import info.stasha.testosterone.annotation.Value;
 import info.stasha.testosterone.DefaultTestConfig;
+import info.stasha.testosterone.TestConfigFactory;
 import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.jersey.inject.InjectTestResolver;
 import info.stasha.testosterone.jersey.inject.InputStreamInjectionResolver;
@@ -50,7 +51,7 @@ import org.slf4j.LoggerFactory;
 public class JerseyTestConfig extends DefaultTestConfig<JerseyTestConfig> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JerseyTestConfig.class);
-    public final JerseyClient client = new JerseyClient(this);
+    private final RestClient client = new RestClient(this);
     private ResourceConfig resourceConfig;
 
     public JerseyTestConfig(Testosterone testosterone) {
@@ -70,12 +71,18 @@ public class JerseyTestConfig extends DefaultTestConfig<JerseyTestConfig> {
         return (JettyServerConfig) this.serverConfig;
     }
 
+    @Override
+    public RestClient getClient() {
+        return this.client;
+    }
+
     /**
      * Returns ResourceConfig.
      *
      * @return
      */
-    public ResourceConfig getResourceConfig() {
+    @Override
+    public ResourceConfig getApplication() {
         if (this.resourceConfig == null) {
             this.resourceConfig = new ResourceConfig();
         }
@@ -112,11 +119,11 @@ public class JerseyTestConfig extends DefaultTestConfig<JerseyTestConfig> {
         Integration integration = root.getTest().getClass().getAnnotation(Integration.class);
         Dependencies dependencies = dep.getTest().getClass().getAnnotation(Dependencies.class);
 
-        dep.getTest().configure(root.getResourceConfig());
+        dep.getTest().configure(root.getApplication());
         dep.getTest().configure(root.getServletContainerConfig());
 
         if (root.equals(dep)) {
-            root.getResourceConfig().register(new AbstractBinder() {
+            root.getApplication().register(new AbstractBinder() {
 
                 @Override
                 protected void configure() {
@@ -206,10 +213,10 @@ public class JerseyTestConfig extends DefaultTestConfig<JerseyTestConfig> {
         // Configure mocks only for root test. 
         // Skips configuring mocks for classes registered in @Intergration annotation
         if (integration == null || root.equals(dep)) {
-            dep.getTest().configureMocks(root.getResourceConfig());
+            dep.getTest().configureMocks(root.getApplication());
             dep.getTest().configureMocks(root.getServletContainerConfig());
 
-            root.getResourceConfig().register(new AbstractBinder() {
+            root.getApplication().register(new AbstractBinder() {
                 @Override
                 protected void configure() {
                     dep.getTest().configureMocks(this);
@@ -261,15 +268,15 @@ public class JerseyTestConfig extends DefaultTestConfig<JerseyTestConfig> {
         if (root.equals(dep)) {
             if (Utils.isAnnotationPresent(root.getTest(), Singleton.class)) {
                 LOGGER.info("Adding test as Singleton to resources: {}", root.getTest());
-                root.getResourceConfig().register(root.getTest());
+                root.getApplication().register(root.getTest());
             } else {
                 LOGGER.info("Adding test to resources: {}", root.getTest());
-                root.getResourceConfig().register(root.getTest().getClass());
+                root.getApplication().register(root.getTest().getClass());
             }
 
-            root.getResourceConfig().register(InputStreamInjectionResolver.class);
+            root.getApplication().register(InputStreamInjectionResolver.class);
 
-            root.getResourceConfig().register(new AbstractBinder() {
+            root.getApplication().register(new AbstractBinder() {
 
                 @Override
                 protected void configure() {
@@ -279,15 +286,15 @@ public class JerseyTestConfig extends DefaultTestConfig<JerseyTestConfig> {
                 }
             });
             // registering setup so it can listen for application events
-            root.getResourceConfig().register(root.getSetup());
+            root.getApplication().register(root.getSetup());
 
             // registering jersey servlet
-            Servlet s = new Servlet(new ServletContainer(root.getResourceConfig()),
+            Servlet s = new Servlet(new ServletContainer(root.getApplication()),
                     root.getServletContainerConfig().getJerseyServletPath()).setInitOrder(1);
             root.getServletContainerConfig().addServlet(s);
 
             LOGGER.info("Configuration end:   {}", root.getTest().getClass().getName());
-            root.getServerConfig().setConfigurationObject(root.getResourceConfig());
+            root.getServerConfig().setConfigurationObject(root.getApplication());
         }
 
     }
@@ -345,7 +352,7 @@ public class JerseyTestConfig extends DefaultTestConfig<JerseyTestConfig> {
                 System.out.println("");
             }
         } finally {
-            Testosterone.TEST_CONFIGURATIONS.remove(Utils.getInstrumentedClassName(getTest()));
+            TestConfigFactory.TEST_CONFIGURATIONS.remove(Utils.getInstrumentedClassName(getTest()));
         }
     }
 
