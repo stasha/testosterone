@@ -20,7 +20,7 @@ import org.junit.runner.RunWith;
  * @author stasha
  */
 @RunWith(TestosteroneRunner.class)
-@Configuration(startServer = StartServer.PER_TEST_METHOD)
+@Configuration(startServer = StartServer.PER_TEST_METHOD, runDb = true)
 public class DbPerMethodTest implements Testosterone {
 
 	@Context

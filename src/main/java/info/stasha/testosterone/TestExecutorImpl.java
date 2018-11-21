@@ -91,7 +91,11 @@ public class TestExecutorImpl implements TestExecutor {
         // then we invoke __generic__ endpoint. This is needed to initialize test
         // before @Requests or @Request annotation is invoked.
         if (!uri.startsWith("__generic__") || Utils.hasRequestAnnotation(method)) {
-            executeRequest(new RequestAnnotation(getPath("__generic__")), 1);
+            if(target.getTestConfig().isRunServer()){
+                executeRequest(new RequestAnnotation(getPath("__generic__")), 1);
+            } else {
+                executeRequests();
+            }
         } else {
             target.getTestConfig().getSetup().getTestInExecution().setIsRequest(false);
             executeRequest(new RequestAnnotation(uri), 1);
@@ -130,7 +134,7 @@ public class TestExecutorImpl implements TestExecutor {
                     throw new IllegalStateException("@Requests annotation may not be empty.");
                 }
             } else if (requestAnnotation != null) {
-                if (requestAnnotation.url().isEmpty()) {
+                if (target.getTestConfig().isRunServer() && requestAnnotation.url().isEmpty()) {
                     RequestAnnotation ra = new RequestAnnotation(requestAnnotation);
                     ra.setUrl(path);
                     requestAnnotation = ra;
@@ -280,7 +284,7 @@ public class TestExecutorImpl implements TestExecutor {
                 LOGGER.info("Getting response {}", resp.toString());
             }
 
-            if (!request.url().contains("__generic__")) {
+            if (!target.getTestConfig().isRunServer()|| !request.url().contains("__generic__")) {
 
                 // asserting response status if it was set on request
                 int status = resp.getStatus();

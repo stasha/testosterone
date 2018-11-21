@@ -24,7 +24,6 @@ import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.jvnet.hk2.annotations.Service;
 
 /**
  *
@@ -34,8 +33,7 @@ import org.jvnet.hk2.annotations.Service;
 @Dependencies(
         UserDaoTest.class
 )
-@Configuration(startServer = StartServer.PER_TEST_METHOD)
-@Service
+@Configuration(startServer = StartServer.PER_TEST_METHOD, runDb = true)
 public class TaskDaoTest implements Testosterone {
 
     private final String create = "CREATE TABLE tasks (\n"

@@ -296,7 +296,7 @@ public class JerseyTestConfig extends AbstractTestConfig<Testosterone, JerseyTes
     @Override
     public void start() throws Exception {
 
-        if (!getServerConfig().isRunning()) {
+        if (!isRunning()) {
             init(this, this, new ArrayList<>());
 
             super.start();

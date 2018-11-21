@@ -49,14 +49,14 @@ public @interface Configuration {
      *
      * @return
      */
-    boolean runServer() default true;
+    boolean runServer() default TestConfig.RUN_SERVER;
 
     /**
      * true/fale if DB should start for the test
      *
      * @return
      */
-    boolean runDb() default true;
+    boolean runDb() default TestConfig.RUN_DB;
 
     /**
      * Server base uri.

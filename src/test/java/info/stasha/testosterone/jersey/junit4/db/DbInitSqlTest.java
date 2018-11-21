@@ -1,5 +1,6 @@
 package info.stasha.testosterone.jersey.junit4.db;
 
+import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.jersey.junit4.Testosterone;
 import info.stasha.testosterone.junit4.TestosteroneRunner;
@@ -17,6 +18,7 @@ import org.junit.runner.RunWith;
  * @author stasha
  */
 @RunWith(TestosteroneRunner.class)
+@Configuration(runDb = true)
 public class DbInitSqlTest implements Testosterone {
 
     @Context

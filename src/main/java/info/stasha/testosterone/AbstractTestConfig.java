@@ -46,7 +46,7 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
     private StartServer startServer;
     private Setup setup;
     private final String mainThreadName;
-    private boolean running;
+    private static boolean running;
 
     public AbstractTestConfig() {
         this(null, null);
@@ -92,10 +92,10 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
             try {
                 String systemServerConfig = System.getProperty(DEFAULT_SERVER_CONFIG_PROPERTY);
                 ServiceLoader<ServerConfig> serverConfigLoader = ServiceLoader.load(ServerConfig.class);
-                if (systemServerConfig != null) {
-                    Class.forName(systemServerConfig).getDeclaredConstructor(TestConfig.class).newInstance(this);
-                } else if (config != null) {
+                if (config != null) {
                     this.serverConfig = config.serverConfig().getDeclaredConstructor(TestConfig.class).newInstance(this);
+                } else if (systemServerConfig != null) {
+                    Class.forName(systemServerConfig).getDeclaredConstructor(TestConfig.class).newInstance(this);
                 } else if (serverConfigLoader.iterator().hasNext()) {
                     this.serverConfig = serverConfigLoader.iterator().next();
                     this.serverConfig.setTestConfig(this);
@@ -121,10 +121,10 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
             try {
                 String systemDbConfig = System.getProperty(DEFAULT_DB_CONFIG_PROPERTY);
                 ServiceLoader<DbConfig> dbConfigLoader = ServiceLoader.load(DbConfig.class);
-                if (systemDbConfig != null) {
-                    Class.forName(systemDbConfig).getDeclaredConstructor(TestConfig.class).newInstance(this);
-                } else if (config != null) {
+                if (config != null) {
                     this.dbConfig = config.dbConfig().getDeclaredConstructor(TestConfig.class).newInstance(this);
+                } else if (systemDbConfig != null) {
+                    Class.forName(systemDbConfig).getDeclaredConstructor(TestConfig.class).newInstance(this);
                 } else if (dbConfigLoader.iterator().hasNext()) {
                     this.dbConfig = dbConfigLoader.iterator().next();
                     this.dbConfig.setTestConfig(this);
@@ -148,7 +148,7 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
     public ServletContainerConfig getServletContainerConfig() {
         if (this.servletContainerConfig == null) {
             this.servletContainerConfig = new ServletContainerConfig(this);
-            this.serverConfig.setServletContainerConfig(servletContainerConfig);
+            getServerConfig().setServletContainerConfig(servletContainerConfig);
         }
 
         return this.servletContainerConfig;
@@ -283,12 +283,12 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
             if (isRunDb()) {
                 getDbConfig().start();
             } else {
-                LOGGER.info("Running DB is turned off");
+                LOGGER.info("DB is turned off. Use @Configuration(runDb=\"true\") to turn DB on.");
             }
             if (isRunServer()) {
                 getServerConfig().start();
             } else {
-                LOGGER.info("Running Server is turned off");
+                LOGGER.info("Server is turned off");
             }
 
             getClient().start();
@@ -312,18 +312,28 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
     public void stop() throws Exception {
         try {
             if (isRunning()) {
-                running = false;
 
                 getClient().stop();
-                getSetup().beforeServerStop((SuperTestosterone) getTest());
+                try {
+                    getSetup().beforeServerStop((SuperTestosterone) getTest());
+                } catch (Throwable ex) {
+                    throw new Error(ex);
+                } finally {
 
-                LOGGER.info("Stopping server configured with: {}", getStartServer());
-                getServerConfig().stop();
-                getDbConfig().stop();
-                getSetup().afterServerStop((SuperTestosterone) getTest());
-                getSetup().clearFlags();
+                    LOGGER.info("Stopping server configured with: {}", getStartServer());
+                    getServerConfig().stop();
+                    getDbConfig().stop();
+                    try {
+                        getSetup().afterServerStop((SuperTestosterone) getTest());
+                    } catch (Throwable ex) {
+                        throw new Error(ex);
+                    } finally {
+                        getSetup().clearFlags();
 
-                System.out.println("");
+                        running = false;
+                        System.out.println("");
+                    }
+                }
             }
         } finally {
             TestConfigFactory.TEST_CONFIGURATIONS.remove(Utils.getInstrumentedClassName((SuperTestosterone) getTest()));

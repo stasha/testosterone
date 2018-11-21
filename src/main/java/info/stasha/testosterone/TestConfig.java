@@ -12,6 +12,7 @@ import javax.ws.rs.core.Application;
 /**
  *
  * @author stasha
+ * @param <T>
  * @param <C>
  */
 public interface TestConfig<T, C> extends StartStop {
@@ -20,7 +21,7 @@ public interface TestConfig<T, C> extends StartStop {
     public static final int HTTP_PORT = 9998;
     public static StartServer START_SERVER = StartServer.PER_CLASS;
     public static boolean RUN_SERVER = true;
-    public static boolean RUN_DB = true;
+    public static boolean RUN_DB = false;
 
     T getTest();
     
@@ -33,10 +34,14 @@ public interface TestConfig<T, C> extends StartStop {
     RestClient getClient();
 
     ServerConfig getServerConfig();
+    
+    boolean isRunServer();
 
     ServletContainerConfig getServletContainerConfig();
 
     DbConfig getDbConfig();
+    
+    boolean isRunDb();
 
     TestExecutor getTestExecutor(Method method, SuperTestosterone test);
 

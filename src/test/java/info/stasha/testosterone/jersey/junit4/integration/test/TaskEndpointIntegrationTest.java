@@ -1,5 +1,6 @@
 package info.stasha.testosterone.jersey.junit4.integration.test;
 
+import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.annotation.Integration;
 import info.stasha.testosterone.annotation.Request;
 import info.stasha.testosterone.jersey.junit4.Testosterone;
@@ -32,6 +33,7 @@ import org.junit.runner.RunWith;
     TaskDaoTest.class
 })
 @RunWith(TestosteroneRunner.class)
+@Configuration(runDb = true)
 public class TaskEndpointIntegrationTest implements Testosterone {
 
     protected TaskResource taskResource;

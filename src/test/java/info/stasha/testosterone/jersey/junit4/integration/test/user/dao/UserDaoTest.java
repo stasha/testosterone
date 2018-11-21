@@ -19,7 +19,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -28,7 +27,7 @@ import org.junit.runner.RunWith;
  * @author stasha
  */
 @RunWith(TestosteroneRunner.class)
-@Configuration(startServer = StartServer.PER_TEST_METHOD)
+@Configuration(startServer = StartServer.PER_TEST_METHOD, runDb = true)
 public class UserDaoTest implements Testosterone {
 
     private final String create = "CREATE TABLE users (\n"
