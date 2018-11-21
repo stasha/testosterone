@@ -23,16 +23,14 @@ public class JettyServerConfig implements ServerConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(JettyServerConfig.class);
 
     protected Server server;
-    private TestConfig config;
+    private TestConfig testConfig;
     private ServletContainerConfig servletContainerConfig;
 
     public JettyServerConfig() {
     }
-    
-    
 
     public JettyServerConfig(TestConfig config) {
-        this.config = config;
+        this.testConfig = config;
     }
 
     /**
@@ -42,7 +40,17 @@ public class JettyServerConfig implements ServerConfig {
      */
     @Override
     public TestConfig getTestConfig() {
-        return this.config;
+        return this.testConfig;
+    }
+
+    /**
+     * {@inheritDoc }
+     *
+     * @param testConfig
+     */
+    @Override
+    public void setTestConfig(TestConfig testConfig) {
+        this.testConfig = testConfig;
     }
 
     /**
@@ -95,13 +103,13 @@ public class JettyServerConfig implements ServerConfig {
         server.setHandler(context);
 
         // registering context params
-        config.getServletContainerConfig().getContextParams().forEach((t, u) -> {
+        testConfig.getServletContainerConfig().getContextParams().forEach((t, u) -> {
             LOGGER.debug("Setting initial context param {}:{}", t, u);
             context.setInitParameter(t, u);
         });
 
         // registering servlet listeners
-        config.getServletContainerConfig().getListeners().forEach((t) -> {
+        testConfig.getServletContainerConfig().getListeners().forEach((t) -> {
             EventListener listener;
             if (t.getListener() == null) {
                 try {
@@ -119,7 +127,7 @@ public class JettyServerConfig implements ServerConfig {
         });
 
         // registering servlet filters
-        config.getServletContainerConfig().getFilters().forEach((t) -> {
+        testConfig.getServletContainerConfig().getFilters().forEach((t) -> {
             try {
                 FilterHolder fh = new FilterHolder();
                 Filter filter;
@@ -143,7 +151,7 @@ public class JettyServerConfig implements ServerConfig {
         });
 
         // registering servlets
-        config.getServletContainerConfig().getServlets().forEach((t) -> {
+        testConfig.getServletContainerConfig().getServlets().forEach((t) -> {
             try {
                 ServletHolder sh = new ServletHolder();
                 Servlet servlet;
@@ -176,11 +184,10 @@ public class JettyServerConfig implements ServerConfig {
      */
     @Override
     public void start() throws Exception {
-        server = new Server(config.getHttpPort());
-        initializeServletContainer();
         if (!isRunning()) {
+            server = new Server(testConfig.getHttpPort());
+            initializeServletContainer();
             try {
-//                LOGGER.info("Starting server at: {} for test {}", getBaseUri(), this.getMainThreadTestObject().getClass().getName());
                 server.start();
             } catch (java.net.BindException ex) {
                 LOGGER.error("Server failed to start.", ex);
@@ -197,7 +204,6 @@ public class JettyServerConfig implements ServerConfig {
     @Override
     public void stop() throws Exception {
         if (isRunning()) {
-//            LOGGER.info("Stopping server at: {} for test {}", getBaseUri(), this.getMainThreadTestObject().getClass().getName());
             try {
                 server.stop();
             } catch (Exception ex) {

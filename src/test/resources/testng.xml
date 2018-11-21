@@ -2,7 +2,7 @@
 <suite name="TestNG" verbose="1">
     <test name="testng" preserve-order="true" >
 	 <packages>
-            <package name="info.stasha.testosterone.testng.*"/>
+            <package name="info.stasha.testosterone.jersey.testng.*"/>
         </packages>
     </test>
 </suite>

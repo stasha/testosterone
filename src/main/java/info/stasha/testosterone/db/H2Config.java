@@ -30,11 +30,35 @@ public class H2Config implements DbConfig {
 
     protected SuperTestosterone test;
 
-    private final TestConfig config;
+    private TestConfig testConfig;
 
-    public H2Config(TestConfig config) {
-        this.config = config;
-        this.test = (SuperTestosterone) config.getTest();
+    public H2Config() {
+    }
+
+    public H2Config(TestConfig testConfig) {
+        this.testConfig = testConfig;
+        this.test = (SuperTestosterone) testConfig.getTest();
+    }
+
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public TestConfig getTestConfig() {
+        return this.testConfig;
+    }
+
+    /**
+     * {@inheritDoc }
+     *
+     * @param testConfig
+     */
+    @Override
+    public void setTestConfig(TestConfig testConfig) {
+        this.testConfig = testConfig;
+        this.test = (SuperTestosterone) testConfig.getTest();
     }
 
     /**
@@ -173,9 +197,11 @@ public class H2Config implements DbConfig {
      */
     @Override
     public void start() throws Exception {
-        LOGGER.info("Starting H2 DB.");
-        getDataSource();
-        init();
+        if (!isRunning()) {
+            LOGGER.info("Starting H2 DB.");
+            getDataSource();
+            init();
+        }
     }
 
     /**
@@ -185,10 +211,22 @@ public class H2Config implements DbConfig {
      */
     @Override
     public void stop() throws Exception {
-        LOGGER.info("Stopping H2 DB.");
-        getConnection().prepareStatement("shutdown").execute();
-        this.connectionPool.dispose();
-        this.dataSource = null;
+        if (isRunning()) {
+            LOGGER.info("Stopping H2 DB.");
+            getConnection().prepareStatement("shutdown").execute();
+            this.connectionPool.dispose();
+            this.dataSource = null;
+        }
+    }
+
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public boolean isRunning() {
+        return this.dataSource != null;
     }
 
 }

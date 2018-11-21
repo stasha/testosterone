@@ -1,5 +1,7 @@
 package info.stasha.testosterone.db;
 
+import info.stasha.testosterone.StartStop;
+import info.stasha.testosterone.TestConfigBase;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
@@ -11,7 +13,7 @@ import org.glassfish.hk2.api.Factory;
  *
  * @author stasha
  */
-public interface DbConfig {
+public interface DbConfig extends TestConfigBase, StartStop {
 
     /**
      * Add SQL query to DbConfig queue.<br>
@@ -81,17 +83,4 @@ public interface DbConfig {
      */
     void dropTestingDb() throws SQLException;
 
-    /**
-     * Starts DB server.
-     *
-     * @throws Exception
-     */
-    void start() throws Exception;
-
-    /**
-     * Stops DB server.
-     *
-     * @throws Exception
-     */
-    void stop() throws Exception;
 }

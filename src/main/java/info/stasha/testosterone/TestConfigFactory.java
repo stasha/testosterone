@@ -2,11 +2,12 @@ package info.stasha.testosterone;
 
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.jersey.JerseyTestConfig;
-import info.stasha.testosterone.resteasy.RestEasyTestConfig;
+import info.stasha.testosterone.jersey.junit4.Testosterone;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ServiceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,26 +30,33 @@ public class TestConfigFactory {
             return config;
         }
 
+        ServiceLoader<TestConfig> loader = ServiceLoader.load(TestConfig.class);
+        String systemTestProperty = System.getProperty(AbstractTestConfig.DEFAULT_TEST_CONFIG_PROPERTY);
         Configuration conf = testosterone.getClass().getAnnotation(Configuration.class);
 
         try {
-            if (conf != null) {
+            if (systemTestProperty != null) {
+
+                config = (TestConfig) Class.forName(systemTestProperty)
+                        .getDeclaredConstructor(TestConfig.class).newInstance(testosterone);
+
+            } else if (conf != null) {
                 Constructor con = conf.configuration().
-                        getDeclaredConstructor(SuperTestosterone.class, Configuration.class);
+                        getDeclaredConstructor(Testosterone.class, Configuration.class);
 
                 config = (TestConfig) con.newInstance(testosterone, conf);
+            } else if (loader.iterator().hasNext()) {
+                config = loader.iterator().next();
+                config.setConfig(conf);
+                config.setTestosterone(testosterone);
             } else {
-                if (testosterone instanceof info.stasha.testosterone.jersey.junit4.Testosterone) {
-                    config = new JerseyTestConfig((info.stasha.testosterone.jersey.junit4.Testosterone) testosterone);
-                } else if (testosterone instanceof info.stasha.testosterone.resteasy.junit4.Testosterone) {
-                    config = new RestEasyTestConfig((info.stasha.testosterone.resteasy.junit4.Testosterone) testosterone);
-                }
+                config = new JerseyTestConfig((Testosterone) testosterone);
             }
 
             TEST_CONFIGURATIONS.put(Utils.getInstrumentedClassName(testosterone), config);
 
             return config;
-        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ClassNotFoundException ex) {
             LOGGER.error("Failed to create Test Configuration.", ex);
             throw new RuntimeException(ex);
         }

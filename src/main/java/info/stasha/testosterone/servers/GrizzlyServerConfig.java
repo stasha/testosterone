@@ -17,14 +17,17 @@ import org.slf4j.LoggerFactory;
 public class GrizzlyServerConfig implements ServerConfig<ResourceConfig> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GrizzlyServerConfig.class);
-    private final TestConfig config;
+    private TestConfig testConfig;
 
     private HttpServer server;
     private ResourceConfig resourceConfig;
     private ServletContainerConfig servletContainerConfig;
 
+    public GrizzlyServerConfig() {
+    }
+
     public GrizzlyServerConfig(TestConfig config) {
-        this.config = config;
+        this.testConfig = config;
     }
 
     /**
@@ -34,7 +37,17 @@ public class GrizzlyServerConfig implements ServerConfig<ResourceConfig> {
      */
     @Override
     public TestConfig getTestConfig() {
-        return this.config;
+        return this.testConfig;
+    }
+
+    /**
+     * {@inheritDoc }
+     *
+     * @param testConfig
+     */
+    @Override
+    public void setTestConfig(TestConfig testConfig) {
+        this.testConfig = testConfig;
     }
 
     /**
@@ -87,7 +100,7 @@ public class GrizzlyServerConfig implements ServerConfig<ResourceConfig> {
 
         if (!isRunning()) {
             try {
-                server = GrizzlyHttpServerFactory.createHttpServer(this.config.getBaseUri(), this.resourceConfig);
+                server = GrizzlyHttpServerFactory.createHttpServer(this.testConfig.getBaseUri(), this.resourceConfig);
             } catch (Exception ex) {
                 LOGGER.error("Failed to create server.", ex);
             }

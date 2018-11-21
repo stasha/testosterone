@@ -1,6 +1,5 @@
 package info.stasha.testosterone.jersey.testng;
 
-import info.stasha.testosterone.jersey.testng.Testosterone;
 import info.stasha.testosterone.TestInExecutionImpl;
 import org.testng.annotations.Test;
 

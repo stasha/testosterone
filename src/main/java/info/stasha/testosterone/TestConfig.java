@@ -1,5 +1,6 @@
 package info.stasha.testosterone;
 
+import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
 import java.lang.reflect.Method;
@@ -18,8 +19,14 @@ public interface TestConfig<T, C> extends StartStop {
     public static final String BASE_URI = "http://localhost/";
     public static final int HTTP_PORT = 9998;
     public static StartServer START_SERVER = StartServer.PER_CLASS;
+    public static boolean RUN_SERVER = true;
+    public static boolean RUN_DB = true;
 
     T getTest();
+    
+    void setTestosterone(T testosterone);
+
+    void setConfig(Configuration config);
 
     Application getApplication();
 

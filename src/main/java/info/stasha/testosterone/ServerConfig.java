@@ -8,14 +8,7 @@ import info.stasha.testosterone.servlet.ServletContainerConfig;
  * @author stasha
  * @param <T>
  */
-public interface ServerConfig<T> extends StartStop {
-
-    /**
-     * Returns test configuration.
-     *
-     * @return
-     */
-    TestConfig getTestConfig();
+public interface ServerConfig<T> extends TestConfigBase, StartStop {
 
     /**
      * Returns servlet configuration object where context params, listeners,

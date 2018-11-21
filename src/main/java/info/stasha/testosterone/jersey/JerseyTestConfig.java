@@ -10,7 +10,7 @@ import info.stasha.testosterone.annotation.InjectTest;
 import info.stasha.testosterone.annotation.Integration;
 import info.stasha.testosterone.annotation.LoadFile;
 import info.stasha.testosterone.annotation.Value;
-import info.stasha.testosterone.DefaultTestConfig;
+import info.stasha.testosterone.AbstractTestConfig;
 import info.stasha.testosterone.SuperTestosterone;
 import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.jersey.inject.InjectTestResolver;
@@ -48,11 +48,14 @@ import org.slf4j.LoggerFactory;
  *
  * @author stasha
  */
-public class JerseyTestConfig extends DefaultTestConfig<Testosterone, JerseyTestConfig> {
+public class JerseyTestConfig extends AbstractTestConfig<Testosterone, JerseyTestConfig> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JerseyTestConfig.class);
 
     private ResourceConfig resourceConfig;
+
+    public JerseyTestConfig() {
+    }
 
     public JerseyTestConfig(Testosterone testosterone) {
         super(testosterone);
