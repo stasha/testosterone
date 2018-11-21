@@ -1,14 +1,10 @@
 package info.stasha.testosterone.db;
 
-import info.stasha.testosterone.SuperTestosterone;
 import info.stasha.testosterone.TestConfig;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import javax.sql.DataSource;
-import org.glassfish.hk2.api.Factory;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.h2.jdbcx.JdbcDataSource;
 import org.slf4j.Logger;
@@ -19,69 +15,17 @@ import org.slf4j.LoggerFactory;
  *
  * @author stasha
  */
-public class H2Config implements DbConfig {
+public class H2Config extends AbstractDbConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(H2Config.class);
-    private final Map<String, String> sqls = new LinkedHashMap<>();
 
-    private String testDbName;
-    private DataSource dataSource;
     private JdbcConnectionPool connectionPool;
-
-    protected SuperTestosterone test;
-
-    private TestConfig testConfig;
 
     public H2Config() {
     }
 
     public H2Config(TestConfig testConfig) {
-        this.testConfig = testConfig;
-        this.test = (SuperTestosterone) testConfig.getTest();
-    }
-
-    /**
-     * {@inheritDoc }
-     *
-     * @return
-     */
-    @Override
-    public TestConfig getTestConfig() {
-        return this.testConfig;
-    }
-
-    /**
-     * {@inheritDoc }
-     *
-     * @param testConfig
-     */
-    @Override
-    public void setTestConfig(TestConfig testConfig) {
-        this.testConfig = testConfig;
-        this.test = (SuperTestosterone) testConfig.getTest();
-    }
-
-    /**
-     * {@inheritDoc }
-     *
-     * @param queryName
-     * @param query
-     * @return
-     */
-    @Override
-    public DbConfig add(String queryName, String query) {
-        sqls.put(queryName, query);
-        return this;
-    }
-
-    /**
-     * {@inheritDoc }
-     *
-     * @return
-     */
-    @Override
-    public Map<String, String> getInitSqls() {
-        return sqls;
+        super(testConfig);
     }
 
     /**
@@ -120,36 +64,6 @@ public class H2Config implements DbConfig {
     }
 
     /**
-     * {@inheritDoc }
-     *
-     * @return
-     */
-    @Override
-    public Class<? extends Factory<Connection>> getConnectionFactory() {
-        return H2ConnectionFactory.class;
-    }
-
-    /**
-     * {@inheritDoc }
-     *
-     * @throws SQLException
-     */
-    @Override
-    public void createTestingDb() throws SQLException {
-        throw new UnsupportedOperationException("Testing DB is created on server startup");
-    }
-
-    /**
-     * {@inheritDoc }
-     *
-     * @throws SQLException
-     */
-    @Override
-    public void dropTestingDb() throws SQLException {
-        throw new UnsupportedOperationException("Testing DB is dropped on server end");
-    }
-
-    /**
      * Executes all SQL queries in the queue and removes them after execution.
      *
      * @return
@@ -184,15 +98,6 @@ public class H2Config implements DbConfig {
     /**
      * {@inheritDoc }
      *
-     */
-    @Override
-    public void init() throws SQLException {
-        execute();
-    }
-
-    /**
-     * {@inheritDoc }
-     *
      * @throws Exception
      */
     @Override
@@ -200,7 +105,7 @@ public class H2Config implements DbConfig {
         if (!isRunning()) {
             LOGGER.info("Starting H2 DB.");
             getDataSource();
-            init();
+            execute();
         }
     }
 
@@ -217,16 +122,6 @@ public class H2Config implements DbConfig {
             this.connectionPool.dispose();
             this.dataSource = null;
         }
-    }
-
-    /**
-     * {@inheritDoc }
-     *
-     * @return
-     */
-    @Override
-    public boolean isRunning() {
-        return this.dataSource != null;
     }
 
 }

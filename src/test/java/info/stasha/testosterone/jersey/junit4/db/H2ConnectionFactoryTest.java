@@ -1,6 +1,6 @@
 package info.stasha.testosterone.jersey.junit4.db;
 
-import info.stasha.testosterone.db.H2ConnectionFactory;
+import info.stasha.testosterone.db.DbConnectionFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
 import org.junit.Test;
@@ -18,7 +18,7 @@ public class H2ConnectionFactoryTest {
      public void testSqlException() throws SQLException{
          Mockito.doThrow(new SQLException("failed to close connection")).when(conn).close();
          
-         new H2ConnectionFactory().dispose(conn);
+         new DbConnectionFactory().dispose(conn);
      }
     
 }

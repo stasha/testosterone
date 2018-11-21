@@ -42,13 +42,6 @@ public interface DbConfig extends TestConfigBase, StartStop {
     Map<String, String> getInitSqls();
 
     /**
-     * Initialize database.
-     *
-     * @throws java.sql.SQLException
-     */
-    void init() throws SQLException;
-
-    /**
      * Returns DataSource.
      *
      * @return

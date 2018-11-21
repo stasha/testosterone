@@ -161,7 +161,6 @@ public class TestExecutorImpl implements TestExecutor {
      * @param index
      */
     protected void executeRequest(RequestAnnotation request, int index) {
-        LOGGER.info(request.toString());
 
         GET get = method.getAnnotation(GET.class);
         POST post = method.getAnnotation(POST.class);
@@ -170,9 +169,9 @@ public class TestExecutorImpl implements TestExecutor {
         HEAD head = method.getAnnotation(HEAD.class);
         OPTIONS options = method.getAnnotation(OPTIONS.class);
 
-        String requestMethod = HttpMethod.GET;
+        String requestMethod;
 
-        if (request.method() != null) {
+        if (!request.method().isEmpty()) {
             requestMethod = request.method();
         } else {
             if (post != null) {
@@ -189,6 +188,10 @@ public class TestExecutorImpl implements TestExecutor {
                 requestMethod = HttpMethod.GET;
             }
         }
+        
+        request.setMethod(requestMethod);
+        
+        LOGGER.info(request.toString());
 
         int requestRepeat = request.repeat() == 0 ? 1 : request.repeat();
         String normalizedUrl = request.url();
@@ -224,7 +227,7 @@ public class TestExecutorImpl implements TestExecutor {
 
             Response resp;
 
-            Entity entity = Entity.json(null);
+            Entity entity = Entity.json("");
 
             if (!request.entity().isEmpty()) {
                 try {

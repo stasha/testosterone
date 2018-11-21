@@ -152,10 +152,10 @@ public class TestInterceptors {
         public static class GenericUrl {
 
             @RuntimeType
-            public static Void generic(@This SuperTestosterone orig) throws Exception, Throwable {
+            public static Void generic(@AllArguments Object[] args, @This SuperTestosterone orig) throws Exception, Throwable {
                 TestInExecution et = orig.getTestConfig().getSetup().getTestInExecution();
                 et.setIsRequest(false);
-                PathAndTest.test(null, null, et.getMainThreadTestMethod(), et.getMainThreadTest());
+                PathAndTest.test(null, args, et.getMainThreadTestMethod(), et.getMainThreadTest());
                 return null;
             }
         }

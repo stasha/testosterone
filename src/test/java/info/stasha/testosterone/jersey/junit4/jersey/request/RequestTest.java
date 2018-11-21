@@ -128,7 +128,7 @@ public class RequestTest implements Testosterone {
     @Test
     @POST
     @Path("test/{service}/{id}")
-    @Request(url = "test/[a-z]{10,20}/[0-9]{1,10}?firstName=Jon&lastName=Doe", method = HttpMethod.POST)
+    @Request(url = "test/[a-z]{10,20}/[0-9]{1,10}?firstName=Jon&lastName=Doe&noValue", method = HttpMethod.POST)
     public void singleRequestTest(
             @PathParam("service") String service,
             @PathParam("id") String id,
@@ -221,26 +221,36 @@ public class RequestTest implements Testosterone {
         assertEquals("Content-Type should equals", "application/json", contentType);
         assertEquals("User-Agent should equals", "testosterone", userAgent);
     }
-    
+
     @Request
     @Requests
     @Test(expected = IllegalStateException.class)
-    public void requestAndRequestsTest(){
-        
+    public void requestAndRequestsTest() {
+
     }
-    
+
     @Requests
     @Test(expected = IllegalStateException.class)
-    public void requestsEmptyTest(){
-        
+    public void requestsEmptyTest() {
+
     }
-    
-    @Ignore
+
     @Test
-    @POST
-    @Path("post")
-    public void postRequest(TestResponse resp){
-        assertEquals("Method should be post", HttpMethod.POST, resp.getRequest().method());
+    @GET
+    @Path("tst")
+    @Request(url = "tst")
+    public void indexRequest(Integer index) {
+        assertEquals("Index should equal", (Integer) 1, index);
+    }
+
+    @Test(expected = AssertionError.class)
+    @Request(url = "tst", expectedStatus = 300)
+    public void expectedStatusError() {
+    }
+
+    @Test(expected = AssertionError.class)
+    @Request(url = "tst", expectedStatusBetween = {0, 2})
+    public void expectedStatesBetweenError() {
     }
 
     /**

@@ -44,7 +44,7 @@ public @interface Request {
      *
      * @return
      */
-    String method() default HttpMethod.GET;
+    String method() default "";
 
     /**
      * Header parameters that will be used when invoking test method

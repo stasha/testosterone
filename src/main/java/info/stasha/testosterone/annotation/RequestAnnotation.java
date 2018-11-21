@@ -2,7 +2,6 @@ package info.stasha.testosterone.annotation;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
-import javax.ws.rs.HttpMethod;
 
 /**
  * Implementation of Request annotation
@@ -15,10 +14,11 @@ public class RequestAnnotation implements Request {
     private int[] excludeFromRepeat = {};
     private String url;
     private String[] headerParams = {};
-    private String method = HttpMethod.GET;
+    private String method = "";
     private int[] expectedStatus = {};
     private int[] expectedStatusBetween = {200, 400};
     private String entity = "";
+    private boolean generic;
 
     /**
      * Creates new RequestAnnotation instance.
@@ -27,13 +27,34 @@ public class RequestAnnotation implements Request {
     }
 
     public RequestAnnotation(Request request) {
-        this.entity = request.entity();
-        this.excludeFromRepeat = request.excludeFromRepeat();
-        this.expectedStatus = request.expectedStatus();
-        this.headerParams = request.headerParams();
-        this.method = request.method();
-        this.repeat = request.repeat();
-        this.url = request.url();
+        if (request != null) {
+            this.entity = request.entity();
+            this.excludeFromRepeat = request.excludeFromRepeat();
+            this.expectedStatus = request.expectedStatus();
+            this.expectedStatusBetween = request.expectedStatusBetween();
+            this.headerParams = request.headerParams();
+            this.method = request.method();
+            this.repeat = request.repeat();
+            this.url = request.url();
+        }
+    }
+
+    /**
+     * Returns true/false if this request is generic.
+     *
+     * @return
+     */
+    public boolean isGeneric() {
+        return generic;
+    }
+
+    /**
+     * Sets if this request is generic.
+     *
+     * @param generic
+     */
+    public void setGeneric(boolean generic) {
+        this.generic = generic;
     }
 
     /**
@@ -70,6 +91,9 @@ public class RequestAnnotation implements Request {
      */
     public void setUrl(String url) {
         this.url = url;
+        if (url.equals("__generic__")) {
+            setGeneric(true);
+        }
     }
 
     /**

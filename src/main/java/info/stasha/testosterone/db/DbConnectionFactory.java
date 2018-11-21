@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author stasha
  */
-public class H2ConnectionFactory implements Factory<Connection> {
+public class DbConnectionFactory implements Factory<Connection> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(H2ConnectionFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DbConnectionFactory.class);
 
     @Context
     private CloseableService cs;
