@@ -11,6 +11,9 @@ import java.util.List;
  */
 public class TestAnnotations {
 
+    private TestAnnotations() {
+    }
+
     /**
      * Tries to load class from passed className list.
      *

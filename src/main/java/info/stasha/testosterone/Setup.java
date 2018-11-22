@@ -125,7 +125,7 @@ public class Setup implements ContainerResponseFilter {
      * @throws Exception
      */
     public void beforeServerStart(SuperTestosterone orig) throws Exception {
-        if (!this.beforeServerStart) {
+        if (!isBeforeServerStart()) {
             this.beforeServerStart = true;
             LOGGER.info("Invoking beforeServerStart.");
             orig.beforeServerStart();
@@ -139,7 +139,7 @@ public class Setup implements ContainerResponseFilter {
      * @throws Exception
      */
     public void afterServerStart(SuperTestosterone orig) throws Exception {
-        if (!this.afterServerStart) {
+        if (!isAfterServerStart()) {
             this.afterServerStart = true;
             LOGGER.info("Invoking afterServerStart.");
             orig.afterServerStart();
@@ -153,7 +153,7 @@ public class Setup implements ContainerResponseFilter {
      * @throws Exception
      */
     public void beforeServerStop(SuperTestosterone orig) throws Exception {
-        if (!this.beforeServerStop) {
+        if (!isBeforeServerStop()) {
             this.beforeServerStop = true;
             LOGGER.info("Invoking beforeServerStop.");
             orig.beforeServerStop();
@@ -167,7 +167,7 @@ public class Setup implements ContainerResponseFilter {
      * @throws Exception
      */
     public void afterServerStop(SuperTestosterone orig) throws Exception {
-        if (!this.afterServerStop) {
+        if (!isAfterServerStop()) {
             this.afterServerStop = true;
             LOGGER.info("Invoking afterServerStop.");
             orig.afterServerStop();

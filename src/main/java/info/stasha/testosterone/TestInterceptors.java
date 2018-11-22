@@ -21,6 +21,9 @@ import org.slf4j.LoggerFactory;
  */
 public class TestInterceptors {
 
+    private TestInterceptors() {
+    }
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TestInterceptors.class);
 
     /**
@@ -115,7 +118,13 @@ public class TestInterceptors {
      */
     public static class Intercept {
 
+        private Intercept() {
+        }
+
         public static class Constructor {
+
+            private Constructor() {
+            }
 
             /**
              * Constructor interceptor
@@ -139,6 +148,9 @@ public class TestInterceptors {
          */
         public static class PostConstruct {
 
+            private PostConstruct() {
+            }
+
             @RuntimeType
             public static void postConstruct(@This SuperTestosterone orig) throws Exception {
                 LOGGER.debug("Invoking @PostConstruct");
@@ -151,6 +163,9 @@ public class TestInterceptors {
          */
         public static class GenericUrl {
 
+            private GenericUrl() {
+            }
+
             @RuntimeType
             public static Void generic(@AllArguments Object[] args, @This SuperTestosterone orig) throws Exception, Throwable {
                 TestInExecution et = orig.getTestConfig().getSetup().getTestInExecution();
@@ -161,6 +176,9 @@ public class TestInterceptors {
         }
 
         public static class Before {
+
+            private Before() {
+            }
 
             /**
              *
@@ -175,6 +193,9 @@ public class TestInterceptors {
         }
 
         public static class After {
+
+            private After() {
+            }
 
             /**
              *
@@ -193,6 +214,9 @@ public class TestInterceptors {
          */
         public static class AfterClass {
 
+            private AfterClass() {
+            }
+
             @RuntimeType
             public static void afterClass(@Origin Method method) throws Exception {
                 TestInterceptors.afterClass((Class<? extends SuperTestosterone>) method.getDeclaringClass());
@@ -204,6 +228,9 @@ public class TestInterceptors {
          */
         public static class BeforeClass {
 
+            private BeforeClass() {
+            }
+
             @RuntimeType
             public static void beforeClass(@Origin Method method) throws Exception {
                 TestInterceptors.beforeClass((Class<? extends SuperTestosterone>) method.getDeclaringClass());
@@ -214,6 +241,9 @@ public class TestInterceptors {
          * @Path and @Test annotation interceptor
          */
         public static class PathAndTest {
+
+            private PathAndTest() {
+            }
 
             /**
              * Method interceptor. This before is always executed as first by

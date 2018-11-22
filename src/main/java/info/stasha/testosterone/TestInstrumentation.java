@@ -29,6 +29,9 @@ import net.bytebuddy.matcher.ElementMatchers;
  */
 public class TestInstrumentation {
 
+    private TestInstrumentation() {
+    }
+
     private static final Map<Class<? extends SuperTestosterone>, Class<? extends SuperTestosterone>> CLASSES = new HashMap<>();
 
     /**
@@ -69,12 +72,12 @@ public class TestInstrumentation {
                     .defineMethod("__beforeClass__", void.class, Visibility.PUBLIC, Ownership.STATIC)
                     .intercept(MethodDelegation.to(TestInterceptors.Intercept.BeforeClass.class))
                     .annotateMethod(beforeClassAnnotation)
-//                    .attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
+                    //                    .attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
                     //
                     .defineMethod("__afterClass__", void.class, Visibility.PUBLIC, Ownership.STATIC)
                     .intercept(MethodDelegation.to(TestInterceptors.Intercept.AfterClass.class))
                     .annotateMethod(afterClassAnnotation)
-//                    .attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
+                    //                    .attribute(MethodAttributeAppender.ForInstrumentedMethod.INCLUDING_RECEIVER)
                     //
                     .method(
                             // junit4 annotations

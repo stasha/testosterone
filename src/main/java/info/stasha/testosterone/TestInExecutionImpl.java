@@ -17,7 +17,6 @@ public class TestInExecutionImpl implements TestInExecution {
     private boolean isTest;
     private boolean isRequest;
 
-
     /**
      * Creates new TestInExecution instance.
      *
@@ -134,8 +133,6 @@ public class TestInExecutionImpl implements TestInExecution {
         this.isRequest = isRequest;
     }
 
-   
-
     /**
      * {@inheritDoc }
      *
@@ -143,8 +140,8 @@ public class TestInExecutionImpl implements TestInExecution {
      */
     @Override
     public void beforeTest() throws Exception {
-        isTest = true;
-        isRequest = false;
+        setIsTest(true);
+        setIsRequest(false);
     }
 
     /**
@@ -154,8 +151,8 @@ public class TestInExecutionImpl implements TestInExecution {
      */
     @Override
     public void afterTest() throws Exception {
-        isTest = false;
-        isRequest = false;
+        setIsTest(false);
+        setIsRequest(false);
     }
 
     /**
@@ -177,14 +174,6 @@ public class TestInExecutionImpl implements TestInExecution {
     @Override
     public void executeRequests() throws Throwable {
         mainThreadTest.getTestConfig().getTestExecutor(mainThreadTestMethod, mainThreadTest).executeRequests();
-    }
-
-    @Override
-    public String toString() {
-        return "TestInExecutionImpl{"
-                + "test=" + mainThreadTest.getClass().getName() + ":" + mainThreadTestMethod.getName()
-                + ", isTest=" + isTest + ", "
-                + "isRequest=" + isRequest + '}';
     }
 
 }

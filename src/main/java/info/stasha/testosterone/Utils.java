@@ -8,7 +8,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,33 +20,10 @@ import org.slf4j.LoggerFactory;
  */
 public class Utils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
-
-    /**
-     * Prints class data, methods, arguments, annotations ...
-     *
-     * @param clazz
-     */
-    public static void printClassData(Class<?> clazz) {
-        System.out.println("----");
-        System.out.println("Class data for: " + clazz.getName());
-        for (final Method method : clazz.getDeclaredMethods()) {
-            for (Annotation anon : method.getAnnotations()) {
-                System.out.println(anon.annotationType().getName());
-                for (Field field : anon.getClass().getDeclaredFields()) {
-//                    System.out.println("   " + field.getName());
-                }
-            }
-            System.out.println(method.getName());
-            for (Parameter param : method.getParameters()) {
-                System.out.println("  param: " + param.getName());
-                for (Annotation a : param.getAnnotations()) {
-                    System.out.println("      " + a.annotationType().getName());
-                }
-            }
-
-        }
+    private Utils() {
     }
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
 
     /**
      * Returns true/false if passed class is SuperTestosterone class.
@@ -110,7 +86,7 @@ public class Utils {
         try {
             TestConfig config = TestConfigFactory.TEST_CONFIGURATIONS.get(getInstrumentedClassName(clazz));
             t = config == null ? (SuperTestosterone) clazz.newInstance() : (SuperTestosterone) config.getTest();
-        } catch (InstantiationException | IllegalAccessException ex) {
+        } catch (Exception ex) {
             LOGGER.error("Failed to initialize new SuperTestosterone object.", ex);
             throw new RuntimeException(ex);
         }
@@ -126,7 +102,7 @@ public class Utils {
      */
     public static List<Method> getAnnotatedMethods(Class<?> clazz, List<Class<? extends Annotation>> annotations) {
         List<Method> methods = new ArrayList<>();
-        if (clazz == null || annotations.isEmpty()) {
+        if (clazz == null || annotations == null || annotations.isEmpty()) {
             return methods;
         }
         while (clazz != null) {
@@ -153,42 +129,6 @@ public class Utils {
      */
     public static <T> T getAnnotation(Object o, Class<? extends Annotation> annotation) {
         return getAnnotation(o.getClass(), annotation);
-    }
-
-    /**
-     * Returns annotation from method.
-     *
-     * @param <T>
-     * @param m
-     * @param annotation
-     * @param includingSuper
-     * @return
-     */
-    public static <T> T getAnnotation(Method m, Class<? extends Annotation> annotation, boolean includingSuper) {
-        Annotation a = m.getAnnotation(annotation);
-
-        if (a != null) {
-            return (T) a;
-        }
-
-        if (includingSuper) {
-            Class<?> clazz = m.getDeclaringClass().getSuperclass();
-
-            while (clazz != null && m != null) {
-                try {
-                    m = clazz.getMethod(m.getName(), m.getParameterTypes());
-                    if (m != null) {
-                        return getAnnotation(m, annotation, includingSuper);
-                    }
-                } catch (NoSuchMethodException | SecurityException ex) {
-//                    java.util.logging.Logger.getLogger(Utils.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
-                clazz = clazz.getSuperclass();
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -230,17 +170,6 @@ public class Utils {
      */
     public static boolean isAnnotationPresent(Object o, Class<? extends Annotation> annotation) {
         return getAnnotation(o, annotation) != null;
-    }
-
-    /**
-     * Returns true/false if annotation is present on specified class
-     *
-     * @param clazz
-     * @param annotation
-     * @return
-     */
-    public static boolean isAnnotationPresent(Class<?> clazz, Class<? extends Annotation> annotation) {
-        return getAnnotation(clazz, annotation) != null;
     }
 
     /**
@@ -290,7 +219,7 @@ public class Utils {
         try {
             me.setAccessible(true);
             return me.invoke(target, data);
-        } catch (IllegalArgumentException ex) {
+        } catch (Exception ex) {
             LOGGER.error("Failed to invoke method " + me.getName(), ex);
             throw ex;
         }
