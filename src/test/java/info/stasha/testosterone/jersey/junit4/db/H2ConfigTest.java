@@ -39,18 +39,6 @@ public class H2ConfigTest implements Testosterone {
         assertNotNull("Datasource should not be null", dbConfig.getDataSource());
     }
 
-    @Test(expected = UnsupportedOperationException.class)
-    @DontIntercept
-    public void createTestingDbTest() throws SQLException {
-        CONFIG.createTestingDb();
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    @DontIntercept
-    public void dropTestingDbTest() throws SQLException {
-        CONFIG.dropTestingDb();
-    }
-
     @Test
     @DontIntercept
     public void initSqlTest() {
@@ -58,13 +46,4 @@ public class H2ConfigTest implements Testosterone {
         assertEquals("Query should equal", "select * from test", CONFIG.getInitSqls().get("testQuery"));
     }
 
-    @Test(expected = NullPointerException.class)
-    @DontIntercept
-    public void getConnectionTest() throws Throwable {
-        try {
-            CONFIG.getConnection();
-        } catch (Exception ex) {
-            throw ex.getCause();
-        }
-    }
 }

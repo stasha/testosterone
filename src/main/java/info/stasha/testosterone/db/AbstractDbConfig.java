@@ -1,13 +1,15 @@
 package info.stasha.testosterone.db;
 
+import com.zaxxer.hikari.HikariDataSource;
 import info.stasha.testosterone.SuperTestosterone;
 import info.stasha.testosterone.TestConfig;
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import javax.sql.DataSource;
 import org.glassfish.hk2.api.Factory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,19 +22,31 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractDbConfig implements DbConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDbConfig.class);
+    private TestConfig testConfig;
+    protected boolean running;
+
     protected final Map<String, String> sqls = new LinkedHashMap<>();
 
-    protected String testDbName;
-    protected DataSource dataSource;
+    protected HikariDataSource dataSource = new HikariDataSource();
     protected SuperTestosterone test;
-    private TestConfig testConfig;
+    protected String dbName = "";
+    protected String testDb = "test_db_" + String.valueOf(Math.random()).replace(".", "");
+    protected String userName = "testosterone";
+    protected String password = "password";
+
+    // create/drop testing db specific
+    protected String dbConnectionString;
+    protected String createTestingDbSql;
+    protected String dropTestingDbSql;
 
     public AbstractDbConfig() {
     }
 
     public AbstractDbConfig(TestConfig testConfig) {
-        this.testConfig = testConfig;
-        this.test = (SuperTestosterone) testConfig.getTest();
+        if (testConfig != null) {
+            this.testConfig = testConfig;
+            this.test = (SuperTestosterone) testConfig.getTest();
+        }
     }
 
     /**
@@ -95,33 +109,23 @@ public abstract class AbstractDbConfig implements DbConfig {
      * @return
      */
     @Override
+    public HikariDataSource getDataSource() {
+        return this.dataSource;
+    }
+
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
     public Connection getConnection() {
         try {
-            return this.dataSource.getConnection();
+            return getDataSource().getConnection();
         } catch (Exception ex) {
             LOGGER.error("Failed to obtain new connection from connection pool.");
             throw new RuntimeException(ex);
         }
-    }
-
-    /**
-     * {@inheritDoc }
-     *
-     * @throws SQLException
-     */
-    @Override
-    public void createTestingDb() throws SQLException {
-        throw new UnsupportedOperationException("Testing DB is created on server startup");
-    }
-
-    /**
-     * {@inheritDoc }
-     *
-     * @throws SQLException
-     */
-    @Override
-    public void dropTestingDb() throws SQLException {
-        throw new UnsupportedOperationException("Testing DB is dropped on server end");
     }
 
     /**
@@ -163,7 +167,71 @@ public abstract class AbstractDbConfig implements DbConfig {
      */
     @Override
     public boolean isRunning() {
-        return this.dataSource != null;
+        return running;
+    }
+
+    /**
+     * {@inheritDoc }
+     *
+     * @throws SQLException
+     */
+    @Override
+    public void createTestingDb() throws SQLException {
+        if (!isRunning() && this.createTestingDbSql != null) {
+            LOGGER.info("Creating test DB: {}", testDb);
+            try (Connection c = DriverManager.getConnection(dbConnectionString, userName, password);
+                    PreparedStatement ps = c.prepareStatement(this.createTestingDbSql)) {
+                ps.executeUpdate();
+                LOGGER.info("Successfully created test DB: {}", testDb);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc }
+     *
+     * @throws SQLException
+     */
+    @Override
+    public void dropTestingDb() throws SQLException {
+        if (isRunning() && this.dropTestingDbSql != null) {
+            LOGGER.info("Dropping test DB: {}", testDb);
+            try (Connection c = DriverManager.getConnection(dbConnectionString, userName, password);
+                    PreparedStatement ps = c.prepareStatement(this.dropTestingDbSql)) {
+                ps.executeUpdate();
+                LOGGER.info("Successfully dropped test DB: {}", testDb);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc }
+     *
+     * @throws Exception
+     */
+    @Override
+    public void start() throws Exception {
+        if (!isRunning()) {
+            this.running = true;
+            LOGGER.info("Starting " + this.dbName);
+            createTestingDb();
+            execute();
+        }
+    }
+
+    /**
+     * {@inheritDoc }
+     *
+     * @throws Exception
+     */
+    @Override
+    public void stop() throws Exception {
+        if (isRunning()) {
+            LOGGER.info("Stopping" + this.dbName);
+            this.dataSource.close();
+            dropTestingDb();
+            this.running = true;
+        }
     }
 
 }

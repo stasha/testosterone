@@ -35,7 +35,6 @@ public class DbInitSqlTest implements Testosterone {
     @Override
     public void configure(DbConfig config) {
         config.add("createPeopleTable", create);
-
     }
 
     @Override
