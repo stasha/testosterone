@@ -212,9 +212,10 @@ public abstract class AbstractDbConfig implements DbConfig {
     @Override
     public void start() throws Exception {
         if (!isRunning()) {
-            this.running = true;
             LOGGER.info("Starting " + this.dbName);
             createTestingDb();
+            this.running = true;
+            
             execute();
         }
     }
