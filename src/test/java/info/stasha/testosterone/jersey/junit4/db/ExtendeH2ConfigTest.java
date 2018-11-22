@@ -3,7 +3,6 @@ package info.stasha.testosterone.jersey.junit4.db;
 import info.stasha.testosterone.StartServer;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.db.DbConfig;
-import info.stasha.testosterone.db.HsqldbConfig;
 import info.stasha.testosterone.jersey.junit4.Testosterone;
 import info.stasha.testosterone.junit4.TestosteroneRunner;
 import java.sql.Connection;
@@ -16,13 +15,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * HSQL in-memory DB test
+ * Derby in-memory DB test
  *
  * @author stasha
  */
 @RunWith(TestosteroneRunner.class)
-@Configuration(startServer = StartServer.PER_CLASS, dbConfig = HsqldbConfig.class, runDb = true)
-public class HsqldbConfigTest implements Testosterone {
+@Configuration(startServer = StartServer.PER_CLASS, dbConfig = ExtendedH2Config.class, runDb = true)
+public class ExtendeH2ConfigTest implements Testosterone {
 
     @Context
     DbConfig config;
@@ -32,14 +31,13 @@ public class HsqldbConfigTest implements Testosterone {
      */
     @Override
     public void afterServerStart() throws Exception {
-        String create = "CREATE TABLE people (\n"
-                + "  id  int NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY \n"
-                + " (START WITH 1, INCREMENT BY 1),\n"
-                + "  first_name VARCHAR(56) NOT NULL,\n"
-                + "  last_name VARCHAR(56),\n"
-                + "  created_at TIMESTAMP,\n"
-                + "  updated_at TIMESTAMP\n"
-                + "  )";
+         String create = "CREATE TABLE people (\n"
+            + "  id  int(11) NOT NULL auto_increment PRIMARY KEY,\n"
+            + "  first_name VARCHAR(56) NOT NULL,\n"
+            + "  last_name VARCHAR(56),\n"
+            + "  created_at DATETIME,\n"
+            + "  updated_at DATETIME\n"
+            + "  )";
 
         try (Connection conn = config.getConnection()) {
             conn.prepareStatement(create).executeUpdate();
@@ -71,15 +69,12 @@ public class HsqldbConfigTest implements Testosterone {
     @Test
     public void dbtest2(@Context Connection conn) throws SQLException {
         try (ResultSet rs = conn.prepareStatement("select first_name, last_name from people").executeQuery()) {
-            int count = 0;
             while (rs.next()) {
-                count++;
                 String firstName = rs.getString(1);
                 String lastName = rs.getString(2);
                 assertEquals("jon", firstName);
                 assertEquals("doe", lastName);
             }
-            assertEquals("There should be two records in DB", 2, count);
         }
 
     }

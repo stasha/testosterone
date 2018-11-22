@@ -18,7 +18,6 @@ public class RequestAnnotation implements Request {
     private int[] expectedStatus = {};
     private int[] expectedStatusBetween = {200, 400};
     private String entity = "";
-    private boolean generic;
 
     /**
      * Creates new RequestAnnotation instance.
@@ -37,24 +36,6 @@ public class RequestAnnotation implements Request {
             this.repeat = request.repeat();
             this.url = request.url();
         }
-    }
-
-    /**
-     * Returns true/false if this request is generic.
-     *
-     * @return
-     */
-    public boolean isGeneric() {
-        return generic;
-    }
-
-    /**
-     * Sets if this request is generic.
-     *
-     * @param generic
-     */
-    public void setGeneric(boolean generic) {
-        this.generic = generic;
     }
 
     /**
@@ -91,9 +72,6 @@ public class RequestAnnotation implements Request {
      */
     public void setUrl(String url) {
         this.url = url;
-        if (url.equals("__generic__")) {
-            setGeneric(true);
-        }
     }
 
     /**

@@ -8,7 +8,6 @@ import org.glassfish.hk2.api.ServiceHandle;
 import org.slf4j.LoggerFactory;
 import info.stasha.testosterone.annotation.LoadFile;
 import java.io.Closeable;
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
@@ -51,7 +50,7 @@ public class InputStreamInjectionResolver implements InjectionResolver<LoadFile>
         } else if (cls == String.class) {
             try {
                 out = new String(Files.readAllBytes(Paths.get(this.getClass().getResource(path).getPath())));
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
         } else {

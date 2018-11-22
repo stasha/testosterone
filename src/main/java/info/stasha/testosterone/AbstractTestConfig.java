@@ -27,10 +27,6 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTestConfig.class);
 
-    public static final String DEFAULT_TEST_CONFIG_PROPERTY = "testosterone.default.test.config";
-    public static final String DEFAULT_SERVER_CONFIG_PROPERTY = "testosterone.default.server.config";
-    public static final String DEFAULT_DB_CONFIG_PROPERTY = "testosterone.default.db.config";
-
     private final Set<Throwable> exceptions = new HashSet<>();
 
     private RestClient client = new RestClient(this);

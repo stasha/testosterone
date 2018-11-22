@@ -7,13 +7,13 @@ import info.stasha.testosterone.TestConfig;
  *
  * @author stasha
  */
-public class HsqldbConfig extends AbstractDbConfig {
+public class HsqlDbConfig extends AbstractDbConfig {
 
-    public HsqldbConfig() {
+    public HsqlDbConfig() {
         this(null);
     }
 
-    public HsqldbConfig(TestConfig testConfig) {
+    public HsqlDbConfig(TestConfig testConfig) {
         super(testConfig);
         this.dbName = "HSQL DB";
 

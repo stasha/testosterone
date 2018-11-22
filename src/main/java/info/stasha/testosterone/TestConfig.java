@@ -17,6 +17,10 @@ import javax.ws.rs.core.Application;
  */
 public interface TestConfig<T, C> extends StartStop {
 
+    public static final String DEFAULT_TEST_CONFIG_PROPERTY = "testosterone.default.test.config";
+    public static final String DEFAULT_SERVER_CONFIG_PROPERTY = "testosterone.default.server.config";
+    public static final String DEFAULT_DB_CONFIG_PROPERTY = "testosterone.default.db.config";
+
     public static final String BASE_URI = "http://localhost/";
     public static final int HTTP_PORT = 9998;
     public static StartServer START_SERVER = StartServer.PER_CLASS;
@@ -24,7 +28,7 @@ public interface TestConfig<T, C> extends StartStop {
     public static boolean RUN_DB = false;
 
     T getTest();
-    
+
     void setTestosterone(T testosterone);
 
     void setConfig(Configuration config);
@@ -34,13 +38,13 @@ public interface TestConfig<T, C> extends StartStop {
     RestClient getClient();
 
     ServerConfig getServerConfig();
-    
+
     boolean isRunServer();
 
     ServletContainerConfig getServletContainerConfig();
 
     DbConfig getDbConfig();
-    
+
     boolean isRunDb();
 
     TestExecutor getTestExecutor(Method method, SuperTestosterone test);

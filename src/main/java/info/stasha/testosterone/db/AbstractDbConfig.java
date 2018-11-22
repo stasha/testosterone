@@ -39,8 +39,6 @@ public abstract class AbstractDbConfig implements DbConfig {
     protected String createTestingDbSql;
     protected String dropTestingDbSql;
 
-    public AbstractDbConfig() {
-    }
 
     public AbstractDbConfig(TestConfig testConfig) {
         if (testConfig != null) {

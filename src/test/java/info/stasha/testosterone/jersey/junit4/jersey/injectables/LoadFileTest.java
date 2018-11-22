@@ -6,15 +6,19 @@ import org.junit.runner.RunWith;
 import info.stasha.testosterone.annotation.LoadFile;
 import info.stasha.testosterone.annotation.Request;
 import info.stasha.testosterone.annotation.Requests;
+import info.stasha.testosterone.jersey.inject.InputStreamInjectionResolver;
 import info.stasha.testosterone.junit4.TestosteroneRunner;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
+import org.glassfish.hk2.api.ServiceLocator;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test @LoadFile annotation.
@@ -26,6 +30,9 @@ public class LoadFileTest implements Testosterone {
 
     private static int requestCount;
     private static int inputStreamCount;
+
+    @Context
+    ServiceLocator locator;
 
     @LoadFile("test.txt")
     public InputStream is;
@@ -90,6 +97,23 @@ public class LoadFileTest implements Testosterone {
             assertEquals("Text from input stream should empty string as it was already consumed", "", txt);
         }
         assertFalse("Text string should not be empty", text.isEmpty());
+    }
+
+    @Test
+    public void testProps() {
+        InputStreamInjectionResolver ir = new InputStreamInjectionResolver();
+        assertFalse("Method should be false", ir.isMethodParameterIndicator());
+        assertTrue("Constructor should be true", ir.isConstructorParameterIndicator());
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void notSupportedType() {
+        locator.createAndInitialize(LoadFileWrongType.class);
+    }
+    
+    @Test(expected = RuntimeException.class)
+    public void notExistingPath() {
+        locator.createAndInitialize(LoadFileNotExistingPath.class);
     }
 
 }

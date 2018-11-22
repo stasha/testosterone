@@ -5,6 +5,7 @@ import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.annotation.DontIntercept;
 import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.db.H2Config;
+import info.stasha.testosterone.jersey.JerseyTestConfig;
 import info.stasha.testosterone.jersey.junit4.Testosterone;
 import info.stasha.testosterone.junit4.TestosteroneRunner;
 import java.sql.SQLException;
@@ -21,7 +22,7 @@ import org.mockito.Mockito;
  */
 @RunWith(TestosteroneRunner.class)
 @Configuration(runDb = true)
-public class H2ConfigTest implements Testosterone {
+public class AbstractDbConfigTest implements Testosterone {
 
     private final H2Config CONFIG = new H2Config(Mockito.mock(TestConfig.class));
 
@@ -35,15 +36,30 @@ public class H2ConfigTest implements Testosterone {
     }
 
     @Test
-    public void dataSourceTest() throws SQLException {
-        assertNotNull("Datasource should not be null", dbConfig.getDataSource());
-    }
-
-    @Test
     @DontIntercept
     public void initSqlTest() {
         CONFIG.add("testQuery", "select * from test");
         assertEquals("Query should equal", "select * from test", CONFIG.getInitSqls().get("testQuery"));
+    }
+
+    @Test
+    public void returnTestConfig() {
+        assertNotNull("TestConfig should not be null", dbConfig.getTestConfig());
+    }
+
+    @Test
+    public void setAndReturnTestConfig() {
+        TestConfig tc = new JerseyTestConfig(this);
+        dbConfig.setTestConfig(tc);
+        assertEquals("TestConfig should equal", tc, dbConfig.getTestConfig());
+    }
+
+    @Test(expected = RuntimeException.class)
+    @DontIntercept
+    public void connectionException() {
+        H2Config conf = Mockito.spy(CONFIG);
+        Mockito.doReturn(null).when(conf).getDataSource();
+        conf.getConnection();
     }
 
 }
