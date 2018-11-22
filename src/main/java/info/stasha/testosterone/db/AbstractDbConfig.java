@@ -29,7 +29,7 @@ public abstract class AbstractDbConfig implements DbConfig {
 
     protected HikariDataSource dataSource = new HikariDataSource();
     protected SuperTestosterone test;
-    protected String dbName = "";
+    protected String dbName = "!!! SPECIFY \"dbName\" NAME IN YOUR CONFIGURATION !!!";
     protected String testDb = "test_db_" + String.valueOf(Math.random()).replace(".", "");
     protected String userName = "testosterone";
     protected String password = "password";
@@ -215,7 +215,7 @@ public abstract class AbstractDbConfig implements DbConfig {
             LOGGER.info("Starting " + this.dbName);
             createTestingDb();
             this.running = true;
-            
+
             execute();
         }
     }
@@ -228,7 +228,7 @@ public abstract class AbstractDbConfig implements DbConfig {
     @Override
     public void stop() throws Exception {
         if (isRunning()) {
-            LOGGER.info("Stopping" + this.dbName);
+            LOGGER.info("Stopping " + this.dbName);
             this.dataSource.close();
             dropTestingDb();
             this.running = true;

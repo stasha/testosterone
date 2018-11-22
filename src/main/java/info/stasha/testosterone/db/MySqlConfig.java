@@ -3,11 +3,14 @@ package info.stasha.testosterone.db;
 import info.stasha.testosterone.TestConfig;
 
 /**
- * MySql DbConfig implementation.
+ * MySql DbConfig implementation.<br>
+ * NOTE: User with create db privileges must be used.
  *
  * @author stasha
  */
 public class MySqlConfig extends AbstractDbConfig {
+
+    private final String conn = "jdbc:mysql://localhost:3306/";
 
     public MySqlConfig() {
         this(null);
@@ -17,13 +20,13 @@ public class MySqlConfig extends AbstractDbConfig {
         super(testConfig);
         this.dbName = "MySql DB";
 
-        this.dataSource.setJdbcUrl("jdbc:mysql://localhost:5432/" + testDb);
+        this.dataSource.setJdbcUrl(conn + testDb);
         this.dataSource.setUsername(this.userName);
         this.dataSource.setPassword(this.password);
 
         // create/drop test db specific
-        this.dbConnectionString = "jdbc:mysql://localhost:5432/postgres";
-        this.createTestingDbSql = "CREATE DATABASE " + testDb + " WITH ENCODING='UTF8' OWNER = " + userName + " CONNECTION LIMIT=-1";
+        this.dbConnectionString = conn;
+        this.createTestingDbSql = "CREATE SCHEMA `" + testDb + "` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci";
         this.dropTestingDbSql = "DROP DATABASE " + testDb;
 
     }

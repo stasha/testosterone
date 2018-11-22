@@ -2,6 +2,7 @@ package info.stasha.testosterone.jersey.junit4.db;
 
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.db.DbConfig;
+import info.stasha.testosterone.db.MySqlConfig;
 import info.stasha.testosterone.jersey.junit4.Testosterone;
 import info.stasha.testosterone.junit4.TestosteroneRunner;
 import java.sql.Connection;
@@ -20,18 +21,18 @@ import org.junit.runner.RunWith;
  */
 @Ignore("Tested only on local machine")
 @RunWith(TestosteroneRunner.class)
-@Configuration(runDb = true)
-public class PostgresTest implements Testosterone {
+@Configuration(dbConfig = MySqlConfig.class, runDb = true)
+public class MySqlConfigTest implements Testosterone {
 
     @Context
     DbConfig config;
 
     String create = "CREATE TABLE people (\n"
-            + "  id  int NOT NULL SERIAL PRIMARY KEY,\n"
+            + "  id int NOT NULL AUTO_INCREMENT PRIMARY KEY,\n"
             + "  first_name VARCHAR(56) NOT NULL,\n"
             + "  last_name VARCHAR(56),\n"
-            + "  created_at DATETIME,\n"
-            + "  updated_at DATETIME\n"
+            + "  created_at TIMESTAMP  DEFAULT CURRENT_TIMESTAMP,\n"
+            + "  updated_at TIMESTAMP  DEFAULT CURRENT_TIMESTAMP\n"
             + "  )";
 
     @Override

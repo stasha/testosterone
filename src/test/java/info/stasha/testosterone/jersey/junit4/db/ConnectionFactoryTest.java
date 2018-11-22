@@ -10,7 +10,7 @@ import org.mockito.Mockito;
  *
  * @author stasha
  */
-public class H2ConnectionFactoryTest {
+public class ConnectionFactoryTest {
 
      private Connection conn = Mockito.mock(Connection.class);
      
