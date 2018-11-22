@@ -17,7 +17,7 @@ public class HsqldbConfig extends AbstractDbConfig {
         super(testConfig);
         this.dbName = "HSQL DB";
 
-        this.dataSource.setJdbcUrl("jdbc:hsqldb:hsql:mem" + testDb + ";create=true");
+        this.dataSource.setJdbcUrl("jdbc:hsqldb:mem:" + testDb + ";create=true");
         this.dataSource.setUsername(this.userName);
         this.dataSource.setPassword(this.password);
     }
