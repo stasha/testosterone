@@ -91,7 +91,7 @@ public class TestExecutorImpl implements TestExecutor {
         // then we invoke __generic__ endpoint. This is needed to initialize test
         // before @Requests or @Request annotation is invoked.
         if (!uri.startsWith("__generic__") || Utils.hasRequestAnnotation(method)) {
-            if(target.getTestConfig().isRunServer()){
+            if (target.getTestConfig().isRunServer()) {
                 executeRequest(new RequestAnnotation(getPath("__generic__")), 1);
             } else {
                 executeRequests();
@@ -133,15 +133,13 @@ public class TestExecutorImpl implements TestExecutor {
                 if (reqs.length == 0) {
                     throw new IllegalStateException("@Requests annotation may not be empty.");
                 }
-            } else if (requestAnnotation != null) {
+            } else {
                 if (target.getTestConfig().isRunServer() && requestAnnotation.url().isEmpty()) {
                     RequestAnnotation ra = new RequestAnnotation(requestAnnotation);
                     ra.setUrl(path);
                     requestAnnotation = ra;
                 }
                 reqs = new Request[]{requestAnnotation};
-            } else {
-                reqs = new Request[]{new RequestAnnotation(path)};
             }
 
             for (Request r : reqs) {
@@ -188,9 +186,9 @@ public class TestExecutorImpl implements TestExecutor {
                 requestMethod = HttpMethod.GET;
             }
         }
-        
+
         request.setMethod(requestMethod);
-        
+
         LOGGER.info(request.toString());
 
         int requestRepeat = request.repeat() == 0 ? 1 : request.repeat();
@@ -242,17 +240,19 @@ public class TestExecutorImpl implements TestExecutor {
                     } else if (obj != null) {
                         entity = (Entity) Entity.json(String.valueOf(obj));
                     }
-                } catch (NoSuchFieldException fex) {
+                } catch (SecurityException | NoSuchFieldException | IllegalArgumentException | IllegalAccessException fex) {
                     try {
                         Method en = target.getClass().getMethod(request.entity());
-                        entity = (Entity) en.invoke(target, new Object[]{});
-                    } catch (NoSuchMethodException mex) {
-                        // do nothing
-                    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                        java.util.logging.Logger.getLogger(TestExecutorImpl.class.getName()).log(Level.SEVERE, null, ex);
+                        Object obj = en.invoke(target, new Object[]{});
+                        if (en.getReturnType() == Entity.class) {
+                            entity = (Entity) obj;
+                        } else {
+                            entity = Entity.json(obj);
+                        }
+                    } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                        LOGGER.error("Failed to load entity " + request.entity(), ex);
+                        throw new RuntimeException(ex);
                     }
-                } catch (IllegalArgumentException | IllegalAccessException ex) {
-                    java.util.logging.Logger.getLogger(TestExecutorImpl.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
 
@@ -287,7 +287,7 @@ public class TestExecutorImpl implements TestExecutor {
                 LOGGER.info("Getting response {}", resp.toString());
             }
 
-            if (!target.getTestConfig().isRunServer()|| !request.url().contains("__generic__")) {
+            if (!target.getTestConfig().isRunServer() || !request.url().contains("__generic__")) {
 
                 // asserting response status if it was set on request
                 int status = resp.getStatus();

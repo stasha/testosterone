@@ -58,7 +58,6 @@ public class RestClient implements StartStop {
                 c.close();
                 client.getAndSet(null);
             } catch (Throwable ex) {
-                ex.printStackTrace();
                 throw new RuntimeException(ex);
             }
 

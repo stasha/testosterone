@@ -284,11 +284,9 @@ public class TestInterceptors {
                             setup.setTestInExecution(et);
                             // Invoking http request to resource before on resource object
                             et.executeTest();
-                        } catch (InvocationTargetException ex) {
-                            throw ex.getCause();
                         } catch (Exception ex) {
                             LOGGER.error("Failed to execute test " + invoking, ex);
-                            config.getExceptions().add(ex);
+                            config.getExceptions().add(ex.getCause());
                         }
                         // if any, throw errors produced by test before
                         config.throwExceptions();
