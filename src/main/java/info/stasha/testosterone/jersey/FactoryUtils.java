@@ -19,6 +19,9 @@ import org.mockito.Mockito;
  */
 public class FactoryUtils {
 
+    private FactoryUtils() {
+    }
+
     /**
      * FactoryUtils provide interceptor.
      *

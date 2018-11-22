@@ -1,14 +1,10 @@
 package info.stasha.testosterone.jersey.inject;
 
 import info.stasha.testosterone.annotation.Value;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Context;
 import org.glassfish.hk2.api.Injectee;
@@ -33,10 +29,8 @@ public class ValueInjectionResolver implements InjectionResolver<Value> {
                 p.load(fi);
                 props.put(propertiesPath, p);
                 return p;
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(ValueInjectionResolver.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(ValueInjectionResolver.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
             }
         }
         return new Properties();
