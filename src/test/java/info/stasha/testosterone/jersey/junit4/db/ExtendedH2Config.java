@@ -12,6 +12,7 @@ public class ExtendedH2Config extends H2Config {
     private final String conn = "jdbc:h2:mem:";
 
     public ExtendedH2Config() {
+        this(null);
     }
 
     public ExtendedH2Config(TestConfig testConfig) {

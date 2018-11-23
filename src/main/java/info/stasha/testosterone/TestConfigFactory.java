@@ -24,36 +24,20 @@ public class TestConfigFactory {
     public static <T extends SuperTestosterone> TestConfig getConfig(T testosterone) {
         TestConfig config = TEST_CONFIGURATIONS.get(Utils.getInstrumentedClassName(testosterone));
 
-        // returning existing config
         if (config != null) {
             return config;
         }
 
-        ServiceLoader<TestConfig> loader = ServiceLoader.load(TestConfig.class);
-        String systemTestProperty = System.getProperty(TestConfig.DEFAULT_TEST_CONFIG_PROPERTY);
         Configuration conf = testosterone.getClass().getAnnotation(Configuration.class);
 
-        try {
-            if (conf != null) {
-                config = conf.configuration().newInstance();
-            } else if (systemTestProperty != null) {
-                config = (TestConfig) Class.forName(systemTestProperty).newInstance();
-            } else if (loader.iterator().hasNext()) {
-                config = loader.iterator().next();
-            } else {
-                config = new JerseyTestConfig();
-            }
+        config = Utils.loadConfig(TestConfig.DEFAULT_TEST_CONFIG_PROPERTY,
+                TestConfig.class, JerseyTestConfig.class, testosterone);
+        config.setConfig(conf);
+        config.setTestosterone(testosterone);
 
-            config.setConfig(conf);
-            config.setTestosterone(testosterone);
+        TEST_CONFIGURATIONS.put(Utils.getInstrumentedClassName(testosterone), config);
 
-            TEST_CONFIGURATIONS.put(Utils.getInstrumentedClassName(testosterone), config);
-
-            return config;
-        } catch (SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | ClassNotFoundException ex) {
-            LOGGER.error("Failed to create Test Configuration.", ex);
-            throw new RuntimeException(ex);
-        }
+        return config;
 
     }
 }

@@ -85,23 +85,12 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
     @Override
     public ServerConfig getServerConfig() {
         if (serverConfig == null) {
-            try {
-                String systemServerConfig = System.getProperty(DEFAULT_SERVER_CONFIG_PROPERTY);
-                ServiceLoader<ServerConfig> serverConfigLoader = ServiceLoader.load(ServerConfig.class);
-                if (config != null) {
-                    this.serverConfig = config.serverConfig().getDeclaredConstructor(TestConfig.class).newInstance(this);
-                } else if (systemServerConfig != null) {
-                    Class.forName(systemServerConfig).getDeclaredConstructor(TestConfig.class).newInstance(this);
-                } else if (serverConfigLoader.iterator().hasNext()) {
-                    this.serverConfig = serverConfigLoader.iterator().next();
-                    this.serverConfig.setTestConfig(this);
-                } else {
-                    this.serverConfig = new JettyServerConfig(this);
-                }
-            } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                LOGGER.error("Failed to create new instance of " + ServerConfig.class, ex);
-                throw new RuntimeException(ex);
-            }
+            this.serverConfig = Utils.loadConfig(
+                    DEFAULT_SERVER_CONFIG_PROPERTY,
+                    ServerConfig.class,
+                    JettyServerConfig.class,
+                    (SuperTestosterone) getTest());
+            this.serverConfig.setTestConfig(this);
         }
 
         return this.serverConfig;
@@ -114,23 +103,12 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
     @Override
     public DbConfig getDbConfig() {
         if (dbConfig == null) {
-            try {
-                String systemDbConfig = System.getProperty(DEFAULT_DB_CONFIG_PROPERTY);
-                ServiceLoader<DbConfig> dbConfigLoader = ServiceLoader.load(DbConfig.class);
-                if (config != null) {
-                    this.dbConfig = config.dbConfig().getDeclaredConstructor(TestConfig.class).newInstance(this);
-                } else if (systemDbConfig != null) {
-                    Class.forName(systemDbConfig).getDeclaredConstructor(TestConfig.class).newInstance(this);
-                } else if (dbConfigLoader.iterator().hasNext()) {
-                    this.dbConfig = dbConfigLoader.iterator().next();
-                    this.dbConfig.setTestConfig(this);
-                } else {
-                    this.dbConfig = new H2Config(this);
-                }
-            } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                LOGGER.error("Failed to create new instance of " + DbConfig.class, ex);
-                throw new RuntimeException(ex);
-            }
+            this.dbConfig = Utils.loadConfig(
+                    DEFAULT_DB_CONFIG_PROPERTY,
+                    DbConfig.class,
+                    H2Config.class,
+                    (SuperTestosterone) getTest());
+            this.dbConfig.setTestConfig(this);
         }
 
         return this.dbConfig;

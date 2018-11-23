@@ -3,6 +3,7 @@ package info.stasha.testosterone;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.annotation.Request;
 import info.stasha.testosterone.annotation.Requests;
+import info.stasha.testosterone.db.DbConfig;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -11,6 +12,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ServiceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +70,37 @@ public class Utils {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    public static <T> T loadConfig(
+            String propertyName,
+            Class<T> configInterface,
+            Class<?> defaultClass,
+            SuperTestosterone testosterone) {
+
+        String systemTestProperty = System.getProperty(propertyName);
+        ServiceLoader<T> loader = ServiceLoader.load(configInterface);
+        Configuration conf = testosterone.getClass().getAnnotation(Configuration.class);
+        T config = null;
+
+        if (conf != null) {
+            if (configInterface == TestConfig.class) {
+                config = Utils.newInstance(conf.configuration());
+            } else if (configInterface == ServerConfig.class) {
+                config = Utils.newInstance(conf.serverConfig());
+            } else if (configInterface == DbConfig.class) {
+                config = Utils.newInstance(conf.dbConfig());
+            }
+        } else if (systemTestProperty != null) {
+            config = Utils.<T>newInstance(Utils.getClass(systemTestProperty));
+        } else if (loader.iterator().hasNext()) {
+            config = loader.iterator().next();
+        } else {
+            config = Utils.newInstance(defaultClass);
+        }
+
+        return config;
+
     }
 
     /**
