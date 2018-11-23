@@ -1,4 +1,4 @@
-package info.stasha.testosterone.jersey.junit4.servers;
+package info.stasha.testosterone.servers;
 
 import info.stasha.testosterone.jersey.junit4.*;
 import info.stasha.testosterone.ServerConfig;

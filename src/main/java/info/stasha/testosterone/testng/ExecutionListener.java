@@ -55,12 +55,8 @@ public class ExecutionListener implements ITestListener, IClassListener {
         if (!Utils.isTestosterone(itr.getInstance())) {
             return;
         }
-        try {
-            TestInterceptors.before((SuperTestosterone) itr.getInstance());
-        } catch (Exception ex) {
-            LOGGER.error("Failed to start test", ex);
-            throw new RuntimeException(ex);
-        }
+
+        TestInterceptors.before((SuperTestosterone) itr.getInstance());
     }
 
     /**
@@ -73,12 +69,8 @@ public class ExecutionListener implements ITestListener, IClassListener {
         if (!Utils.isTestosterone(itr.getInstance())) {
             return;
         }
-        try {
-            TestInterceptors.after((SuperTestosterone) itr.getInstance());
-        } catch (Exception ex) {
-            LOGGER.error("Failed to finish test", ex);
-            throw new RuntimeException(ex);
-        }
+
+        TestInterceptors.after((SuperTestosterone) itr.getInstance());
     }
 
     /**
@@ -91,12 +83,8 @@ public class ExecutionListener implements ITestListener, IClassListener {
         if (!Utils.isTestosterone(itr.getInstance())) {
             return;
         }
-        try {
-            TestInterceptors.after((SuperTestosterone) itr.getInstance());
-        } catch (Exception ex) {
-            LOGGER.error("Failed to finish test", ex);
-            throw new RuntimeException(ex);
-        }
+
+        TestInterceptors.after((SuperTestosterone) itr.getInstance());
     }
 
     /**
@@ -119,12 +107,8 @@ public class ExecutionListener implements ITestListener, IClassListener {
         if (!Utils.isTestosterone(itr.getInstance())) {
             return;
         }
-        try {
-            TestInterceptors.after((SuperTestosterone) itr.getInstance());
-        } catch (Exception ex) {
-            LOGGER.error("Failed to finish test", ex);
-            throw new RuntimeException(ex);
-        }
+
+        TestInterceptors.after((SuperTestosterone) itr.getInstance());
     }
 
     @Override
@@ -132,12 +116,8 @@ public class ExecutionListener implements ITestListener, IClassListener {
         if (!Utils.isTestosterone(itc.getRealClass())) {
             return;
         }
-        try {
-            TestInterceptors.beforeClass(getClass(itc.getRealClass()));
-        } catch (Exception ex) {
-            LOGGER.error("Failed to start test", ex);
-            throw new RuntimeException(ex);
-        }
+
+        TestInterceptors.beforeClass(getClass(itc.getRealClass()));
     }
 
     @Override
@@ -145,12 +125,8 @@ public class ExecutionListener implements ITestListener, IClassListener {
         if (!Utils.isTestosterone(itc.getRealClass())) {
             return;
         }
-        try {
-            TestInterceptors.afterClass(getClass(itc.getRealClass()));
-        } catch (Exception ex) {
-            LOGGER.error("Failed to finish test", ex);
-            throw new RuntimeException(ex);
-        }
+
+        TestInterceptors.afterClass(getClass(itc.getRealClass()));
     }
 
 }

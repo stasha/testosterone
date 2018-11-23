@@ -1,4 +1,4 @@
-package info.stasha.testosterone.jersey.junit4.annotations;
+package info.stasha.testosterone;
 
 import info.stasha.testosterone.TestAnnotations;
 import java.lang.reflect.InvocationTargetException;
@@ -29,5 +29,10 @@ public class TestAnnotationsTest {
         Method m = TestAnnotations.class.getDeclaredMethod("get", String[].class);
         m.setAccessible(true);
         m.invoke(null, TestAnnon.class);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void noTestFrameworkFound() {
+        TestAnnotations.get("testClassName");
     }
 }

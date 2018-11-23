@@ -20,13 +20,13 @@ public class TestAnnotations {
      * @param className
      * @return
      */
-    private static List<Class<? extends Annotation>> get(String... className) {
+    static List<Class<? extends Annotation>> get(String... className) {
         List<Class<? extends Annotation>> annotations = new ArrayList<>();
         for (String name : className) {
             try {
-                annotations.add((Class<? extends Annotation>) Class.forName(name));
-            } catch (ClassNotFoundException ex) {
-                // do nothing
+                annotations.add((Class<? extends Annotation>) Utils.getClass(name));
+            } catch (Exception ex) {
+                //
             }
         }
         if (annotations.isEmpty()) {

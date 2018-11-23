@@ -12,16 +12,23 @@ import org.junit.Test;
  */
 public class GrizzlyServerConfigTest {
 
+    TestConfig tc = new JerseyTestConfig();
+    ServletContainerConfig sc = new ServletContainerConfig(tc);
+
     @Test
-    public void jettyTest() {
-        TestConfig tc = new JerseyTestConfig();
-        ServletContainerConfig sc = new ServletContainerConfig(tc);
+    public void grizzlyTest() {
         GrizzlyServerConfig config = new GrizzlyServerConfig();
         config.setTestConfig(tc);
         config.setServletContainerConfig(sc);
 
         assertEquals("TestConfig should equal", tc, config.getTestConfig());
         assertEquals("ServletContainerConfig should equal", sc, config.getServletContainerConfig());
+    }
+
+    @Test
+    public void grizzlyTest2() {
+        GrizzlyServerConfig config = new GrizzlyServerConfig(tc);
+        assertEquals("TestConfig should equal", tc, config.getTestConfig());
     }
 
 }

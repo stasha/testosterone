@@ -64,19 +64,9 @@ public class ExecutionListener implements TestExecutionListener {
         Class<? extends SuperTestosterone> cls = getClass(testIdentifier);
         if (cls != null && Utils.isTestosterone(cls)) {
             if (testIdentifier.isContainer()) {
-                try {
-                    TestInterceptors.beforeClass(cls);
-                } catch (Exception ex) {
-                    LOGGER.error("Failed to start test", ex);
-                    throw new RuntimeException(ex);
-                }
+                TestInterceptors.beforeClass(cls);
             } else if (testIdentifier.isTest()) {
-                try {
-                    TestInterceptors.before(cls);
-                } catch (Exception ex) {
-                    LOGGER.error("Failed to start test", ex);
-                    throw new RuntimeException(ex);
-                }
+                TestInterceptors.before(cls);
             }
         }
     }
@@ -93,19 +83,9 @@ public class ExecutionListener implements TestExecutionListener {
         Class<? extends SuperTestosterone> cls = getClass(testIdentifier);
         if (cls != null && Utils.isTestosterone(cls)) {
             if (testIdentifier.isContainer()) {
-                try {
-                    TestInterceptors.afterClass(cls);
-                } catch (Exception ex) {
-                    LOGGER.error("Failed to finish test", ex);
-                    throw new RuntimeException(ex);
-                }
+                TestInterceptors.afterClass(cls);
             } else if (testIdentifier.isTest()) {
-                try {
-                    TestInterceptors.after(cls);
-                } catch (Exception ex) {
-                    LOGGER.error("Failed to finish test", ex);
-                    throw new RuntimeException(ex);
-                }
+                TestInterceptors.after(cls);
             }
         }
     }

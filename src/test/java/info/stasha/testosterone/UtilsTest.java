@@ -70,4 +70,11 @@ public class UtilsTest implements InterfaceWithAnnotation {
     public void invokeOriginalMethod() throws IllegalAccessException, InvocationTargetException {
         Utils.invokeOriginalMethod(this.getClass().getDeclaredMethods()[0], new PlaygroundTest(), null);
     }
+    
+    @Test(expected = RuntimeException.class)
+    public void copyFields()  {
+        Utils.copyFields(null, null);
+    }
+    
+    
 }

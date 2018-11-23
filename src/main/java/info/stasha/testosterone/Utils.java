@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ServiceLoader;
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -364,18 +365,22 @@ public class Utils {
      * @param source
      * @param dest
      */
-    public static void copyFields(Object source, Object dest) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException {
+    public static void copyFields(Object source, Object dest) {
         for (Field f : source.getClass().getSuperclass().getDeclaredFields()) {
-            if (f.getName().contains("$") || Modifier.isStatic(f.getModifiers())) {
-                continue;
-            }
-            f.setAccessible(true);
-            Field modifiers = f.getClass().getDeclaredField("modifiers");
-            modifiers.setAccessible(true);
-            modifiers.setInt(f, f.getModifiers() & ~Modifier.FINAL);
+            try {
+                if (f.getName().contains("$") || Modifier.isStatic(f.getModifiers())) {
+                    continue;
+                }
+                f.setAccessible(true);
+                Field modifiers = f.getClass().getDeclaredField("modifiers");
+                modifiers.setAccessible(true);
+                modifiers.setInt(f, f.getModifiers() & ~Modifier.FINAL);
 
-            Object value = f.get(source);
-            f.set(dest, value);
+                Object value = Utils.getFieldValue(f, source);
+                f.set(dest, value);
+            } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 }

@@ -5,11 +5,9 @@ import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.db.H2Config;
 import info.stasha.testosterone.servers.JettyServerConfig;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.HashSet;
-import java.util.ServiceLoader;
 import java.util.Set;
 import javax.inject.Singleton;
 import javax.ws.rs.core.UriBuilder;
@@ -29,7 +27,7 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
 
     private final Set<Throwable> exceptions = new HashSet<>();
 
-    private RestClient client = new RestClient(this);
+    private RestClient client;
     private T testosterone;
     private ServerConfig serverConfig;
     private Configuration config;
@@ -70,6 +68,9 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
 
     @Override
     public RestClient getClient() {
+        if(this.client == null){
+            this.setClient(new RestClient(this));
+        }
         return this.client;
     }
 
@@ -85,12 +86,11 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
     @Override
     public ServerConfig getServerConfig() {
         if (serverConfig == null) {
-            this.serverConfig = Utils.loadConfig(
+            this.setServerConfig(Utils.loadConfig(
                     DEFAULT_SERVER_CONFIG_PROPERTY,
                     ServerConfig.class,
                     JettyServerConfig.class,
-                    (SuperTestosterone) getTest());
-            this.serverConfig.setTestConfig(this);
+                    (SuperTestosterone) getTest()));
         }
 
         return this.serverConfig;
@@ -98,17 +98,18 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
 
     public void setServerConfig(ServerConfig serverConfig) {
         this.serverConfig = serverConfig;
+        this.serverConfig.setTestConfig(this);
     }
 
     @Override
     public DbConfig getDbConfig() {
         if (dbConfig == null) {
-            this.dbConfig = Utils.loadConfig(
+            this.setDbConfig(Utils.loadConfig(
                     DEFAULT_DB_CONFIG_PROPERTY,
                     DbConfig.class,
                     H2Config.class,
-                    (SuperTestosterone) getTest());
-            this.dbConfig.setTestConfig(this);
+                    (SuperTestosterone) getTest()));
+
         }
 
         return this.dbConfig;
@@ -116,12 +117,13 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
 
     public void setDbConfig(DbConfig dbConfig) {
         this.dbConfig = dbConfig;
+        this.dbConfig.setTestConfig(this);
     }
 
     @Override
     public ServletContainerConfig getServletContainerConfig() {
         if (this.servletContainerConfig == null) {
-            this.servletContainerConfig = new ServletContainerConfig(this);
+            this.setServletContainerConfig(new ServletContainerConfig(this));
             getServerConfig().setServletContainerConfig(servletContainerConfig);
         }
 
@@ -134,7 +136,7 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
 
     public boolean isRunServer() {
         if (this.runServer == null) {
-            this.runServer = config != null ? config.runServer() : RUN_SERVER;
+            this.setRunServer(config != null ? config.runServer() : RUN_SERVER);
         }
 
         return this.runServer;
@@ -146,7 +148,7 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
 
     public boolean isRunDb() {
         if (this.runDb == null) {
-            this.runDb = config != null ? config.runDb() : RUN_DB;
+            this.setRunDb(config != null ? config.runDb() : RUN_DB);
         }
 
         return this.runDb;
@@ -165,7 +167,7 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
     public URI getBaseUri() {
         if (this.baseUri == null) {
             String uri = config != null ? config.baseUri() : BASE_URI;
-            this.baseUri = UriBuilder.fromUri(uri).port(getHttpPort()).build();
+            this.setBaseUri(UriBuilder.fromUri(uri).port(getHttpPort()).build());
         }
 
         return this.baseUri;
@@ -178,7 +180,7 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
     @Override
     public int getHttpPort() {
         if (this.httpPort == 0) {
-            this.httpPort = config != null ? config.httpPort() : HTTP_PORT;
+            this.setHttpPort(config != null ? config.httpPort() : HTTP_PORT);
         }
 
         return this.httpPort;
@@ -191,7 +193,7 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
     @Override
     public StartServer getStartServer() {
         if (this.startServer == null) {
-            this.startServer = config != null ? config.startServer() : StartServer.PER_CLASS;
+            this.setStartServer(config != null ? config.startServer() : StartServer.PER_CLASS);
         }
 
         return this.startServer;
@@ -204,7 +206,7 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
     @Override
     public Setup getSetup() {
         if (this.setup == null) {
-            this.setup = new Setup(this);
+            this.setSetup(new Setup(this));
         }
         return this.setup;
     }
@@ -250,7 +252,7 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
     public void start() throws Exception {
 
         if (!isRunning()) {
-            running = true;
+            setRunning(true);
             getSetup().beforeServerStart((SuperTestosterone) getTest());
             LOGGER.info("Starting server with {} configuration", getStartServer());
 
@@ -304,7 +306,7 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
                     } finally {
                         getSetup().clearFlags();
 
-                        running = false;
+                        setRunning(false);
                         System.out.println("");
                     }
                 }
