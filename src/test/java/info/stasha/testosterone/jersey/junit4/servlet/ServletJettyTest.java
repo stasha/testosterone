@@ -23,14 +23,14 @@ import static org.mockito.Mockito.times;
  * @author stasha
  */
 @RunWith(TestosteroneRunner.class)
-public class ServletTest implements Testosterone {
+public class ServletJettyTest implements Testosterone {
 
     AccessServlet servlet = Mockito.spy(new AccessServlet());
     AccessServlet servlet2 = new AccessServlet();
 
     @Override
     public void configure(ServletContainerConfig sc) {
-        sc.setJerseyServletPath("/jersey").addServlet(servlet, "/*");
+        sc.setJerseyServletPath("/*").addServlet(servlet, "/hello/*");
         sc.addServlet(servlet2, new String[]{"/admins/a/*", "/adming/b/*"});
         sc.addServlet(servlet2, new String[]{"/users/a/*", "/users/b/*"});
         sc.addServlet(AccessServlet.class, "/home/a/*");
@@ -40,7 +40,7 @@ public class ServletTest implements Testosterone {
     }
 
     @Test
-    @Request(url = Resource.HELLO_WORLD_PATH, expectedStatus = 405)
+    @Request(url = "/hello/" +Resource.HELLO_WORLD_PATH, expectedStatus = 405)
     public void test(Response resp) throws ServletException, IOException {
         Mockito.verify(servlet, times(1)).service(any(HttpServletRequest.class), any(HttpServletResponse.class));
     }

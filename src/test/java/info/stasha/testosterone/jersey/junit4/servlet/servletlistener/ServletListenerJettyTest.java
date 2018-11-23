@@ -27,7 +27,7 @@ import static org.mockito.Mockito.times;
  * @author stasha
  */
 @RunWith(TestosteroneRunner.class)
-public class ServletListenerTest implements Testosterone {
+public class ServletListenerJettyTest implements Testosterone {
 
     private ServletListener listener = Mockito.spy(new ServletListener());
 

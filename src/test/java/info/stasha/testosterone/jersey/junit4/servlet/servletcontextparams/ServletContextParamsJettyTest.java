@@ -19,7 +19,7 @@ import org.junit.runner.RunWith;
  * @author stasha
  */
 @RunWith(TestosteroneRunner.class)
-public class ServletContextParamsTest implements Testosterone, ServletContextListener {
+public class ServletContextParamsJettyTest implements Testosterone, ServletContextListener {
 
 	private static final String TEST_PARAM = "test.param";
 	private static final String TEST_PARAM_VALUE = TEST_PARAM + ".value";

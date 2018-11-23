@@ -17,7 +17,7 @@ public class Filter implements Instantiable {
 
     private Class<? extends javax.servlet.Filter> clazz;
     private javax.servlet.Filter filter;
-    private final String[] urlPattern;
+    private String[] urlPattern;
     private final Map<String, String> initParams = new LinkedHashMap<>();
     private EnumSet<DispatcherType> dispatchers = EnumSet.of(ASYNC, ERROR, FORWARD, INCLUDE, REQUEST);
 
@@ -69,6 +69,11 @@ public class Filter implements Instantiable {
      */
     public String[] getUrlPattern() {
         return urlPattern;
+    }
+
+    public Filter setUrlPatterns(String... patterns) {
+        this.urlPattern = patterns;
+        return this;
     }
 
     /**

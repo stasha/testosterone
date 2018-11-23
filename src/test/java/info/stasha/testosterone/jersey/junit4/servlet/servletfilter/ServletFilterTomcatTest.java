@@ -1,8 +1,10 @@
 package info.stasha.testosterone.jersey.junit4.servlet.servletfilter;
 
+import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.annotation.Request;
 import info.stasha.testosterone.jersey.junit4.Testosterone;
 import info.stasha.testosterone.junit4.TestosteroneRunner;
+import info.stasha.testosterone.servers.TomcatServerConfig;
 import info.stasha.testosterone.servlet.Filter;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
 import java.io.IOException;
@@ -28,7 +30,8 @@ import static org.mockito.Mockito.times;
  * @author stasha
  */
 @RunWith(TestosteroneRunner.class)
-public class ServletFilterTest implements Testosterone {
+@Configuration(serverConfig = TomcatServerConfig.class)
+public class ServletFilterTomcatTest implements Testosterone {
 
     private AccessFilter filter = Mockito.spy(new AccessFilter());
     private AccessFilter filter2 = Mockito.spy(new AccessFilter());
@@ -42,7 +45,7 @@ public class ServletFilterTest implements Testosterone {
         sc.addFilter(filter2, new String[]{"/test/*"}, EnumSet.of(FORWARD, INCLUDE, REQUEST));
         sc.addFilter(AccessFilter.class, new String[]{"/home/*", "/user/*"});
         sc.addFilter(AccessFilter.class, new String[]{"/home/*", "/user/*"}, EnumSet.of(FORWARD, INCLUDE, REQUEST));
-        sc.addFilter(new Filter(AccessFilter.class));
+        sc.addFilter(new Filter(AccessFilter.class).setUrlPatterns("/*"));
     }
 
     @Override
