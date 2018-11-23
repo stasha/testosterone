@@ -27,6 +27,7 @@ public class JettyServerConfig implements ServerConfig {
     private ServletContainerConfig servletContainerConfig;
 
     public JettyServerConfig() {
+        this(null);
     }
 
     public JettyServerConfig(TestConfig config) {
