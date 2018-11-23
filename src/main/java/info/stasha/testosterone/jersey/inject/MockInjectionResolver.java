@@ -1,5 +1,6 @@
 package info.stasha.testosterone.jersey.inject;
 
+import info.stasha.testosterone.Utils;
 import info.stasha.testosterone.jersey.junit4.Testosterone;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
@@ -30,29 +31,25 @@ public class MockInjectionResolver implements InjectionResolver<Mock> {
 
     @Override
     public Object resolve(Injectee injectee, ServiceHandle<?> handle) {
-        try {
-            AnnotatedElement el = injectee.getParent();
+        AnnotatedElement el = injectee.getParent();
 
-            Mock mock = el.getAnnotation(Mock.class);
-            Singleton singleton = el.getAnnotation(Singleton.class);
+        Mock mock = el.getAnnotation(Mock.class);
+        Singleton singleton = el.getAnnotation(Singleton.class);
 
-            if (singleton != null) {
-                if (el instanceof Field) {
-                    Field f = (Field) el;
-                    f.setAccessible(true);
-                    Object obj = f.get(test);
+        if (singleton != null) {
+            if (el instanceof Field) {
+                Field f = (Field) el;
+                f.setAccessible(true);
+                Object obj = Utils.getFieldValue(f, test);
 
-                    if (obj != null && obj.toString().toLowerCase().contains("mock")) {
-                        return obj;
-                    }
+                if (obj != null && obj.toString().toLowerCase().contains("mock")) {
+                    return obj;
                 }
             }
-
-            return Mockito.mock(Class.forName(injectee.getRequiredType().getTypeName()), mock.answer());
-        } catch (ClassNotFoundException | IllegalArgumentException | IllegalAccessException ex) {
-            LOGGER.error("Failed to create mock " + injectee.getRequiredType().getTypeName(), ex);
-            throw new RuntimeException(ex);
         }
+
+        return Mockito.mock(Utils.getClass(injectee.getRequiredType().getTypeName()), mock.answer());
+
     }
 
     @Override

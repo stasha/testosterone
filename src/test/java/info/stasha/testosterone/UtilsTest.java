@@ -14,7 +14,21 @@ import org.junit.Test;
  * @author stasha
  */
 public class UtilsTest implements InterfaceWithAnnotation {
-    
+
+    @Test(expected = RuntimeException.class)
+    public void getClasstest() {
+        Utils.getClass((String) null);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void newInstanceFromClassTest() {
+        Utils.newInstance((Class<?>) null);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void readFieldValue() {
+        Utils.getFieldValue(null, null);
+    }
 
     @Test
     public void isTestosteroneClassTest() {
@@ -26,7 +40,7 @@ public class UtilsTest implements InterfaceWithAnnotation {
     public void getTestosteroneTest() {
         Utils.getTestosterone(null);
     }
-    
+
     @Test(expected = RuntimeException.class)
     public void getTestosteroneTest2() {
         Utils.getTestosterone((Class<? extends SuperTestosterone>) this.getClass());
@@ -41,15 +55,17 @@ public class UtilsTest implements InterfaceWithAnnotation {
     public void getMethodStartingWithNameTest2() {
         assertNull("Method starting with name should be null", Utils.getMethodStartingWithName(this.getClass(), "method", new Class[]{}));
     }
+
     @Test
     public void getAnnotatedMethodsTest() {
         assertEquals("Method should return zero length list", 0, Utils.getAnnotatedMethods(this.getClass(), null).size());
     }
+
     @Test
     public void getAnnotationTest() {
         assertNotNull("Method should return annotation from interface", Utils.getAnnotation(this.getClass(), Configuration.class));
     }
-    
+
     @Test(expected = RuntimeException.class)
     public void invokeOriginalMethod() throws IllegalAccessException, InvocationTargetException {
         Utils.invokeOriginalMethod(this.getClass().getDeclaredMethods()[0], new PlaygroundTest(), null);

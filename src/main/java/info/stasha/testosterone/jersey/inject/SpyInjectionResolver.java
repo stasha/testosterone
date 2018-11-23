@@ -1,5 +1,6 @@
 package info.stasha.testosterone.jersey.inject;
 
+import info.stasha.testosterone.Utils;
 import info.stasha.testosterone.jersey.junit4.Testosterone;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
@@ -41,52 +42,33 @@ public class SpyInjectionResolver implements InjectionResolver<Spy> {
 
         if (singleton != null) {
             if (el instanceof Field) {
-                try {
-                    Field f = (Field) el;
-                    f.setAccessible(true);
-                    Object obj = f.get(test);
+                Field f = (Field) el;
+                f.setAccessible(true);
+                Object obj = Utils.getFieldValue(f, test);
 
-                    if (obj != null && obj.getClass().toString().toLowerCase().contains("mock")) {
-                        locator.inject(obj);
-                        return obj;
-                    }
-                } catch (IllegalArgumentException | IllegalAccessException ex) {
-                    LOGGER.error("Failed to create mock " + injectee.getRequiredType().getTypeName(), ex);
-                    throw new RuntimeException(ex);
+                if (obj != null && obj.getClass().toString().toLowerCase().contains("mock")) {
+                    locator.inject(obj);
+                    return obj;
                 }
+
             }
 
         }
 
-        try {
+        Class<?> cls = Utils.getClass(injectee.getRequiredType().getTypeName());
 
-            Class<?> cls = Class.forName(injectee.getRequiredType().getTypeName());
+        Object obj = locator.getService(cls);
+        if (obj instanceof Proxy) {
 
-            Object obj = locator.getService(cls);
-            if (obj instanceof Proxy) {
-
-                Class<?> nonProxy = Class.forName(obj.toString().substring(0, obj.toString().indexOf("@")));
-                if (Factory.class.isAssignableFrom(nonProxy)) {
-                    Factory factory = (Factory) nonProxy.newInstance();
-                    obj = factory.provide();
-                }
+            Class<?> nonProxy = Utils.getClass(obj.toString().substring(0, obj.toString().indexOf("@")));
+            if (Factory.class.isAssignableFrom(nonProxy)) {
+                Factory factory = Utils.newInstance(nonProxy);
+                obj = factory.provide();
             }
-
-            if (obj == null) {
-                throw new InstantiationException();
-            }
-
-            return Mockito.mock(cls, delegatesTo(obj));
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
-            LOGGER.error("Failed to create spy for: " + injectee.getRequiredType() + ""
-                    + "\n\n- Mybee you forgot to bind service or factory in AbstractBinder?\n\n", ex);
-            throw new RuntimeException(ex);
-//        } catch (NoSuchFieldException ex) {
-//            java.util.logging.Logger.getLogger(SpyInjectionResolver.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SecurityException ex) {
-            java.util.logging.Logger.getLogger(SpyInjectionResolver.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return null;
+
+        return Mockito.mock(cls, delegatesTo(obj));
+
     }
 
     @Override

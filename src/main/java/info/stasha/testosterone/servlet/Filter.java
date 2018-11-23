@@ -1,5 +1,7 @@
 package info.stasha.testosterone.servlet;
 
+import info.stasha.testosterone.Instantiable;
+import info.stasha.testosterone.Utils;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -11,7 +13,7 @@ import static javax.servlet.DispatcherType.*;
  *
  * @author stasha
  */
-public class Filter {
+public class Filter implements Instantiable {
 
     private Class<? extends javax.servlet.Filter> clazz;
     private javax.servlet.Filter filter;
@@ -96,6 +98,19 @@ public class Filter {
     public Filter setDispatchers(EnumSet<DispatcherType> dispatchers) {
         this.dispatchers = dispatchers;
         return this;
+    }
+
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public javax.servlet.Filter newInstance() {
+        if (this.getFilter() != null) {
+            return getFilter();
+        }
+        return Utils.<javax.servlet.Filter>newInstance(getClazz());
     }
 
     @Override

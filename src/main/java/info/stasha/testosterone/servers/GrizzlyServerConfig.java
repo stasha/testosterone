@@ -97,13 +97,8 @@ public class GrizzlyServerConfig implements ServerConfig<ResourceConfig> {
      */
     @Override
     public void start() throws Exception {
-
         if (!isRunning()) {
-            try {
-                server = GrizzlyHttpServerFactory.createHttpServer(this.testConfig.getBaseUri(), this.resourceConfig);
-            } catch (Exception ex) {
-                LOGGER.error("Failed to create server.", ex);
-            }
+            server = GrizzlyHttpServerFactory.createHttpServer(this.testConfig.getBaseUri(), this.resourceConfig);
         }
     }
 

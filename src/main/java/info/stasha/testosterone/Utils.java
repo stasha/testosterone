@@ -26,6 +26,51 @@ public class Utils {
     private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
 
     /**
+     * Returns class from string
+     *
+     * @param str
+     * @return
+     */
+    public static Class<?> getClass(String str) {
+        try {
+            return Class.forName(str);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    /**
+     * Returns new instance of class.
+     *
+     * @param <T>
+     * @param cls
+     * @return
+     */
+    public static <T> T newInstance(Class<?> cls) {
+        try {
+            return (T) cls.newInstance();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    /**
+     * Reads field value
+     *
+     * @param <T>
+     * @param field
+     * @param obj
+     * @return
+     */
+    public static <T> T getFieldValue(Field field, Object obj) {
+        try {
+            return (T) field.get(obj);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    /**
      * Returns true/false if passed class is SuperTestosterone class.
      *
      * @param clazz

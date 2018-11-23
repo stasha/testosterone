@@ -1,5 +1,7 @@
 package info.stasha.testosterone.servlet;
 
+import info.stasha.testosterone.Instantiable;
+import info.stasha.testosterone.Utils;
 import java.util.EventListener;
 
 /**
@@ -7,7 +9,7 @@ import java.util.EventListener;
  *
  * @author stasha
  */
-public class Listener {
+public class Listener implements Instantiable {
 
     private Class<? extends EventListener> clazz;
     private EventListener listener;
@@ -46,6 +48,19 @@ public class Listener {
      */
     public EventListener getListener() {
         return listener;
+    }
+
+   /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
+    public java.util.EventListener newInstance() {
+        if (getListener() != null) {
+            return getListener();
+        }
+        return Utils.<java.util.EventListener>newInstance(getClazz());
     }
 
 }

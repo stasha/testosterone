@@ -43,12 +43,7 @@ public class ExecutionListener implements TestExecutionListener {
                 cls = ((ClassSource) ts).getJavaClass();
             } else if (ts instanceof MethodSource) {
                 String className = ((MethodSource) ts).getClassName();
-                try {
-                    cls = Class.forName(className);
-                } catch (ClassNotFoundException ex) {
-                    LOGGER.error("Failed to load class: " + className, ex);
-                    throw new RuntimeException(ex);
-                }
+                cls = Utils.getClass(className);
             }
             if (Testosterone.class.isAssignableFrom(cls)) {
                 return (Class<? extends SuperTestosterone>) TestInstrumentation.testClass(

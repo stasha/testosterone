@@ -110,71 +110,39 @@ public class JettyServerConfig implements ServerConfig {
 
         // registering servlet listeners
         testConfig.getServletContainerConfig().getListeners().forEach((t) -> {
-            EventListener listener;
-            if (t.getListener() == null) {
-                try {
-                    listener = t.getClazz().newInstance();
-                } catch (InstantiationException | IllegalAccessException ex) {
-                    LOGGER.error("Failed to create new listener.", ex);
-                    throw new RuntimeException(ex);
-                }
-            } else {
-                listener = t.getListener();
-            }
-
+            EventListener listener = t.newInstance();
             LOGGER.debug("Adding event listener {} to servlet container.", listener.getClass().getName());
             context.addEventListener(listener);
         });
 
         // registering servlet filters
         testConfig.getServletContainerConfig().getFilters().forEach((t) -> {
-            try {
-                FilterHolder fh = new FilterHolder();
-                Filter filter;
-                if (t.getFilter() == null) {
-                    filter = (Filter) t.getClazz().newInstance();
-                } else {
-                    filter = t.getFilter();
-                }
+            FilterHolder fh = new FilterHolder();
+            Filter filter = t.newInstance();
 
-                LOGGER.debug("Adding filter {} to servlet container.", t.toString());
-                fh.setFilter(filter);
-                fh.setInitParameters(t.getInitParams());
+            LOGGER.debug("Adding filter {} to servlet container.", t.toString());
+            fh.setFilter(filter);
+            fh.setInitParameters(t.getInitParams());
 
-                for (String urlPattern : t.getUrlPattern()) {
-                    context.addFilter(fh, urlPattern, t.getDispatchers());
-                }
-            } catch (InstantiationException | IllegalAccessException ex) {
-                LOGGER.error("Failed to create new filter.", ex);
-                throw new RuntimeException(ex);
+            for (String urlPattern : t.getUrlPattern()) {
+                context.addFilter(fh, urlPattern, t.getDispatchers());
             }
         });
 
         // registering servlets
         testConfig.getServletContainerConfig().getServlets().forEach((t) -> {
-            try {
-                ServletHolder sh = new ServletHolder();
-                Servlet servlet;
-                if (t.getServlet() == null) {
-                    servlet = (Servlet) t.getClazz().newInstance();
-                } else {
-                    servlet = t.getServlet();
-                }
+            ServletHolder sh = new ServletHolder();
+            Servlet servlet = t.newInstance();
 
-                LOGGER.debug("Adding servlet {} to servlet container.", t.toString());
-                sh.setServlet(servlet);
-                sh.setInitOrder(t.getInitOrder());
+            LOGGER.debug("Adding servlet {} to servlet container.", t.toString());
+            sh.setServlet(servlet);
+            sh.setInitOrder(t.getInitOrder());
 
-                sh.setInitParameters(t.getInitParams());
-                for (String urlPattern : t.getUrlPattern()) {
-                    context.addServlet(sh, urlPattern);
-                }
-            } catch (InstantiationException | IllegalAccessException ex) {
-                LOGGER.error("Failed to create new servlet.", ex);
-                throw new RuntimeException(ex);
+            sh.setInitParameters(t.getInitParams());
+            for (String urlPattern : t.getUrlPattern()) {
+                context.addServlet(sh, urlPattern);
             }
         });
-
     }
 
     /**
@@ -187,12 +155,7 @@ public class JettyServerConfig implements ServerConfig {
         if (!isRunning()) {
             server = new Server(testConfig.getHttpPort());
             initializeServletContainer();
-            try {
-                server.start();
-            } catch (java.net.BindException ex) {
-                LOGGER.error("Server failed to start.", ex);
-                throw ex;
-            }
+            server.start();
         }
     }
 
@@ -204,12 +167,7 @@ public class JettyServerConfig implements ServerConfig {
     @Override
     public void stop() throws Exception {
         if (isRunning()) {
-            try {
-                server.stop();
-            } catch (Exception ex) {
-                LOGGER.error("Server failed to stop.", ex);
-                throw ex;
-            }
+            server.stop();
         }
     }
 

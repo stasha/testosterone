@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.TestInstantiationException;
 
 import info.stasha.testosterone.TestInstrumentation;
 import info.stasha.testosterone.TestResponseBuilder.TestResponse;
+import info.stasha.testosterone.Utils;
 import info.stasha.testosterone.junit5.AfterAllAnnotation;
 import info.stasha.testosterone.junit5.BeforeAllAnnotation;
 import info.stasha.testosterone.jersey.junit5.Testosterone.ContextInjectParameterResolver;
@@ -51,15 +52,12 @@ public interface Testosterone extends info.stasha.testosterone.jersey.junit4.Tes
         @Override
         public Object createTestInstance(TestInstanceFactoryContext factoryContext, ExtensionContext extensionContext)
                 throws TestInstantiationException {
-            try {
-                return TestInstrumentation.testClass(
+                return Utils.newInstance(TestInstrumentation.testClass(
                         (Class<? extends SuperTestosterone>) factoryContext.getTestClass(),
                         new BeforeAllAnnotation(),
                         new AfterAllAnnotation()
-                ).newInstance();
-            } catch (InstantiationException | IllegalAccessException ex) {
-                throw new RuntimeException(ex);
-            }
+                ));
+            
         }
     }
 
@@ -96,8 +94,7 @@ public interface Testosterone extends info.stasha.testosterone.jersey.junit4.Tes
             if (pc.getParameter().getType() == Response.class
                     || pc.getParameter().getType() == TestResponse.class
                     || pc.getParameter().getType() == WebTarget.class
-                    || pc.isAnnotated(Context.class)
-                    || pc.isAnnotated(Inject.class)) {
+                    || pc.isAnnotated(Context.class)) {
                 cls = (Class<? extends SuperTestosterone>) pc.getParameter().getType();
                 return true;
             }
