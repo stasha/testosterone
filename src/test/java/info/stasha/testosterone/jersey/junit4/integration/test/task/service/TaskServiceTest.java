@@ -1,7 +1,5 @@
 package info.stasha.testosterone.jersey.junit4.integration.test.task.service;
 
-import info.stasha.testosterone.StartServer;
-import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.jersey.FactoryUtils;
 import info.stasha.testosterone.jersey.junit4.Testosterone;
 import info.stasha.testosterone.junit4.TestosteroneRunner;

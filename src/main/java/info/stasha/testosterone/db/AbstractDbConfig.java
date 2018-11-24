@@ -39,7 +39,6 @@ public abstract class AbstractDbConfig implements DbConfig {
     protected String createTestingDbSql;
     protected String dropTestingDbSql;
 
-
     public AbstractDbConfig(TestConfig testConfig) {
         if (testConfig != null) {
             this.testConfig = testConfig;
@@ -98,7 +97,7 @@ public abstract class AbstractDbConfig implements DbConfig {
      */
     @Override
     public Class<? extends Factory<Connection>> getConnectionFactory() {
-        return DbConnectionFactory.class;
+        return ConnectionFactory.class;
     }
 
     /**
@@ -215,6 +214,7 @@ public abstract class AbstractDbConfig implements DbConfig {
             this.running = true;
 
             execute();
+            LOGGER.info(this.dbName + " successfully started");
         }
     }
 
@@ -230,6 +230,7 @@ public abstract class AbstractDbConfig implements DbConfig {
             this.dataSource.close();
             dropTestingDb();
             this.running = true;
+            LOGGER.info(this.dbName + " successfully stopped");
         }
     }
 

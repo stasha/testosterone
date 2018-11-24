@@ -16,7 +16,9 @@ import javax.servlet.DispatcherType;
  */
 public class ServletContainerConfig {
 
-    private String jerseyServletPath = "/*";
+    public static final String JAX_RS_PATH_PROPERTY = "testosterone.jaxrs.path";
+
+    private String jaxRsPath = "/*";
     private final Set<Servlet> servlets = new LinkedHashSet<>();
     private final Set<Filter> filters = new LinkedHashSet<>();
     private final Set<Listener> listeners = new LinkedHashSet<>();
@@ -36,8 +38,8 @@ public class ServletContainerConfig {
      * @param path
      * @return
      */
-    public ServletContainerConfig setJerseyServletPath(String path) {
-        this.jerseyServletPath = path;
+    public ServletContainerConfig setJaxRsPath(String path) {
+        jaxRsPath = path;
         return this;
     }
 
@@ -46,8 +48,13 @@ public class ServletContainerConfig {
      *
      * @return
      */
-    public String getJerseyServletPath() {
-        return jerseyServletPath;
+    public String getJaxRsPath() {
+        String path = System.getProperty(JAX_RS_PATH_PROPERTY);
+        if (path != null) {
+            setJaxRsPath(path);
+        }
+
+        return jaxRsPath;
     }
 
     /**

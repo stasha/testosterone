@@ -21,7 +21,7 @@ import org.junit.runner.RunWith;
  */
 @RunWith(TestosteroneRunner.class)
 @Configuration(startServer = StartServer.PER_CLASS, dbConfig = ExtendedH2Config.class, runDb = true)
-public class ExtendeH2ConfigTest implements Testosterone {
+public class ExtendedH2ConfigTest implements Testosterone {
 
     @Context
     DbConfig config;

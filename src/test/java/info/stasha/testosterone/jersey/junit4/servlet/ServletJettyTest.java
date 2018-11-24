@@ -30,7 +30,7 @@ public class ServletJettyTest implements Testosterone {
 
     @Override
     public void configure(ServletContainerConfig sc) {
-        sc.setJerseyServletPath("/*").addServlet(servlet, "/hello/*");
+        sc.setJaxRsPath("/*").addServlet(servlet, "/hello/*");
         sc.addServlet(servlet2, new String[]{"/admins/a/*", "/adming/b/*"});
         sc.addServlet(servlet2, new String[]{"/users/a/*", "/users/b/*"});
         sc.addServlet(AccessServlet.class, "/home/a/*");

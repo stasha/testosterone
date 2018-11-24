@@ -295,7 +295,7 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
                 } catch (Throwable ex) {
                     throw new Error(ex);
                 } finally {
-
+                    
                     LOGGER.info("Stopping server configured with: {}", getStartServer());
                     getServerConfig().stop();
                     getDbConfig().stop();
@@ -312,7 +312,7 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
                 }
             }
         } finally {
-            TestConfigFactory.TEST_CONFIGURATIONS.remove(Utils.getInstrumentedClassName((SuperTestosterone) getTest()));
+            TestConfigFactory.TEST_CONFIGURATIONS.clear();
         }
     }
 

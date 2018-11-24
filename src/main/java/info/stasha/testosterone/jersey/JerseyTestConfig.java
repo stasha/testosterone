@@ -131,9 +131,7 @@ public class JerseyTestConfig extends AbstractTestConfig<Testosterone, JerseyTes
 
                     this.bindFactory(root.getDbConfig().getConnectionFactory())
                             .to(Connection.class)
-                            .in(RequestScoped.class)
-                            .proxy(true)
-                            .proxyForSameScope(false);
+                            .in(RequestScoped.class);
 
                     this.bindFactory(new Factory<DbConfig>() {
                         @Override
@@ -192,8 +190,8 @@ public class JerseyTestConfig extends AbstractTestConfig<Testosterone, JerseyTes
                         f.set(root.getTest(), Mockito.mock(obj.getClass(), delegatesTo(obj)));
                     }
 
-                } catch (IllegalArgumentException | IllegalAccessException ex) {
-                    java.util.logging.Logger.getLogger(SuperTestosterone.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (Exception ex) {
+                     throw new RuntimeException(ex);
                 }
             }
 
@@ -279,7 +277,7 @@ public class JerseyTestConfig extends AbstractTestConfig<Testosterone, JerseyTes
 
             // registering jersey servlet
             Servlet s = new Servlet(new ServletContainer(root.getApplication()),
-                    root.getServletContainerConfig().getJerseyServletPath()).setInitOrder(1);
+                    root.getServletContainerConfig().getJaxRsPath()).setInitOrder(0);
             root.getServletContainerConfig().addServlet(s);
 
             LOGGER.info("Configuration end:   {}", root.getTest().getClass().getName());

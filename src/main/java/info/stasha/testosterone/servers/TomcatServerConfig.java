@@ -95,7 +95,7 @@ public class TomcatServerConfig implements ServerConfig {
             LOGGER.debug("Adding filter {} to servlet container.", t.toString());
 
             Filter filter = t.newInstance();
-            String filterName = filter.getClass().getName() + String.valueOf(Math.random()).replaceAll("\\\\.", "");
+            String filterName = filter.getClass().getName() + String.valueOf(Math.random()).replaceAll("\\.", "");
             FilterDef f = new FilterDef();
 
             f.setFilter(filter);
@@ -127,7 +127,7 @@ public class TomcatServerConfig implements ServerConfig {
             LOGGER.debug("Adding servlet {} to servlet container.", t.toString());
 
             Servlet servlet = t.newInstance();
-            String servletName = servlet.getClass().getName() + String.valueOf(Math.random()).replaceAll("\\\\.", "");
+            String servletName = servlet.getClass().getName() + String.valueOf(Math.random()).replaceAll("\\.", "");
             Wrapper sw = new StandardWrapper();
             sw.setName(servletName);
             sw.setLoadOnStartup(t.getInitOrder());

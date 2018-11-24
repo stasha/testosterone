@@ -36,11 +36,16 @@ import org.junit.runner.RunWith;
  * @author stasha
  */
 @RunWith(TestosteroneRunner.class)
-public class RequestTest implements Testosterone {
+public class RequestWithCustomJerseyPathTest implements Testosterone {
 
     public static boolean afterServerStartInvoed;
     public static int afterServerStartCount = 0;
     public static boolean customPathTestInvoked;
+
+    @Override
+    public void configure(ServletContainerConfig config) {
+        config.setJaxRsPath("/jersey/*");
+    }
 
     @Override
     public void configure(ResourceConfig config) {
@@ -180,10 +185,10 @@ public class RequestTest implements Testosterone {
         String resp = response.readEntity(String.class);
 
         switch (req.url()) {
-            case Resource.HELLO_WORLD_PATH:
+            case "jersey/" + Resource.HELLO_WORLD_PATH:
                 assertTrue("Message should be: ", Resource.MESSAGE.equals(resp));
                 break;
-            case Resource.SERVICE_PATH:
+            case "jersey/" + Resource.SERVICE_PATH:
                 assertEquals("Status should equal", 200, response.getStatus());
                 assertTrue("Message should be: ", Resource.MESSAGE.equals(resp) || Service.RESPONSE_TEXT.equals(resp));
                 break;

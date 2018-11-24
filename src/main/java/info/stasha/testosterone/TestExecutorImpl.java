@@ -4,6 +4,7 @@ import info.stasha.testosterone.annotation.Request;
 import com.mifmif.common.regex.Generex;
 import info.stasha.testosterone.annotation.RequestAnnotation;
 import info.stasha.testosterone.annotation.Requests;
+import info.stasha.testosterone.servlet.ServletContainerConfig;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -43,17 +44,17 @@ public class TestExecutorImpl implements TestExecutor {
     private static final String EXECUTION_ERROR_MESSAGE = "Test failed with message: ";
 
     private final Method method;
-    private final SuperTestosterone target;
+    private final SuperTestosterone test;
 
     /**
      * Creates new InvokeTest instance.
      *
      * @param method
-     * @param target
+     * @param test
      */
-    public TestExecutorImpl(Method method, Object target) {
+    public TestExecutorImpl(Method method, SuperTestosterone test) {
         this.method = method;
-        this.target = (SuperTestosterone) target;
+        this.test = (SuperTestosterone) test;
     }
 
     /**
@@ -62,9 +63,13 @@ public class TestExecutorImpl implements TestExecutor {
      * @return
      */
     private String getPath(String path) {
-        Path root = Utils.getAnnotation(target, Path.class);
+        Path root = Utils.getAnnotation(test, Path.class);
         String rp = root != null ? root.value() : "";
-        return Paths.get(rp, path).toString().replaceAll("\\\\", "/");
+        rp = path.startsWith(rp) ? "" : rp;
+        String jp = test.getTestConfig().getServletContainerConfig().getJaxRsPath().replaceAll("/\\*", "").replaceFirst("^/", "");
+        jp = rp.startsWith(jp) ? "" : jp;
+        jp = path.startsWith(jp) ? "" : jp;
+        return Paths.get(jp, rp, path).toString().replaceAll("\\\\", "/");
     }
 
     private String getPath() {
@@ -80,8 +85,8 @@ public class TestExecutorImpl implements TestExecutor {
     @Override
     public void executeTest() throws Throwable {
         LOGGER.info("Executing test {}:{}", method.getDeclaringClass(), method.getName());
-        Path root = Utils.getAnnotation(target, Path.class);
-        Method resourceMethod = target.getTestConfig().getSetup().getTestInExecution().getMainThreadTest().getClass().getMethod(method.getName(), method.getParameterTypes());
+        Path root = Utils.getAnnotation(test, Path.class);
+        Method resourceMethod = test.getTestConfig().getSetup().getTestInExecution().getMainThreadTest().getClass().getMethod(method.getName(), method.getParameterTypes());
         Path path = resourceMethod.getAnnotation(Path.class);
 
         String uri = getPath(path.value());
@@ -90,14 +95,14 @@ public class TestExecutorImpl implements TestExecutor {
         // or if method has @Requests or @Request annotation
         // then we invoke __generic__ endpoint. This is needed to initialize test
         // before @Requests or @Request annotation is invoked.
-        if (!uri.startsWith("__generic__") || Utils.hasRequestAnnotation(method)) {
-            if (target.getTestConfig().isRunServer()) {
+        if (!uri.startsWith(getPath("__generic__")) || Utils.hasRequestAnnotation(method)) {
+            if (test.getTestConfig().isRunServer()) {
                 executeRequest(new RequestAnnotation(getPath("__generic__")), 1);
             } else {
                 executeRequests();
             }
         } else {
-            target.getTestConfig().getSetup().getTestInExecution().setIsRequest(false);
+            test.getTestConfig().getSetup().getTestInExecution().setIsRequest(false);
             executeRequest(new RequestAnnotation(uri), 1);
         }
     }
@@ -111,7 +116,7 @@ public class TestExecutorImpl implements TestExecutor {
     public void executeRequests() throws Throwable {
         String path = getPath();
 
-        LOGGER.info("Running: {}:{} at path {}", target.getClass().getName(), method.getName(), path);
+        LOGGER.info("Running: {}:{} at path {}", test.getClass().getName(), method.getName(), path);
 
         Request requestAnnotation = method.getAnnotation(Request.class);
         Requests requestsAnnotation = method.getAnnotation(Requests.class);
@@ -134,7 +139,7 @@ public class TestExecutorImpl implements TestExecutor {
                     throw new IllegalStateException("@Requests annotation may not be empty.");
                 }
             } else {
-                if (target.getTestConfig().isRunServer() && requestAnnotation.url().isEmpty()) {
+                if (test.getTestConfig().isRunServer() && requestAnnotation.url().isEmpty()) {
                     RequestAnnotation ra = new RequestAnnotation(requestAnnotation);
                     ra.setUrl(path);
                     requestAnnotation = ra;
@@ -189,10 +194,9 @@ public class TestExecutorImpl implements TestExecutor {
 
         request.setMethod(requestMethod);
 
-        LOGGER.info(request.toString());
-
         int requestRepeat = request.repeat() == 0 ? 1 : request.repeat();
-        String normalizedUrl = request.url();
+        String normalizedUrl = getPath(request.url());
+
         normalizedUrl = normalizedUrl
                 .replaceAll("\\?", "\\\\\\?")
                 .replaceAll("\\&", "\\\\\\&")
@@ -202,10 +206,13 @@ public class TestExecutorImpl implements TestExecutor {
         //generex.random();
         for (int m = 0; m < requestRepeat; ++m) {
             String generexUrl = generex.random();
-
+            
+            request.setUrl(generexUrl);
+            LOGGER.info(request.toString());
+            
             String[] url = generexUrl.split("\\?");
 
-            WebTarget webTarget = target.target(url[0]);
+            WebTarget webTarget = test.target(url[0]);
 
             if (url.length > 1 && !url[1].isEmpty()) {
 
@@ -229,9 +236,9 @@ public class TestExecutorImpl implements TestExecutor {
 
             if (!request.entity().isEmpty()) {
                 try {
-                    Field e = target.getClass().getField(request.entity());
+                    Field e = test.getClass().getField(request.entity());
                     e.setAccessible(true);
-                    Object obj = e.get(target);
+                    Object obj = e.get(test);
                     if (obj instanceof InputStream) {
                         entity = Entity.json(new BufferedReader(new InputStreamReader((InputStream) obj))
                                 .lines().collect(Collectors.joining("\n")));
@@ -242,8 +249,8 @@ public class TestExecutorImpl implements TestExecutor {
                     }
                 } catch (SecurityException | NoSuchFieldException | IllegalArgumentException | IllegalAccessException fex) {
                     try {
-                        Method en = target.getClass().getMethod(request.entity());
-                        Object obj = en.invoke(target, new Object[]{});
+                        Method en = test.getClass().getMethod(request.entity());
+                        Object obj = en.invoke(test, new Object[]{});
                         if (en.getReturnType() == Entity.class) {
                             entity = (Entity) obj;
                         } else {
@@ -283,25 +290,25 @@ public class TestExecutorImpl implements TestExecutor {
                 default:
                     resp = builder.get();
             }
-            if (!request.url().equals("__generic__")) {
+            if (!request.url().equals(getPath("__generic__"))) {
                 LOGGER.info("Getting response {}", resp.toString());
             }
 
-            if (!target.getTestConfig().isRunServer() || !request.url().contains("__generic__")) {
+            if (!test.getTestConfig().isRunServer() || !request.url().contains("__generic__")) {
 
                 // asserting response status if it was set on request
                 int status = resp.getStatus();
                 String s = Arrays.toString(request.expectedStatus()).replace(",", " or ");
                 List<Integer> expectedStatus = Arrays.stream(request.expectedStatus()).boxed().collect(Collectors.toList());
                 if (request.expectedStatus().length > 0 && !expectedStatus.contains(status)) {
-                    target.getTestConfig().getExceptions()
-                            .add(new AssertionError("Response status code should be " + s + ". Expecting " + s + " but was [" + status + "]"));
+                    test.getTestConfig().getExceptions()
+                            .add(new AssertionError("Response status code for url " + request.toString() + "\n  should be " + s + ". Expecting " + s + " but was [" + status + "]"));
                 }
 
                 int between[] = request.expectedStatusBetween();
                 if ((request.expectedStatus().length == 0 && between.length > 0) && (status < between[0] || status > between[1])) {
-                    target.getTestConfig().getExceptions()
-                            .add(new AssertionError("Response status code should be between [" + between[0] + " and " + between[1]
+                    test.getTestConfig().getExceptions()
+                            .add(new AssertionError("Response status code for url " + request.toString() + "\n should be between [" + between[0] + " and " + between[1]
                                     + "] but was [" + status + "]"));
                 }
 
@@ -327,7 +334,7 @@ public class TestExecutorImpl implements TestExecutor {
 
                 if (params.size() > 0) {
                     try {
-                        Utils.invokeOriginalMethod(method, target, params.toArray());
+                        Utils.invokeOriginalMethod(method, test, params.toArray());
                     } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException ex) {
                         LOGGER.error("Failed to invoke original test method", ex.getCause());
                         throw new RuntimeException(ex.getCause());

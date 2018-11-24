@@ -4,6 +4,7 @@ import info.stasha.testosterone.TestConfig;
 
 /**
  * HSQL DbConfig implementation.
+ * NOTE: HsqlDbConfig causes Jersey 2.21, 2.22 to fail with stack overflow.
  *
  * @author stasha
  */
