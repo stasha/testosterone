@@ -1,7 +1,5 @@
 # testosterone
-Testosterone enables Jersey usage directly in JUnit test classes. 
-In other words, test classes become Jersey resource classes with full JUnit functionality support. 
-Components can be injected using @Context or @Inject which is ideal for testing single component functionality. 
+Test your Jersey app without a compromise.
 
 [![Build Status](https://travis-ci.org/stasha/testosterone.svg?branch=master)](https://travis-ci.org/stasha/testosterone)
 [![CircleCI](https://circleci.com/gh/stasha/testosterone/tree/master.svg?style=svg)](https://circleci.com/gh/stasha/testosterone/tree/master)
@@ -21,472 +19,98 @@ Components can be injected using @Context or @Inject which is ideal for testing 
 https://repo.maven.apache.org/maven2/info/stasha/testosterone/
 ```
 
-# Examples
+- simple to write code and tests 
 
-### Application event listener test
-```
+- it's also architectural framework that simplifies writing tests from ground up: 
+    1. DAO - against in-memory or external DB
+    2. Service - using mocks
+    3. Resource - using mocks
+    4. Integration - against embedded server, in-memory or external DB
+    5. Integration - against any external environment including production
+
+- supports:
+    - all Jersey versions from 2.1 to 2.27
+    - JUnit4, JUnit5 and TestNG
+    - all Jersey related stuff inside a test
+    - mixed tests inside test class (running on a server or clean unit test)
+    - REST endpoints and tests in a single class
+    - embedded Jetty, Tomcat and Grizzly servers
+    - H2, Derby, HSQLDB in-memory databases
+    - Postgres and MySql external databases
+    - servlets, filters, listeners and context params
+    - local and global mocks
+    - simplified @Request annotation
+    - @Request grouping using @Requests annotation
+    - repeatable requests and request groups
+    - URL path generation by specifying regex pattern in URL
+    - integration testing on embedded or external server
+    - injection of all standard Jersey injectables + additional Testosterone ones:
+        - Connection - injects DB connection
+        - Testosterone - injects current executing test (useful for developing other components)
+        - DbConfig - injects DB configuration used in test (useful for obtaining Connection or DataSource)
+    - additional annotations:
+        - @Mock - injects mocked object
+        - @Spy - injects spied object
+        - @Value - injects value from resource (properties)
+        - @LoadFile - injects String or InputStream
+    - clean separation between tested object and dependencies (mocks)
+    - easy configuration of testing environment by providing custom implementations of ServerConfig, DbConfig or TestConfig
+    - global tests configuration by system variable or ServiceLoader mechanism
+    - single test configuration by @Configuration annotation
+    - running same test methods with different configurations by simply subclassing test class and configuring it differently
+    - on/off Server or DB per test class
+    - freedom to extend any class (testosterone is an interface)
+    - beforeServerStart, afterServerStart, beforeServerStop and afterServerStop callbacks
+    - @Dependencies annotation for including other test classes as dependencies
+    - @Integration annotation for including other test classes that will be used in local integration test
+
+### Minimum code required:
+
+#### JUnit4
+```java
+import info.stasha.testosterone.jersey.junit4.Testosterone;
+import info.stasha.testosterone.junit4.TestosteroneRunner;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 @RunWith(TestosteroneRunner.class)
-public class ApplicationListenerTest extends JerseyRequestTest {
-
-	private static final ApplicationListener APPLICATION_LISTENER = Mockito.spy(new ApplicationListener());
-
-	public ApplicationListenerTest() {
-		this.configuration.registerInstances(APPLICATION_LISTENER);
-	}
-
-	@AfterClass
-	public static void afterClass() {
-		Mockito.verify(APPLICATION_LISTENER, times(4)).onEvent(Mockito.any(ApplicationEvent.class));
-	}
-
-	@Test
-	public void applicationListenerTest() {
-		Mockito.verify(APPLICATION_LISTENER, times(3)).onEvent(Mockito.any(ApplicationEvent.class));
-		Mockito.verify(APPLICATION_LISTENER, times(1)).onRequest(Mockito.any(RequestEvent.class));
-	}
-
-}
-```
-### BeanParam test
-```
-@RunWith(TestosteroneRunner.class)
-public class BeanParamTest extends JerseyRequestTest {
-
-	private static final String FIRST_NAME = "Jon";
-	private static final String LAST_NAME = "Doe";
-	private static final String STATE = "sleeping";
-
-	@GET
-	@Path("beanParam/{state}")
-	public void beanParams(@BeanParam User user) {
-		assertEquals("First Name should equal", FIRST_NAME, user.getFirstName());
-		assertEquals("Last Name should equal", LAST_NAME, user.getLastName());
-		assertEquals("State should equal", STATE, user.getState());
-	}
-
-	@Test
-	public void testParams() {
-		Response resp = target().path("beanParam").path(STATE)
-				.queryParam("firstName", FIRST_NAME)
-				.queryParam("lastName", LAST_NAME)
-				.request().get();
-
-		assertEquals("Status code should be 204", 204, resp.getStatus());
-	}
-
-}
-```
-
-### Exception mapper test
-```
-@RunWith(TestosteroneRunner.class)
-public class ExceptionMappingProviderTest extends JerseyRequestTest {
-
-	public static final String PATH = "exceptionMapping";
-
-	public ExceptionMappingProviderTest() {
-		this.configuration.register(ExceptionMapperProvider.class);
-	}
-
-	@GET
-	@Path(PATH)
-	@DontIntercept
-	public String post() {
-		throw new IllegalStateException();
-	}
-
-	@Test
-	public void testmethod() {
-		String resp = target().path(PATH).request().get().readEntity(String.class);
-		assertEquals("ExceptionMappingProvider should return message", ExceptionMapperProvider.MESSAGE, resp);
-	}
-
-}
-```
-### Expected exception test
-```
-@RunWith(TestosteroneRunner.class)
-public class ExpectedExceptionTest extends JerseyRequestTest {
-
-	public ExpectedExceptionTest() {
-		this.abstractBinder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
-	}
-
-	@Test(expected = IllegalStateException.class)
-	public void illegalStateExceptionTest(@Context Service service) {
-		service.throwIllegalStateException();
-	}
-
-	@GET
-	@Path("exceptionTest")
-	public String throwIllegalStateException(@Context Service service) {
-		service.throwIllegalStateException();
-		return "not reachable";
-	}
-
-	@Test(expected = IllegalStateException.class)
-	public void illegalStateExceptionByRequestTest() {
-		target().path("exceptionTest").request().get();
-	}
-
+public class JUnit4Test implements Testosterone {
+    
+    @Test
+    public void test(){
+    }
 }
 ```
 
-### Injectables test
-```
-@RunWith(TestosteroneRunner.class)
-public class InjectablesTest extends JerseyWebRequestTest {
+#### JUnit5
+```java
+import info.stasha.testosterone.jersey.junit5.Testosterone;
+import org.junit.jupiter.api.Test;
 
-	@Context
-	private Application application;
-
-	@Context
-	private HttpHeaders httpHeaders;
-
-	@Context
-	private Request request;
-
-	@Context
-	private SecurityContext securityContext;
-
-	@Context
-	private UriInfo uriInfo;
-
-	@Context
-	private Configuration conf;
-
-	@Context
-	private ResourceContext resourceContext;
-
-	@Context
-	private Providers providers;
-
-	@Context
-	private HttpServletRequest httpServletRequest;
-
-	@Context
-	private HttpServletResponse httpServletResponse;
-
-	@Context
-	private ServletConfig servletConfig;
-
-	@Context
-	private ServletContext servletContext;
-
-	@Test
-	public void injectablesTest() {
-		assertNotNull("Application should not be null", application);
-		assertNotNull("HttpHeaders should not be null", httpHeaders);
-		assertNotNull("Request should not be null", request);
-		assertNotNull("SecurityContext should not be null", securityContext);
-		assertNotNull("UriInfo should not be null", uriInfo);
-		assertNotNull("Configuration should not be null", conf);
-		assertNotNull("ResourceContext should not be null", resourceContext);
-		assertNotNull("Providers should not be null", providers);
-		assertNotNull("HttpServletRequest should not be null", httpServletRequest);
-		assertNotNull("HttpServletResponse should not be null", httpServletResponse);
-		assertNotNull("ServletConfig should not be null", servletConfig);
-		assertNotNull("ServletContext should not be null", servletContext);
-	}
-
-	@Test
-	public void methodInjectablesTest(
-			@Context Application application,
-			@Context HttpHeaders httpHeaders,
-			@Context Request request,
-			@Context SecurityContext securityContext,
-			@Context UriInfo uriInfo,
-			@Context Configuration conf,
-			@Context ResourceContext resourceContext,
-			@Context Providers providers,
-			@Context HttpServletRequest httpServletRequest,
-			@Context HttpServletResponse httpServletResponse,
-			@Context ServletConfig servletConfig,
-			@Context ServletContext servletContext
-	) {
-		assertNotNull("Application should not be null", application);
-		assertNotNull("HttpHeaders should not be null", httpHeaders);
-		assertNotNull("Request should not be null", request);
-		assertNotNull("SecurityContext should not be null", securityContext);
-		assertNotNull("UriInfo should not be null", uriInfo);
-		assertNotNull("Configuration should not be null", conf);
-		assertNotNull("ResourceContext should not be null", resourceContext);
-		assertNotNull("Providers should not be null", providers);
-		assertNotNull("HttpServletRequest should not be null", httpServletRequest);
-		assertNotNull("HttpServletResponse should not be null", httpServletResponse);
-		assertNotNull("ServletConfig should not be null", servletConfig);
-		assertNotNull("ServletContext should not be null", servletContext);
-	}
+public class JUnit5Test implements Testosterone {
+ 
+    @Test
+    public void test(){
+    }
 }
 ```
 
-### ReadWrite interceptor test
-```
-@RunWith(TestosteroneRunner.class)
-public class ReadWriteInterceptorTest extends JerseyRequestTest {
+#### TestNG
+```java
+import info.stasha.testosterone.jersey.testng.Testosterone;
+import org.testng.annotations.Test;
 
-	public static final String PATH = "changeTextInterceptor";
-
-	public ReadWriteInterceptorTest() {
-		this.configuration.registerInstances(new ReadWriteInterceptor());
-	}
-
-	@GET
-	@Path(PATH)
-	public String post() {
-		return "success";
-	}
-
-	@Test
-	public void testmethod(String data) {
-		// Interceptor should pass string data
-		assertEquals("Interceptor should pass string data", ReadWriteInterceptor.READ_FROM_TEXT, data);
-
-		// without interceptor, returned text should be "success"
-		String resp = target().path(PATH).request().get().readEntity(String.class);
-
-		// Text should be changed by interceptor
-		assertEquals("Interceptor should return string data", ReadWriteInterceptor.WRITE_TO_TEXT, resp);
-	}
-
+public class TestNGTest implements Testosterone {
+ 
+    @Test
+    public void test(){
+    }
 }
 ```
 
 
-### Request test
-```
-@RunWith(TestosteroneRunner.class)
-public class RequestTest extends JerseyRequestTest {
-
-	public RequestTest() {
-		this.configuration.register(Resource.class);
-		this.abstractBinder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
-	}
-
-	/**
-	 * Multi request test.
-	 *
-	 * @param service
-	 * @param id
-	 * @param firstName
-	 * @param lastName
-	 */
-	@Test
-	@GET
-	@Path("test/{service}/{id}")
-	@Requests(
-			repeat = 2,
-			requests = {
-				@Request(url = "test/[a-z]{10,20}/[0-9]{1,10}?firstName=Jon&lastName=Doe"),
-				@Request(url = "test2/car/[a-z]{10,20}", method = HttpMethod.POST, excludeFromRepeat = {2}),
-				@Request(url = "test2/truck/[a-z]{10,20}", method = HttpMethod.POST)
-			})
-	public void multiRequestTest(
-			@PathParam("service") String service,
-			@PathParam("id") String id,
-			@QueryParam("firstName") String firstName,
-			@QueryParam("lastName") String lastName) {
-
-		assertData(service, id, firstName, lastName);
-	}
-
-	/**
-	 * This will be invoked by "annotations" placed on "multiRequestTest" method
-	 *
-	 * @param service
-	 * @param id
-	 */
-	@POST
-	@Path("test2/{service}/{id}")
-	public void multiRequestTestExternalMethod(
-			@PathParam("service") String service,
-			@PathParam("id") String id) {
-
-		assertTrue("Service should be car or truck", (service.equals("car") || service.equals("truck")));
-		assertTrue("Id should be number", id != null && !id.isEmpty());
-	}
-
-	/**
-	 * Single request test
-	 *
-	 * @param service
-	 * @param id
-	 * @param firstName
-	 * @param lastName
-	 */
-	@Test
-	@POST
-	@Path("test/{service}/{id}")
-	@Request(url = "test/[a-z]{10,20}/[0-9]{1,10}?firstName=Jon&lastName=Doe", method = HttpMethod.POST)
-	public void singleRequestTest(
-			@PathParam("service") String service,
-			@PathParam("id") String id,
-			@QueryParam("firstName") String firstName,
-			@QueryParam("lastName") String lastName) {
-
-		assertData(service, id, firstName, lastName);
-	}
-
-	/**
-	 * Single request to external resource test
-	 *
-	 * @param response
-	 */
-	@Test
-	@Request(url = Resource.HELLO_WORLD_PATH)
-	public void singleRequestExternalResourceTest(Response response) {
-		assertEquals("Status should equal", 200, response.getStatus());
-		assertEquals("Response text should equal", Resource.MESSAGE, response.readEntity(String.class));
-	}
-
-	/**
-	 * Multi request to external resource test
-	 *
-	 * @param response
-	 */
-	@Test
-	@Requests(requests = {
-		@Request(url = Resource.HELLO_WORLD_PATH),
-		@Request(url = Resource.SERVICE_PATH)
-	})
-	public void multiRequestExternalResourceTest(Response response) {
-		assertEquals("Status should equal", 200, response.getStatus());
-
-		String resp = response.readEntity(String.class);
-		assertTrue("Message should be: ", Resource.MESSAGE.equals(resp) || Service.RESPONSE_TEXT.equals(resp));
-	}
+    
+    
 
 
-	private void assertData(String service, String id, String firstName, String lastName) {
-		assertTrue("Service should be string", service != null && !service.isEmpty());
-		assertTrue("Id should be number", (Integer) Integer.parseInt(id) instanceof Integer);
-		assertEquals("FirstName should equal", "Jon", firstName);
-		assertEquals("LastName should equal", "Doe", lastName);
-	}
-
-}
-
-```
-
-### Request filter test
-```
-@RunWith(TestosteroneRunner.class)
-public class RequestFilterTest extends JerseyRequestTest {
-
-	public static final String PATH = "filterChangedMethod";
-
-	public RequestFilterTest() {
-		this.configuration.registerInstances(new RequestFilter());
-	}
-
-	@POST
-	@Path(PATH)
-	public String post() {
-		return "success";
-	}
-
-	@Test
-	public void testmethod() {
-		// executing GET request that should be changed to POST by filter
-		String resp = target().path(PATH).request().get().readEntity(String.class);
-		assertEquals("Filter should change request method", "success", resp);
-	}
-
-}
-```
-
-### Request params test
-```
-@RunWith(TestosteroneRunner.class)
-public class RequestParamsTest extends JerseyRequestTest {
-
-	private static final String FIRST_NAME = "Jon";
-	private static final String LAST_NAME = "Doe";
-	private static final String STATE = "sleeping";
-
-	@GET
-	@Path("beanParam/{state}")
-	public void beanParams(
-			@QueryParam("firstName") String firstName,
-			@QueryParam("lastName") String lastName,
-			@PathParam("state") String state
-	) {
-		assertEquals("First Name should equal", FIRST_NAME, firstName);
-		assertEquals("Last Name should equal", LAST_NAME, lastName);
-		assertEquals("State should equal", STATE, state);
-	}
-
-	@Test
-	public void testParams() {
-		Response resp = target().path("beanParam").path(STATE)
-				.queryParam("firstName", FIRST_NAME)
-				.queryParam("lastName", LAST_NAME)
-				.request().get();
-
-		assertEquals("Status code should be 204", 204, resp.getStatus());
-	}
-
-}
-```
-
-### Resource test
-```
-@RunWith(TestosteroneRunner.class)
-public class ResourceTest extends JerseyRequestTest {
-
-	public ResourceTest() {
-		this.configuration.register(Resource.class);
-		this.abstractBinder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
-	}
-
-	@Test
-	public void testResource() {
-		String resp = target().path(Resource.PATH).request().get().readEntity(String.class);
-		assertEquals("Message returned by request should equal", Resource.MESSAGE, resp);
-	}
-
-	@Test
-	public void testResourceService() {
-		String resp = target().path(Resource.PATH).path("service").request().get().readEntity(String.class);
-		assertEquals("Message returned by request should equal", Service.RESPONSE_TEXT, resp);
-	}
-
-}
-```
-### Service test
-```
-@RunWith(TestosteroneRunner.class)
-public class ServiceTest extends JerseyRequestTest {
-
-	private Service service;
-
-	public ServiceTest() {
-		this.abstractBinder.bindFactory(ServiceFactory.class).to(Service.class).in(RequestScoped.class).proxy(true).proxyForSameScope(false);
-	}
-
-	@Context
-	public void setMyService(Service service) {
-		this.service = Mockito.mock(Service.class, delegatesTo(service));
-	}
-
-	@Test
-	public void messageTest() {
-		Mockito.verify(service, times(0)).getText();
-		assertEquals("Returned message should equal", Service.RESPONSE_TEXT, service.getText());
-		Mockito.verify(service, times(1)).getText();
-	}
-
-	@Test
-	public void zeroInteractionsTest() {
-		Mockito.verifyZeroInteractions(service);
-	}
-
-	@Test
-	public void customReturnTest() {
-		assertNull("User should be null", service.getUser());
-		Mockito.doReturn(new User()).when(service).getUser();
-		assertNotNull("User should be not null", service.getUser());
-	}
-}
-```
 
