@@ -1,6 +1,6 @@
 # testosterone
 is architectural testing framework designed to maximally simplify tests writing and Jersey based applications testing.<br />
-Also, it maximally simplifies writing of "free-form" or "cowboy" tests.
+Also, it maximally simplifies writing "free-form" or "cowboy" tests.
 
 
 [![Build Status](https://travis-ci.org/stasha/testosterone.svg?branch=master)](https://travis-ci.org/stasha/testosterone)
