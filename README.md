@@ -55,11 +55,11 @@ Take a look at [example](https://github.com/stasha/testosterone/tree/master/src/
     - [@Spy - injects spied object](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/injectables/SpyInjectTest.java)
     - [@Value - injects value from resource (properties)](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/injectables/ValueInjectionTest.java)
     - [@LoadFile - injects String or InputStream](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/injectables/LoadFileTest.java) 
-    - [@Request - Sends request to specified url](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/request/RequestTest.java)
+    - [@Request - sends request to specified URL](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/request/RequestTest.java)
     - [@Requests - groups @Request annotations](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/request/RequestTest.java)
-    - [@Dependencies - including other test classes as dependencies](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/task/dao/TaskDaoTest.java)
-    - [@Integration - including other test classes in local integration test](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/TaskEndpointIntegrationTest.java)
-- additional life-cycle callbacks
+    - [@Dependencies - includes other test classes as dependencies](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/task/dao/TaskDaoTest.java)
+    - [@Integration - includes other test classes into local integration test](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/TaskEndpointIntegrationTest.java)
+- life-cycle callbacks
     - [beforeServerStart](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/lifecycle/TestLifeCyclePerClassTest.java)
     - [afterServerStart](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/lifecycle/TestLifeCyclePerClassTest.java)
     - [beforeServerStop](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/lifecycle/TestLifeCyclePerClassTest.java)
