@@ -1,5 +1,5 @@
 # testosterone
-is architectural testing framework designed to maximally simplify writing of tests and testing Jersey applications.<br />
+is architectural testing framework designed to maximally simplify tests writing and Jersey based applications testing.<br />
 Also, it maximally simplifies writing of "free-form" or "cowboy" tests.
 
 
