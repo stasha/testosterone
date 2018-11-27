@@ -41,7 +41,7 @@ public class TaskResourceTest implements Testosterone {
     protected TaskService taskService;
 
     @Override
-    public void configureMocks(ResourceConfig config) {
+    public void configure(ResourceConfig config) {
         config.register(taskResource);
     }
 

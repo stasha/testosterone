@@ -10,6 +10,7 @@ import info.stasha.testosterone.jersey.junit4.integration.app.task.TaskResource;
 import info.stasha.testosterone.jersey.junit4.integration.app.user.User;
 import info.stasha.testosterone.jersey.junit4.integration.app.user.dao.UserDao;
 import info.stasha.testosterone.jersey.junit4.integration.test.task.dao.TaskDaoTest;
+import info.stasha.testosterone.jersey.junit4.integration.test.task.resource.TaskResourceTest;
 import info.stasha.testosterone.jersey.junit4.integration.test.task.service.TaskServiceTest;
 import java.sql.SQLException;
 import static javax.ws.rs.HttpMethod.DELETE;
@@ -19,7 +20,6 @@ import static javax.ws.rs.HttpMethod.PUT;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,6 +29,7 @@ import org.junit.runner.RunWith;
  * @author stasha
  */
 @Integration({
+    TaskResourceTest.class,
     TaskServiceTest.class,
     TaskDaoTest.class
 })
@@ -44,11 +45,6 @@ public class TaskEndpointIntegrationTest implements Testosterone {
 
     @Context
     UserDao userDao;
-
-    @Override
-    public void configure(ResourceConfig config) {
-        config.register(TaskResource.class);
-    }
 
     @Before
     public void setUp() throws SQLException {
