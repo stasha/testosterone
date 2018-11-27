@@ -17,6 +17,7 @@ Testosterone is built around idea of writing tests from ground up
 4. [Integration test - against embedded server, in-memory or external DB](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/TaskEndpointIntegrationTest.java)
 5. [Integration test - against any external environment](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/request/ExternalBaseUriWithCustomJerseyPathTest.java)
 
+Take a look at [example](https://github.com/stasha/testosterone/tree/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration) code.
 
 
 ### Testosterone supports
