@@ -15,7 +15,7 @@ Testosterone is built around idea where components are tested from ground up end
 2. [Test service - using mocks](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/task/service/TaskServiceTest.java)
 3. [Test resource - using mocks](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/task/resource/TaskResourceTest.java)
 4. [Integration test - against embedded server, in-memory or external DB](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/TaskEndpointIntegrationTest.java)
-5. [Integration test - against any external environment](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/request/ExternalBaseUriWithCustomJerseyPathTest.java)
+5. [Integration test - against any external environment](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/TaskEndpointExternalIntegrationTest.java)
 
 Take a look at [example](https://github.com/stasha/testosterone/tree/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration) code.
 
