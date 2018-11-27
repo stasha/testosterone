@@ -8,9 +8,8 @@
 	
     <name>testosterone</name>
     <description>
-        Testosterone enables Jersey usage directly in JUnit test classes. 
-        In other words, test classes become Jersey resource classes with full 
-        JUnit functionality support.
+        Testosterone is architectural testing framework designed to maximally 
+        simplify tests writing and Jersey based applications testing.
     </description>
     <url>https://github.com/stasha/testosterone</url>
     <licenses>
