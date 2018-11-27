@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ServiceLoader;
-import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +85,7 @@ public class Utils {
 
         if (conf != null) {
             if (configInterface == TestConfig.class) {
-                config = Utils.newInstance(conf.configuration());
+                config = Utils.newInstance(conf.testConfig());
             } else if (configInterface == ServerConfig.class) {
                 config = Utils.newInstance(conf.serverConfig());
             } else if (configInterface == DbConfig.class) {

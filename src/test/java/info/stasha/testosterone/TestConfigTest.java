@@ -13,7 +13,7 @@ import org.mockito.Mockito;
  * @author stasha
  */
 @RunWith(TestosteroneRunner.class)
-@Configuration(configuration = CustomTestConfig.class)
+@Configuration(testConfig = CustomTestConfig.class)
 public class TestConfigTest implements Testosterone {
 
     public static Setup setup;

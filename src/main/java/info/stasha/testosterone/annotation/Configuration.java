@@ -28,7 +28,7 @@ public @interface Configuration {
      *
      * @return
      */
-    Class<? extends TestConfig> configuration() default JerseyTestConfig.class;
+    Class<? extends TestConfig> testConfig() default JerseyTestConfig.class;
 
     /**
      * Server configuration

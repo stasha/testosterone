@@ -1,6 +1,5 @@
 package info.stasha.testosterone.jersey.junit5;
 
-import info.stasha.testosterone.jersey.junit5.Testosterone;
 import info.stasha.testosterone.StartServer;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.annotation.Request;
