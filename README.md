@@ -10,7 +10,7 @@ Also, it maximally simplifies writing of "free-form" or "cowboy" tests.
 
 
 
-Testosterone is built around idea of writing tests from ground up
+Testosterone is built around idea where components are tested from ground up ending with joined tests into integration.
 1. [Test DAO - against in-memory or external DB](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/task/dao/TaskDaoTest.java)
 2. [Test service - using mocks](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/task/service/TaskServiceTest.java)
 3. [Test resource - using mocks](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/task/resource/TaskResourceTest.java)
