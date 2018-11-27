@@ -81,7 +81,7 @@ Take a look at [example](https://github.com/stasha/testosterone/tree/master/src/
     - [configureMocks(...)](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/user/dao/UserDaoTest.java)
 - integration testing
     - [locally on embedded server with in-memory or external DB](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/TaskEndpointIntegrationTest.java)
-    - [remote](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/request/ExternalBaseUriWithCustomJerseyPathTest.java)
+    - [remote](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/TaskEndpointExternalIntegrationTest.java)
 
 ### Install using maven
 ```
