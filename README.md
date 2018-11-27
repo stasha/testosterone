@@ -108,6 +108,25 @@ public class TestNGTest implements Testosterone {
 }
 ```
 
+#### Test class configuration
+```java
+@Configuration(
+  baseUri = "http://localhost/", 
+  httpPort = 9998, 
+  testConfig = JerseyTestConfig.class, 
+  dbConfig = H2Config.class, 
+  serverConfig = JettyServerConfig.class, 
+  runServer = true, 
+  runDb = true, 
+  startServer = StartServer.PER_CLASS
+)
+public class TestNGTest implements Testosterone {
+ 
+    @Test
+    public void test(){
+    }
+}
+```
 
     
     
