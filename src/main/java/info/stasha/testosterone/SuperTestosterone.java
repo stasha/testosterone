@@ -2,7 +2,6 @@ package info.stasha.testosterone;
 
 import javax.ws.rs.client.WebTarget;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
-import info.stasha.testosterone.db.DbConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

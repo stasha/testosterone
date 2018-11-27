@@ -1,5 +1,6 @@
 package info.stasha.testosterone.db;
 
+import info.stasha.testosterone.DbConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import info.stasha.testosterone.SuperTestosterone;
 import info.stasha.testosterone.TestConfig;

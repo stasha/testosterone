@@ -1,5 +1,6 @@
 package info.stasha.testosterone.db;
 
+import info.stasha.testosterone.DbConfig;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.ws.rs.core.Context;

@@ -3,7 +3,7 @@ package info.stasha.testosterone.jersey.junit4.integration.test.task.dao;
 import info.stasha.testosterone.StartServer;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.annotation.Dependencies;
-import info.stasha.testosterone.db.DbConfig;
+import info.stasha.testosterone.DbConfig;
 import info.stasha.testosterone.jersey.junit4.Testosterone;
 import info.stasha.testosterone.junit4.TestosteroneRunner;
 import info.stasha.testosterone.jersey.junit4.integration.app.task.Task;

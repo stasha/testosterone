@@ -3,7 +3,7 @@ package info.stasha.testosterone.jersey.junit4.db;
 import info.stasha.testosterone.TestConfig;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.annotation.DontIntercept;
-import info.stasha.testosterone.db.DbConfig;
+import info.stasha.testosterone.DbConfig;
 import info.stasha.testosterone.db.H2Config;
 import info.stasha.testosterone.jersey.JerseyTestConfig;
 import info.stasha.testosterone.jersey.junit4.Testosterone;

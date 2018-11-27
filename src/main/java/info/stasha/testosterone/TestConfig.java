@@ -1,7 +1,6 @@
 package info.stasha.testosterone;
 
 import info.stasha.testosterone.annotation.Configuration;
-import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
 import java.lang.reflect.Method;
 import java.net.URI;

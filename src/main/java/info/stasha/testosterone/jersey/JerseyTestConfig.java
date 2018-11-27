@@ -12,7 +12,7 @@ import info.stasha.testosterone.annotation.LoadFile;
 import info.stasha.testosterone.annotation.Value;
 import info.stasha.testosterone.AbstractTestConfig;
 import info.stasha.testosterone.SuperTestosterone;
-import info.stasha.testosterone.db.DbConfig;
+import info.stasha.testosterone.DbConfig;
 import info.stasha.testosterone.jersey.inject.InjectTestResolver;
 import info.stasha.testosterone.jersey.inject.InputStreamInjectionResolver;
 import info.stasha.testosterone.jersey.inject.MockInjectionResolver;

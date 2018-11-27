@@ -3,7 +3,6 @@ package info.stasha.testosterone;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.annotation.Request;
 import info.stasha.testosterone.annotation.Requests;
-import info.stasha.testosterone.db.DbConfig;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

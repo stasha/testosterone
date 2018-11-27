@@ -1,4 +1,4 @@
-package info.stasha.testosterone.db;
+package info.stasha.testosterone;
 
 import info.stasha.testosterone.StartStop;
 import info.stasha.testosterone.TestConfigBase;

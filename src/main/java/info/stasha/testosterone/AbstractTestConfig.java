@@ -1,7 +1,6 @@
 package info.stasha.testosterone;
 
 import info.stasha.testosterone.annotation.Configuration;
-import info.stasha.testosterone.db.DbConfig;
 import info.stasha.testosterone.db.H2Config;
 import info.stasha.testosterone.servers.JettyServerConfig;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
