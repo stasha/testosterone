@@ -2,20 +2,24 @@
 is architectural testing framework designed to maximally simplify writing of tests and testing Jersey applications.<br />
 Also, it maximally simplifies writing of "free-form" or "cowboy" tests.
 
+
 [![Build Status](https://travis-ci.org/stasha/testosterone.svg?branch=master)](https://travis-ci.org/stasha/testosterone)
 [![CircleCI](https://circleci.com/gh/stasha/testosterone/tree/master.svg?style=svg)](https://circleci.com/gh/stasha/testosterone/tree/master)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/info.stasha/testosterone/badge.svg)](https://maven-badges.herokuapp.com/maven-central/info.stasha/testosterone)
 [![Coverage Status](https://coveralls.io/repos/github/stasha/testosterone/badge.svg)](https://coveralls.io/github/stasha/testosterone)
 
 
-### Testosterone is built around idea of writing tests from ground up
+
+Testosterone is built around idea of writing tests from ground up
 1. [Test DAO - against in-memory or external DB](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/task/dao/TaskDaoTest.java)
 2. [Test service - using mocks](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/task/service/TaskServiceTest.java)
 3. [Test resource - using mocks](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/task/resource/TaskResourceTest.java)
 4. [Integration test - against embedded server, in-memory or external DB](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/TaskEndpointIntegrationTest.java)
 5. [Integration test - against any external environment](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/request/ExternalBaseUriWithCustomJerseyPathTest.java)
 
-### Testosterone supports:
+
+
+### Testosterone supports
 - **ALL Jersey versions from 2.1 to 2.27**
 ###
 - testing frameworks 
@@ -78,7 +82,7 @@ Also, it maximally simplifies writing of "free-form" or "cowboy" tests.
     - [locally on embedded server with in-memory or external DB](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/TaskEndpointIntegrationTest.java)
     - [remote](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/request/ExternalBaseUriWithCustomJerseyPathTest.java)
 
-### Install using maven:
+### Install using maven
 ```
 <dependency>
   <groupId>info.stasha</groupId>
@@ -92,7 +96,7 @@ Also, it maximally simplifies writing of "free-form" or "cowboy" tests.
 https://repo.maven.apache.org/maven2/info/stasha/testosterone/
 ```
 
-### Minimum dependencies for running app
+### Minimum dependencies for running tests
 ```
 <dependency>
     <groupId>org.glassfish.jersey.containers</groupId>
@@ -130,7 +134,7 @@ this dependency should be removed because it makes conflicts -->
 ```
 
 
-### Minimum code required:
+### Minimum code required
 
 #### JUnit4
 ```java
@@ -174,7 +178,7 @@ public class TestNGTest implements Testosterone {
 }
 ```
 
-#### Test class configuration
+#### Test class configuration defaults
 ```java
 @Configuration(
   baseUri = "http://localhost/", 
@@ -183,7 +187,7 @@ public class TestNGTest implements Testosterone {
   dbConfig = H2Config.class, 
   serverConfig = JettyServerConfig.class, 
   runServer = true, 
-  runDb = true, 
+  runDb = false, 
   startServer = StartServer.PER_CLASS
 )
 public class TestNGTest implements Testosterone {
