@@ -22,37 +22,37 @@ https://repo.maven.apache.org/maven2/info/stasha/testosterone/
 - simple to write code and tests 
 
 - it's also architectural framework that simplifies writing tests from ground up: 
-    1. DAO - against in-memory or external DB
-    2. Service - using mocks
-    3. Resource - using mocks
-    4. Integration - against embedded server, in-memory or external DB
+    1. [DAO - against in-memory or external DB](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/task/dao/TaskDaoTest.java)
+    2. [Service - using mocks](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/task/service/TaskServiceTest.java)
+    3. [Resource - using mocks](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/task/resource/TaskResourceTest.java)
+    4. [Integration - against embedded server, in-memory or external DB](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/TaskEndpointIntegrationTest.java)
     5. Integration - against any external environment including production
 
 - supports:
     - all Jersey versions from 2.1 to 2.27
-    - JUnit4, JUnit5 and TestNG
-    - all Jersey related stuff inside a test
-    - mixed tests inside test class (running on a server or clean unit test)
-    - REST endpoints and tests in a single class
-    - embedded Jetty, Tomcat and Grizzly servers
-    - H2, Derby, HSQLDB in-memory databases
-    - Postgres and MySql external databases
-    - servlets, filters, listeners and context params
-    - local and global mocks
-    - simplified @Request annotation
-    - @Request grouping using @Requests annotation
-    - repeatable requests and request groups
-    - URL path generation by specifying regex pattern in URL
-    - integration testing on embedded or external server
-    - injection of all standard Jersey injectables + additional Testosterone ones:
-        - Connection - injects DB connection
-        - Testosterone - injects current executing test (useful for developing other components)
-        - DbConfig - injects DB configuration used in test (useful for obtaining Connection or DataSource)
+    - [JUnit4](https://github.com/stasha/testosterone/tree/master/src/main/java/info/stasha/testosterone/jersey/junit4), [JUnit5](https://github.com/stasha/testosterone/tree/master/src/main/java/info/stasha/testosterone/jersey/junit5) and [TestNG](https://github.com/stasha/testosterone/tree/master/src/main/java/info/stasha/testosterone/jersey/testng)
+    - [all Jersey related stuff inside a test](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/injectables/InjectablesTest.java)
+    - [mixed tests inside single test class, running on a server and clean unit test (clean unit test is annotated with @DontIntercept)](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/injectables/InjectTestTest.java)
+    - [REST endpoints and tests in a single class](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/HttpMethodsTest.java)
+    - embedded [Jetty](https://github.com/stasha/testosterone/blob/master/src/main/java/info/stasha/testosterone/servers/JettyServerConfig.java), [Tomcat](https://github.com/stasha/testosterone/blob/master/src/main/java/info/stasha/testosterone/servers/TomcatServerConfig.java) and [Grizzly](https://github.com/stasha/testosterone/blob/master/src/main/java/info/stasha/testosterone/servers/GrizzlyServerConfig.java] servers
+    - [H2](https://github.com/stasha/testosterone/blob/master/src/main/java/info/stasha/testosterone/db/H2Config.java), [Derby](https://github.com/stasha/testosterone/blob/master/src/main/java/info/stasha/testosterone/db/DerbyConfig.java), [HSQLDB](https://github.com/stasha/testosterone/blob/master/src/main/java/info/stasha/testosterone/db/HsqlDbConfig.java) in-memory databases
+    - [Postgres](https://github.com/stasha/testosterone/blob/master/src/main/java/info/stasha/testosterone/db/PostgresConfig.java) and [MySql](https://github.com/stasha/testosterone/blob/master/src/main/java/info/stasha/testosterone/db/MySqlConfig.java) external databases
+    - [servlets, filters, listeners and context params](https://github.com/stasha/testosterone/tree/master/src/test/java/info/stasha/testosterone/jersey/junit4/servlet)
+    - local and global [mocks](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/injectables/MockInjectTest.java) and [spies](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/injectables/SpyInjectTest.java)
+    - [simplified @Request annotation](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/request/RequestTest.java)
+    - [@Request grouping using @Requests annotation](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/request/RequestTest.java)
+    - [repeatable requests and request groups](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/request/RequestTest.java)
+    - [URL path generation by specifying regex pattern in URL](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/request/RequestTest.java)
+    - [integration testing on embedded](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/TaskEndpointIntegrationTest.java) or [external server](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/request/ExternalBaseUriWithCustomJerseyPathTest.java)
+    - injection of all [standard Jersey injectables](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/injectables/InjectablesTest.java) + additional Testosterone ones:
+        - [Connection - injects DB connection](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/task/dao/TaskDaoTest.java)
+        - [Testosterone - injects current executing test (useful for developing other components)](https://github.com/stasha/testosterone/blob/master/src/main/java/info/stasha/testosterone/jersey/inject/SpyInjectionResolver.java)
+        - [DbConfig - injects DB configuration used in test (useful for obtaining Connection or DataSource)](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/db/HsqlDbConfigTest.java)
     - additional annotations:
-        - @Mock - injects mocked object
-        - @Spy - injects spied object
-        - @Value - injects value from resource (properties)
-        - @LoadFile - injects String or InputStream
+        - [@Mock - injects mocked object](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/injectables/MockInjectTest.java)
+        - [@Spy - injects spied object](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/injectables/SpyInjectTest.java)
+        - [@Value - injects value from resource (properties)](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/injectables/ValueInjectionTest.java)
+        - [@LoadFile - injects String or InputStream](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/injectables/LoadFileTest.java)
     - clean separation between tested object and dependencies (mocks)
     - easy configuration of testing environment by providing custom implementations of ServerConfig, DbConfig or TestConfig
     - global tests configuration by system variable or ServiceLoader mechanism
@@ -61,8 +61,8 @@ https://repo.maven.apache.org/maven2/info/stasha/testosterone/
     - on/off Server or DB per test class
     - freedom to extend any class (testosterone is an interface)
     - beforeServerStart, afterServerStart, beforeServerStop and afterServerStop callbacks
-    - @Dependencies annotation for including other test classes as dependencies
-    - @Integration annotation for including other test classes that will be used in local integration test
+    - [@Dependencies](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/task/dao/TaskDaoTest.java) annotation for including other test classes as dependencies
+    - [@Integration](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/TaskEndpointIntegrationTest.java) annotation for including other test classes that will be used in local integration test
 
 ### Minimum code required:
 
