@@ -1,30 +1,19 @@
 # testosterone
-Test your Jersey app without a compromise.
+is architectural testing framework designed to maximally simplify writing of tests and testing Jersey applications.<br />
+Also, it maximally simplifies writing of "free-form" or "cowboy" tests.
 
 [![Build Status](https://travis-ci.org/stasha/testosterone.svg?branch=master)](https://travis-ci.org/stasha/testosterone)
 [![CircleCI](https://circleci.com/gh/stasha/testosterone/tree/master.svg?style=svg)](https://circleci.com/gh/stasha/testosterone/tree/master)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/info.stasha/testosterone/badge.svg)](https://maven-badges.herokuapp.com/maven-central/info.stasha/testosterone)
 [![Coverage Status](https://coveralls.io/repos/github/stasha/testosterone/badge.svg)](https://coveralls.io/github/stasha/testosterone)
 
-### Install using maven:
-```
-<dependency>
-  <groupId>info.stasha</groupId>
-  <artifactId>testosterone</artifactId>
-  <version>${testosterone.version}</version>
-</dependency>
-```
-### Downlod from: 
-```
-https://repo.maven.apache.org/maven2/info/stasha/testosterone/
-```
 
-- it's also architectural framework that simplifies writing tests from ground up: 
-    1. [DAO - against in-memory or external DB](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/task/dao/TaskDaoTest.java)
-    2. [Service - using mocks](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/task/service/TaskServiceTest.java)
-    3. [Resource - using mocks](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/task/resource/TaskResourceTest.java)
-    4. [Integration - against embedded server, in-memory or external DB](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/TaskEndpointIntegrationTest.java)
-    5. Integration - against any external environment including production
+### Testosterone is built around idea of writing tests from ground up
+1. [Test DAO - against in-memory or external DB](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/task/dao/TaskDaoTest.java)
+2. [Test service - using mocks](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/task/service/TaskServiceTest.java)
+3. [Test resource - using mocks](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/task/resource/TaskResourceTest.java)
+4. [Integration test - against embedded server, in-memory or external DB](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/TaskEndpointIntegrationTest.java)
+5. [Integration test - against any external environment](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/request/ExternalBaseUriWithCustomJerseyPathTest.java)
 
 ### Testosterone supports:
 - **ALL Jersey versions from 2.1 to 2.27**
@@ -88,6 +77,57 @@ https://repo.maven.apache.org/maven2/info/stasha/testosterone/
 - integration testing
     - [locally on embedded server with in-memory or external DB](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/TaskEndpointIntegrationTest.java)
     - [remote](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/jersey/request/ExternalBaseUriWithCustomJerseyPathTest.java)
+
+### Install using maven:
+```
+<dependency>
+  <groupId>info.stasha</groupId>
+  <artifactId>testosterone</artifactId>
+  <version>${testosterone.version}</version>
+</dependency>
+```
+
+### Downlod from
+```
+https://repo.maven.apache.org/maven2/info/stasha/testosterone/
+```
+
+### Minimum dependencies for running app
+```
+<dependency>
+    <groupId>org.glassfish.jersey.containers</groupId>
+    <artifactId>jersey-container-grizzly2-servlet</artifactId>
+    <version>2.27</version>
+</dependency>
+
+<dependency>
+    <groupId>org.glassfish.jersey.containers</groupId>
+    <artifactId>jersey-container-grizzly2-http</artifactId>
+    <version>2.27</version>
+</dependency>
+
+<!-- Required for Jersey version 2.26 and higher. For lower versions
+this dependency should be removed because it makes conflicts -->
+<dependency>
+    <groupId>org.glassfish.jersey.inject</groupId>
+    <artifactId>jersey-hk2</artifactId>
+    <version>2.27</version>
+</dependency>
+
+<dependency>
+    <groupId>info.stasha</groupId>
+    <artifactId>testosterone</artifactId>
+    <version>3.0.0</version>
+    <scope>test</scope>
+</dependency>
+
+<dependency>
+    <groupId>junit</groupId>
+    <artifactId>junit</artifactId>
+    <version>4.12</version>
+    <scope>test</scope>
+</dependency>
+```
 
 
 ### Minimum code required:
