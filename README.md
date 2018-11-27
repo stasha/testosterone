@@ -28,23 +28,34 @@ https://repo.maven.apache.org/maven2/info/stasha/testosterone/
     4. [Integration - against embedded server, in-memory or external DB](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/TaskEndpointIntegrationTest.java)
     5. Integration - against any external environment including production
 
+
 - supports:
     - all Jersey versions from 2.1 to 2.27
+    
+    
     - testing frameworks 
         - [JUnit4](https://github.com/stasha/testosterone/tree/master/src/main/java/info/stasha/testosterone/jersey/junit4) 
         - [JUnit5](https://github.com/stasha/testosterone/tree/master/src/main/java/info/stasha/testosterone/jersey/junit5)
         - [TestNG](https://github.com/stasha/testosterone/tree/master/src/main/java/info/stasha/testosterone/jersey/testng)
+    
+    
     - embedded servers 
         - [Jetty](https://github.com/stasha/testosterone/blob/master/src/main/java/info/stasha/testosterone/servers/JettyServerConfig.java)
         - [Tomcat](https://github.com/stasha/testosterone/blob/master/src/main/java/info/stasha/testosterone/servers/TomcatServerConfig.java)
         - [Grizzly](https://github.com/stasha/testosterone/blob/master/src/main/java/info/stasha/testosterone/servers/GrizzlyServerConfig.java) 
+    
+    
     - in-memory databases 
         - [H2](https://github.com/stasha/testosterone/blob/master/src/main/java/info/stasha/testosterone/db/H2Config.java)
         - [Derby](https://github.com/stasha/testosterone/blob/master/src/main/java/info/stasha/testosterone/db/DerbyConfig.java)
         - [HSQLDB](https://github.com/stasha/testosterone/blob/master/src/main/java/info/stasha/testosterone/db/HsqlDbConfig.java)
+    
+    
     - external databases 
         - [Postgres](https://github.com/stasha/testosterone/blob/master/src/main/java/info/stasha/testosterone/db/PostgresConfig.java) 
         - [MySql](https://github.com/stasha/testosterone/blob/master/src/main/java/info/stasha/testosterone/db/MySqlConfig.java) 
+    
+    
     - servlet environment in Jetty and Tomcat
         - [Servlets](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/servlet/ServletJettyTest.java)
         - [Filters](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/servlet/servletfilter/ServletFilterJettyTest.java)
