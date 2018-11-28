@@ -38,8 +38,9 @@ public class User {
         return id;
     }
 
-    public void setId(Long id) {
+    public User setId(Long id) {
         this.id = id;
+        return this;
     }
 
     public String getFirstName() {
