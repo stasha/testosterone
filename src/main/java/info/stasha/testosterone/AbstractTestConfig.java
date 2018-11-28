@@ -55,33 +55,63 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
         this.mainThreadName = Thread.currentThread().getName();
     }
 
+    /**
+     * {@inheritDoc }
+     *
+     * @param testosterone
+     */
     @Override
     public void setTestosterone(T testosterone) {
         this.testosterone = testosterone;
     }
 
+    /**
+     * {@inheritDoc }
+     *
+     * @param config
+     */
     @Override
     public void setConfig(Configuration config) {
         this.config = config;
     }
 
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
     @Override
     public RestClient getClient() {
-        if(this.client == null){
+        if (this.client == null) {
             this.setClient(new RestClient(this));
         }
         return this.client;
     }
 
+    /**
+     * Sets the rest client that will be used for running tests.
+     *
+     * @param client
+     */
     public void setClient(RestClient client) {
         this.client = client;
     }
 
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
     @Override
     public T getTest() {
         return testosterone;
     }
 
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
     @Override
     public ServerConfig getServerConfig() {
         if (serverConfig == null) {
@@ -95,11 +125,21 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
         return this.serverConfig;
     }
 
+    /**
+     * Sets server config that will be used for running tests.
+     *
+     * @param serverConfig
+     */
     public void setServerConfig(ServerConfig serverConfig) {
         this.serverConfig = serverConfig;
         this.serverConfig.setTestConfig(this);
     }
 
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
     @Override
     public DbConfig getDbConfig() {
         if (dbConfig == null) {
@@ -114,11 +154,21 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
         return this.dbConfig;
     }
 
+    /**
+     * Sets db config that will be used for running tests.
+     *
+     * @param dbConfig
+     */
     public void setDbConfig(DbConfig dbConfig) {
         this.dbConfig = dbConfig;
         this.dbConfig.setTestConfig(this);
     }
 
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
     @Override
     public ServletContainerConfig getServletContainerConfig() {
         if (this.servletContainerConfig == null) {
@@ -129,10 +179,21 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
         return this.servletContainerConfig;
     }
 
+    /**
+     * Sets servlet container config that will be used for running test.
+     *
+     * @param servletContainerConfig
+     */
     public void setServletContainerConfig(ServletContainerConfig servletContainerConfig) {
         this.servletContainerConfig = servletContainerConfig;
     }
 
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
     public boolean isRunServer() {
         if (this.runServer == null) {
             this.setRunServer(config != null ? config.runServer() : RUN_SERVER);
@@ -141,10 +202,21 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
         return this.runServer;
     }
 
+    /**
+     * Sets if server shout be started.
+     *
+     * @param runServer
+     */
     public void setRunServer(Boolean runServer) {
         this.runServer = runServer;
     }
 
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
     public boolean isRunDb() {
         if (this.runDb == null) {
             this.setRunDb(config != null ? config.runDb() : RUN_DB);
@@ -153,15 +225,32 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
         return this.runDb;
     }
 
+    /**
+     * Sets if db should be started.
+     *
+     * @param runDb
+     */
     public void setRunDb(Boolean runDb) {
         this.runDb = runDb;
     }
 
+    /**
+     * {@inheritDoc }
+     *
+     * @param method
+     * @param test
+     * @return
+     */
     @Override
     public TestExecutor getTestExecutor(Method method, SuperTestosterone test) {
         return new TestExecutorImpl(method, test);
     }
 
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
     @Override
     public URI getBaseUri() {
         if (this.baseUri == null) {
@@ -172,10 +261,20 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
         return this.baseUri;
     }
 
+    /**
+     * Sets base uri.
+     *
+     * @param baseUri
+     */
     public void setBaseUri(URI baseUri) {
         this.baseUri = baseUri;
     }
 
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
     @Override
     public int getHttpPort() {
         if (this.httpPort == 0) {
@@ -185,10 +284,20 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
         return this.httpPort;
     }
 
+    /**
+     * Sets servers http port.
+     *
+     * @param httpPort
+     */
     public void setHttpPort(int httpPort) {
         this.httpPort = httpPort;
     }
 
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
     @Override
     public StartServer getStartServer() {
         if (this.startServer == null) {
@@ -198,10 +307,20 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
         return this.startServer;
     }
 
+    /**
+     * Sets how server should start, per test class or per test method.
+     *
+     * @param startServer
+     */
     public void setStartServer(StartServer startServer) {
         this.startServer = startServer;
     }
 
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
     @Override
     public Setup getSetup() {
         if (this.setup == null) {
@@ -210,20 +329,40 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
         return this.setup;
     }
 
+    /**
+     * Sets setup.
+     *
+     * @param setup
+     */
     public void setSetup(Setup setup) {
         this.setup = setup;
     }
 
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
     @Override
     public String getMainThreadName() {
         return this.mainThreadName;
     }
 
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
     @Override
     public Set<Throwable> getExceptions() {
         return exceptions;
     }
 
+    /**
+     * {@inheritDoc }
+     *
+     * @throws Throwable
+     */
     @Override
     public void throwExceptions() throws Throwable {
         for (Throwable ex : exceptions) {
@@ -233,17 +372,27 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
         }
     }
 
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
     @Override
     public boolean isRunning() {
         return running;
     }
 
+    /**
+     * Sets if configuration is running or not.
+     *
+     * @param running
+     */
     public void setRunning(boolean running) {
         this.running = running;
     }
 
     /**
-     * Starts server.
+     * {@inheritDoc }
      *
      * @throws Exception
      */
@@ -279,7 +428,7 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
     }
 
     /**
-     * Stops server.
+     * {@inheritDoc }
      *
      * @throws Exception
      */
@@ -294,7 +443,7 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
                 } catch (Throwable ex) {
                     throw new Error(ex);
                 } finally {
-                    
+
                     LOGGER.info("Stopping server configured with: {}", getStartServer());
                     getServerConfig().stop();
                     getDbConfig().stop();
@@ -315,6 +464,11 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
         }
     }
 
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
     @Override
     public String toString() {
         return "DefaultTestConfig{"

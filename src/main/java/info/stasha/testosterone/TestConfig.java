@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.ws.rs.core.Application;
 
 /**
+ * Test configuration.
  *
  * @author stasha
  * @param <T>
@@ -26,42 +27,141 @@ public interface TestConfig<T, C> extends StartStop {
     public static boolean RUN_SERVER = true;
     public static boolean RUN_DB = false;
 
+    /**
+     * Returns current running test
+     *
+     * @return
+     */
     T getTest();
 
+    /**
+     * Sets current running test
+     *
+     * @param testosterone
+     */
     void setTestosterone(T testosterone);
 
+    /**
+     * Sets configuration that will be used for running tests.
+     *
+     * @param config
+     */
     void setConfig(Configuration config);
 
+    /**
+     * Returns application.
+     *
+     * @return
+     */
     Application getApplication();
 
+    /**
+     * Returns rest client that will be used for running tests.
+     *
+     * @return
+     */
     RestClient getClient();
 
+    /**
+     * Returns server config that will be used for running tests.
+     *
+     * @return
+     */
     ServerConfig getServerConfig();
 
+    /**
+     * Returns true/false if server should be started.
+     *
+     * @return
+     */
     boolean isRunServer();
 
+    /**
+     * Returns servlet container config that will be used for running tests.
+     *
+     * @return
+     */
     ServletContainerConfig getServletContainerConfig();
 
+    /**
+     * Returns DB config that will be used for running tests
+     *
+     * @return
+     */
     DbConfig getDbConfig();
 
+    /**
+     * Returns true/false if DB should be started.
+     *
+     * @return
+     */
     boolean isRunDb();
 
+    /**
+     * Returns test executor that will be used for running test.
+     *
+     * @param method
+     * @param test
+     * @return
+     */
     TestExecutor getTestExecutor(Method method, SuperTestosterone test);
 
+    /**
+     * Returns base uri that will be used for running tests.
+     *
+     * @return
+     */
     URI getBaseUri();
 
+    /**
+     * Returns server http port that will be used for runnning tests.
+     *
+     * @return
+     */
     int getHttpPort();
 
+    /**
+     * Returns how server should run, per test class or per test method.
+     *
+     * @return
+     */
     StartServer getStartServer();
 
+    /**
+     * Returns setup.
+     *
+     * @return
+     */
     Setup getSetup();
 
+    /**
+     * Returns main thread name.
+     *
+     * @return
+     */
     String getMainThreadName();
 
+    /**
+     * Returns set of exceptions that will be thrown in main thread.
+     *
+     * @return
+     */
     Set<Throwable> getExceptions();
 
+    /**
+     * Throws exceptions.
+     *
+     * @throws Throwable
+     */
     void throwExceptions() throws Throwable;
 
+    /**
+     * Initialize configuration.
+     *
+     * @param root
+     * @param dep
+     * @param tests
+     */
     void init(C root, C dep, List<T> tests);
 
 }
