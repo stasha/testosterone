@@ -1,7 +1,9 @@
+![alt text](https://github.com/stasha/testosterone/blob/master/testosterona.png "Logo Title Text 1")
+
+
 # testosterone
 is architectural testing framework designed to simplify tests writing and Jersey based applications testing.<br />
 Also, it simplifies writing "free-form" or "cowboy" tests.
-
 
 [![Build Status](https://travis-ci.org/stasha/testosterone.svg?branch=master)](https://travis-ci.org/stasha/testosterone)
 [![CircleCI](https://circleci.com/gh/stasha/testosterone/tree/master.svg?style=svg)](https://circleci.com/gh/stasha/testosterone/tree/master)
