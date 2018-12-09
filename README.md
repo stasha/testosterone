@@ -1,4 +1,4 @@
-![alt text](https://github.com/stasha/testosterone/blob/master/testosterona.png "Logo Title Text 1")
+![Testosterona cartoon](https://github.com/stasha/testosterone/blob/master/testosterona.png)
 
 
 # testosterone
