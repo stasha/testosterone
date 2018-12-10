@@ -36,7 +36,7 @@ import org.junit.runner.RunWith;
 @Configuration(startServer = StartServer.PER_TEST_METHOD, runDb = true)
 public class TaskDaoTest implements Testosterone {
 
-    private final String create = "CREATE TABLE tasks (\n"
+    private final String createTasksTable = "CREATE TABLE tasks (\n"
             + "  id BIGINT(11) NOT NULL auto_increment PRIMARY KEY,\n"
             + "  title VARCHAR(56) NOT NULL,\n"
             + "  description VARCHAR(56) NOT NULL,\n"
@@ -60,7 +60,7 @@ public class TaskDaoTest implements Testosterone {
 
     @Override
     public void configure(DbConfig config) {
-        config.add("createTasksTable", create);
+        config.add("createTasksTable", createTasksTable);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class TaskDaoTest implements Testosterone {
     @Test
     public void readTask() throws Exception {
         Task dbtask = taskDao.getTask(new Task(3L));
-        assertNotNull("Returned task from db should be not null", dbtask);
+        assertNotNull("Returned task from db should not be null", dbtask);
     }
 
     @Test
@@ -100,9 +100,9 @@ public class TaskDaoTest implements Testosterone {
         this.taskDao.updateTask(new Task(2L).setTitle("Update Task Test").setDescription("Updating testing TaskDao").setDone(Boolean.TRUE));
 
         Task dbtask = taskDao.getTask(new Task(2L));
-        assertNotNull("Returned task from db should be not null", dbtask);
+        assertNotNull("Returned task sould not be null", dbtask);
         assertEquals("Title should be updated", "Update Task Test", dbtask.getTitle());
-        assertEquals("Title should be updated", "Updating testing TaskDao", dbtask.getDescription());
+        assertEquals("Description should be updated", "Updating testing TaskDao", dbtask.getDescription());
         assertEquals("Done should be true", true, dbtask.getDone());
     }
 
@@ -111,7 +111,6 @@ public class TaskDaoTest implements Testosterone {
         this.taskDao.deleteTask(new Task(1L));
 
         Task dbtask = taskDao.getTask(new Task(1L));
-
         assertNull("Returned task should be null", dbtask);
     }
 
