@@ -122,6 +122,12 @@ this dependency should be removed because it makes conflicts -->
 </dependency>
 
 <dependency>
+    <groupId>javax.servlet</groupId>
+    <artifactId>javax.servlet-api</artifactId>
+    <version>3.1.0</version>
+</dependency>
+
+<dependency>
     <groupId>info.stasha</groupId>
     <artifactId>testosterone</artifactId>
     <version>3.0.0</version>
