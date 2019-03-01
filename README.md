@@ -23,7 +23,7 @@ Take a look at [example](https://github.com/stasha/testosterone/tree/master/src/
 
 
 ### Testosterone supports
-- **ALL Jersey versions from 2.1 to 2.27**
+- **ALL Jersey versions from 2.1 to 2.28**
 ###
 - testing frameworks 
     - [JUnit4](https://github.com/stasha/testosterone/tree/master/src/main/java/info/stasha/testosterone/jersey/junit4) 
