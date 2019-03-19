@@ -109,9 +109,11 @@ public class GrizzlyServerConfig implements ServerConfig<ResourceConfig> {
      */
     @Override
     public void stop() throws Exception {
-        if (isRunning()) {
+        if (isRunning() && (testConfig == null || testConfig.isStopServerAfterTestEnds())) {
             server.stop();
-        }
+        } else if (isRunning() && !testConfig.isStopServerAfterTestEnds()) {
+            Thread.currentThread().join();
+        }  
     }
 
 }

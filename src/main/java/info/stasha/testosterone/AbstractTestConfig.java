@@ -37,6 +37,7 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
     private URI baseUri;
     private int httpPort;
     private StartServer startServer;
+    private Boolean stopServerAfterTestEnds;
     private Setup setup;
     private final String mainThreadName;
     private static boolean running;
@@ -317,6 +318,27 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
     }
 
     /**
+     * Returns true/false if server should stop after test ends.
+     *
+     * @return
+     */
+    public boolean isStopServerAfterTestEnds() {
+        if(this.stopServerAfterTestEnds == null) {
+            this.setStopServerAfterTestEnds(config != null ? config.stopServerAfterTestEnds() : true);
+        }
+        return stopServerAfterTestEnds;
+    }
+
+    /**
+     * Sets flag true/false if server should stop after test ends.
+     *
+     * @param stopServerAfterTestEnds
+     */
+    public void setStopServerAfterTestEnds(boolean stopServerAfterTestEnds) {
+        this.stopServerAfterTestEnds = stopServerAfterTestEnds;
+    }
+
+    /**
      * {@inheritDoc }
      *
      * @return
@@ -435,7 +457,7 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
     @Override
     public void stop() throws Exception {
         try {
-            if (isRunning()) {
+            if (isRunning() && this.isStopServerAfterTestEnds()) {
 
                 getClient().stop();
                 try {
@@ -458,6 +480,8 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
                         System.out.println("");
                     }
                 }
+            } else if(isRunning() && !this.isStopServerAfterTestEnds()){
+                getServerConfig().stop();
             }
         } finally {
             TestConfigFactory.TEST_CONFIGURATIONS.clear();

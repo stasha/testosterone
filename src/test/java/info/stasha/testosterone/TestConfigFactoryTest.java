@@ -1,7 +1,7 @@
 package info.stasha.testosterone;
 
-import info.stasha.testosterone.jersey.JerseyTestConfig;
 import info.stasha.testosterone.jersey.junit4.PlaygroundTest;
+import info.stasha.testosterone.jersey.JerseyTestConfig;
 import info.stasha.testosterone.jersey.junit4.Testosterone;
 import java.io.IOException;
 import java.nio.file.Files;

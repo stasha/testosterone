@@ -128,6 +128,13 @@ public interface TestConfig<T, C> extends StartStop {
     StartServer getStartServer();
 
     /**
+     * Returns true/false if server should be stopped after test ends.
+     *
+     * @return
+     */
+    boolean isStopServerAfterTestEnds();
+
+    /**
      * Returns setup.
      *
      * @return

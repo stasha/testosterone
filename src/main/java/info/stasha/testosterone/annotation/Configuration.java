@@ -80,4 +80,11 @@ public @interface Configuration {
      */
     StartServer startServer() default StartServer.PER_CLASS;
 
+    /**
+     * Stop embedded server after test ends.
+     *
+     * @return
+     */
+    boolean stopServerAfterTestEnds() default true;
+
 }

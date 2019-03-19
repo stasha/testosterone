@@ -27,7 +27,7 @@ public class TomcatServerConfig implements ServerConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(TomcatServerConfig.class);
 
     protected Tomcat server;
-     StandardContext context = new StandardContext();
+    StandardContext context = new StandardContext();
     private TestConfig testConfig;
     private ServletContainerConfig servletContainerConfig;
 
@@ -69,7 +69,7 @@ public class TomcatServerConfig implements ServerConfig {
      * filters and servlets
      */
     protected void initializeServletContainer() {
-       
+
         context.setDocBase(new File(".").getAbsolutePath());
         context.setPath("");
         context.setName("");
@@ -165,9 +165,13 @@ public class TomcatServerConfig implements ServerConfig {
 
     @Override
     public void stop() throws Exception {
-        server.stop();
-        server.destroy();
-        server = null;
+        if (testConfig == null || testConfig.isStopServerAfterTestEnds()) {
+            server.stop();
+            server.destroy();
+            server = null;
+        } else if (isRunning() && !testConfig.isStopServerAfterTestEnds()) {
+            server.getServer().await();
+        }
     }
 
     @Override

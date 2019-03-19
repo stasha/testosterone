@@ -1,7 +1,7 @@
 package info.stasha.testosterone;
 
-import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.jersey.junit4.PlaygroundTest;
+import info.stasha.testosterone.annotation.Configuration;
 import java.lang.reflect.InvocationTargetException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

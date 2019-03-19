@@ -5,7 +5,6 @@ import info.stasha.testosterone.ServerConfig;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.annotation.Request;
 import info.stasha.testosterone.junit4.TestosteroneRunner;
-import info.stasha.testosterone.servers.GrizzlyServerConfig;
 import javax.ws.rs.core.Response;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;

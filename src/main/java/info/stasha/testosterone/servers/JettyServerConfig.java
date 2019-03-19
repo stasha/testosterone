@@ -157,6 +157,8 @@ public class JettyServerConfig implements ServerConfig {
             server = new Server(testConfig.getHttpPort());
             initializeServletContainer();
             server.start();
+            String url = "http://localhost:" + testConfig.getHttpPort();
+            LOGGER.info("Server started at: " + url);
         }
     }
 
@@ -167,8 +169,10 @@ public class JettyServerConfig implements ServerConfig {
      */
     @Override
     public void stop() throws Exception {
-        if (isRunning()) {
+        if (isRunning() && (testConfig == null || testConfig.isStopServerAfterTestEnds())) {
             server.stop();
+        } else if (isRunning() && !testConfig.isStopServerAfterTestEnds()) {
+            server.join();
         }
     }
 

@@ -197,7 +197,8 @@ public class TestNGTest implements Testosterone {
   serverConfig = JettyServerConfig.class, 
   runServer = true, 
   runDb = false, 
-  startServer = StartServer.PER_CLASS
+  startServer = StartServer.PER_CLASS,
+  stopServerAfterTestEnds = true
 )
 public class TestNGTest implements Testosterone {
  
