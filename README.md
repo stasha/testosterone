@@ -84,8 +84,7 @@ Take a look at [example](https://github.com/stasha/testosterone/tree/master/src/
 - integration testing
     - [locally on embedded server with in-memory or external DB](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/TaskEndpointIntegrationTest.java)
     - [remote](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/integration/test/TaskEndpointExternalIntegrationTest.java)
-    - [test execution from browser]
-Tests and in test endpoints can be executed from browser by setting configuration property "stopServerAfterTestEnds=false"
+- tests and in test endpoints can be executed from browser by setting configuration property ```stopServerAfterTestEnds=false```
 
 ### Install using maven
 ```xml
