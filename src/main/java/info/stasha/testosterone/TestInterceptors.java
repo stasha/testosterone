@@ -322,7 +322,7 @@ public class TestInterceptors {
                         et.setIsRequest(true);
                     }
 
-                    locator.inject(orig);
+                    Utils.inject(locator, orig);
                     try {
                         LOGGER.info("Invoking {}", invoking);
                         for (Method m : Utils.getAnnotatedMethods(orig.getClass(), TestAnnotations.BEFORE)) {

@@ -12,6 +12,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ServiceLoader;
+import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.AnnotatedType;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.CDI;
+import javax.enterprise.inject.spi.InjectionTarget;
+import javax.enterprise.inject.spi.InjectionTargetFactory;
+import org.glassfish.hk2.api.ServiceLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -380,5 +387,49 @@ public class Utils {
                 throw new RuntimeException(ex);
             }
         }
+    }
+
+    /**
+     * Returns CDI BeanManager instance. If it is not available null is
+     * returned.
+     *
+     * @return
+     */
+    public static BeanManager getBeanManager() {
+        try {
+            return CDI.current().getBeanManager();
+        } catch (IllegalStateException ex) {
+            LOGGER.info("There is no CDI (WELD) available. Injecting CDI beans will be skipped.");
+            return null;
+        }
+    }
+
+    /**
+     * Injects required objects into object.
+     *
+     * @param locator
+     * @param test
+     */
+    public static void inject(ServiceLocator locator, Object test) {
+
+        BeanManager beanManager = getBeanManager();
+
+        if (beanManager == null) {
+            locator.inject(test);
+        } else {
+            final AnnotatedType annotatedType = beanManager.createAnnotatedType(test.getClass());
+            final InjectionTargetFactory injectionTargetFactory = beanManager.getInjectionTargetFactory(annotatedType);
+            final InjectionTarget injectionTarget = injectionTargetFactory.createInjectionTarget(null);
+
+            final CreationalContext creationalContext = beanManager.createCreationalContext(null);
+            injectionTarget.inject(test, creationalContext);
+
+            // inject analyzer is in string format which is wrong, should
+            // be used constant from CdiComponentProvider.CDI_CLASS_ANALYZER
+            // but, for now I just want to avoid dependency on additional package
+            // which might show in the future as wrong move.
+            locator.inject(test, "CdiInjecteeSkippingClassAnalyzer");
+        }
+
     }
 }

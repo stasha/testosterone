@@ -194,7 +194,7 @@ public class Setup implements ContainerResponseFilter {
      */
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
-        locator.inject(config.getTest());
+        Utils.inject(locator, config.getTest());
     }
 
     @Override
