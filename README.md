@@ -3,7 +3,7 @@
 
 # testosterone
 is architectural testing framework designed to simplify tests writing and Jersey based applications testing.<br />
-Also, it simplifies writing "free-form" or "cowboy" tests.
+Also, it simplifies writing "free-form" or "cowboy" tests. Beside testing it is ideal for learning/experimenting with Jersey, Helidon or CDI.
 
 [![Build Status](https://travis-ci.org/stasha/testosterone.svg?branch=master)](https://travis-ci.org/stasha/testosterone)
 [![CircleCI](https://circleci.com/gh/stasha/testosterone/tree/master.svg?style=svg)](https://circleci.com/gh/stasha/testosterone/tree/master)
