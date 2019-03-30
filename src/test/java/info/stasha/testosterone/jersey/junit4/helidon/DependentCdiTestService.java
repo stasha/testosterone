@@ -3,8 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package info.stasha.testosterone.helidon;
+package info.stasha.testosterone.jersey.junit4.helidon;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
@@ -16,6 +18,16 @@ import javax.inject.Inject;
 public class DependentCdiTestService {
 
     public static String MESSAGE = "message from dependent cdi service";
+
+    @PostConstruct
+    public void init() {
+        System.out.println(this + " has initialized");
+    }
+
+    @PreDestroy
+    public void destroy() {
+        System.out.println(this + " has destroyed");
+    }
 
     @Inject
     ApplicationScopedCdiTestService service;

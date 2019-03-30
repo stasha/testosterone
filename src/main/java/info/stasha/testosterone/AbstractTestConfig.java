@@ -1,6 +1,7 @@
 package info.stasha.testosterone;
 
 import info.stasha.testosterone.annotation.Configuration;
+import info.stasha.testosterone.cdi.CdiConfig;
 import info.stasha.testosterone.db.H2Config;
 import info.stasha.testosterone.servers.JettyServerConfig;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
@@ -32,6 +33,7 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
     private Configuration config;
     private ServletContainerConfig servletContainerConfig;
     private DbConfig dbConfig;
+    private CdiConfig cdiConfig;
     private Boolean runServer;
     private Boolean runDb;
     private URI baseUri;
@@ -195,6 +197,29 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
      * @return
      */
     @Override
+    public CdiConfig getCdiConfig() {
+        if (this.cdiConfig == null) {
+            this.setCdiConfig(new CdiConfig());
+        }
+
+        return this.cdiConfig;
+    }
+
+    /**
+     * Sets CDI configuration.
+     *
+     * @param cdiConfig
+     */
+    public void setCdiConfig(CdiConfig cdiConfig) {
+        this.cdiConfig = cdiConfig;
+    }
+
+    /**
+     * {@inheritDoc }
+     *
+     * @return
+     */
+    @Override
     public boolean isRunServer() {
         if (this.runServer == null) {
             this.setRunServer(config != null ? config.runServer() : RUN_SERVER);
@@ -323,7 +348,7 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
      * @return
      */
     public boolean isStopServerAfterTestEnds() {
-        if(this.stopServerAfterTestEnds == null) {
+        if (this.stopServerAfterTestEnds == null) {
             this.setStopServerAfterTestEnds(config != null ? config.stopServerAfterTestEnds() : true);
         }
         return stopServerAfterTestEnds;
@@ -480,7 +505,7 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
                         System.out.println("");
                     }
                 }
-            } else if(isRunning() && !this.isStopServerAfterTestEnds()){
+            } else if (isRunning() && !this.isStopServerAfterTestEnds()) {
                 getServerConfig().stop();
             }
         } finally {

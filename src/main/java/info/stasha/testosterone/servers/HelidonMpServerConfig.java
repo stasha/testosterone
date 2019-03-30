@@ -3,17 +3,17 @@ package info.stasha.testosterone.servers;
 import io.helidon.microprofile.server.Server;
 import info.stasha.testosterone.ServerConfig;
 import info.stasha.testosterone.TestConfig;
+import info.stasha.testosterone.cdi.weld.WeldExtended;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
 import io.helidon.config.Config;
 import io.helidon.microprofile.config.MpConfig;
 import javax.ws.rs.core.Application;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.jboss.weld.environment.se.Weld;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Netty server configuration
+ * Helidon microprofile server configuration
  *
  * @author stasha
  */
@@ -100,11 +100,12 @@ public class HelidonMpServerConfig implements ServerConfig<Application> {
      */
     @Override
     public void start() throws Exception {
+
         if (!isRunning()) {
 
             server = Server.builder()
                     .addApplication(this.resourceConfig)
-                    .cdiContainer(new Weld().initialize())
+                    .cdiContainer(new WeldExtended(this.testConfig).initialize())
                     .config(MpConfig.builder().config(Config.create()).build())
                     .host(testConfig.getBaseUri().getHost())
                     .port(testConfig.getHttpPort())

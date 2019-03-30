@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
 import javax.inject.Singleton;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.api.InjectionResolver;
@@ -202,6 +201,7 @@ public class JerseyTestConfig extends AbstractTestConfig<Testosterone, JerseyTes
         if (integration == null || root.equals(dep)) {
             dep.getTest().configureMocks(root.getApplication());
             dep.getTest().configureMocks(root.getServletContainerConfig());
+            dep.getTest().configureMocks(root.getCdiConfig());
 
             root.getApplication().register(new AbstractBinder() {
                 @Override

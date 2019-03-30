@@ -3,6 +3,7 @@ package info.stasha.testosterone;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.annotation.Request;
 import info.stasha.testosterone.annotation.Requests;
+import static info.stasha.testosterone.cdi.weld.WeldUtils.getBeanManager;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -15,7 +16,6 @@ import java.util.ServiceLoader;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.CDI;
 import javax.enterprise.inject.spi.InjectionTarget;
 import javax.enterprise.inject.spi.InjectionTargetFactory;
 import org.glassfish.hk2.api.ServiceLocator;
@@ -389,21 +389,7 @@ public class Utils {
         }
     }
 
-    /**
-     * Returns CDI BeanManager instance. If it is not available null is
-     * returned.
-     *
-     * @return
-     */
-    public static BeanManager getBeanManager() {
-        try {
-            return CDI.current().getBeanManager();
-        } catch (IllegalStateException ex) {
-            LOGGER.info("There is no CDI (WELD) available. Injecting CDI beans will be skipped.");
-            return null;
-        }
-    }
-
+    
     /**
      * Injects required objects into object.
      *

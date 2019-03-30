@@ -1,5 +1,6 @@
 package info.stasha.testosterone;
 
+import info.stasha.testosterone.cdi.CdiConfig;
 import javax.ws.rs.client.WebTarget;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
 import org.slf4j.Logger;
@@ -77,6 +78,15 @@ public interface SuperTestosterone {
      * @param config
      */
     default void configureMocks(DbConfig config) {
+
+    }
+
+    /**
+     * Override to add mock beans.
+     *
+     * @param config
+     */
+    default void configureMocks(CdiConfig config) {
 
     }
 

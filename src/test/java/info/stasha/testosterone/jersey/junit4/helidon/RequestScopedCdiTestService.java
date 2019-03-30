@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package info.stasha.testosterone.helidon;
+package info.stasha.testosterone.jersey.junit4.helidon;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;

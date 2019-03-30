@@ -1,6 +1,7 @@
 package info.stasha.testosterone;
 
 import info.stasha.testosterone.annotation.Configuration;
+import info.stasha.testosterone.cdi.CdiConfig;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -68,6 +69,13 @@ public interface TestConfig<T, C> extends StartStop {
      * @return
      */
     ServerConfig getServerConfig();
+    
+    /**
+     * Returns CDI config that will be used for running tests.
+     * 
+     * @return 
+     */
+    CdiConfig getCdiConfig();
 
     /**
      * Returns true/false if server should be started.
