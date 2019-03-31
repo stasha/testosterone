@@ -3,6 +3,7 @@ package info.stasha.testosterone;
 import info.stasha.testosterone.jersey.junit4.PlaygroundTest;
 import info.stasha.testosterone.annotation.Configuration;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -58,7 +59,7 @@ public class UtilsTest implements InterfaceWithAnnotation {
 
     @Test
     public void getAnnotatedMethodsTest() {
-        assertEquals("Method should return zero length list", 0, Utils.getAnnotatedMethods(this.getClass(), null).size());
+        assertEquals("Method should return zero length list", 0, Utils.getAnnotatedMethods(this.getClass(), (List)null).size());
     }
 
     @Test

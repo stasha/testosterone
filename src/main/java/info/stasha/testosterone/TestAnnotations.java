@@ -53,6 +53,9 @@ public class TestAnnotations {
                 return get("org.junit.After", "org.junit.jupiter.api.AfterEach", "org.testng.annotations.AfterMethod");
             case "afterClass":
                 return get("org.junit.AfterClass", "org.junit.jupiter.api.AfterAll", "org.testng.annotations.AfterClass");
+            case "ignore":
+                return get("org.junit.Ignore", "org.junit.jupiter.api.Disabled", "org.testng.annotations.Ignore");
+
         }
         return null;
     }
@@ -62,5 +65,6 @@ public class TestAnnotations {
     public static final List<Class<? extends Annotation>> TEST = getAnnotation("test");
     public static final List<Class<? extends Annotation>> AFTER = getAnnotation("after");
     public static final List<Class<? extends Annotation>> AFTERCLASS = getAnnotation("afterClass");
+    public static final List<Class<? extends Annotation>> IGNORE = getAnnotation("ignore");
 
 }

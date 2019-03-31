@@ -3,6 +3,7 @@ package info.stasha.testosterone;
 import info.stasha.testosterone.annotation.Request;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import javax.ws.rs.Path;
 import net.bytebuddy.implementation.bind.annotation.AllArguments;
@@ -296,10 +297,15 @@ public class TestInterceptors {
 
                     try {
                         try {
+                            Set<Method> methods = mainThreadTest.getTestConfig().getTestMethods();
+                            Set<Method> executed = mainThreadTest.getTestConfig().getExecutedTests();
+                            methods.remove(resourceMethod);
+                            
                             et = new TestInExecutionImpl(orig, mainThreadTest, resourceMethod, Utils.getMethodStartingWithName(mainThreadTest.getClass(), resourceMethod), args);
                             setup.setTestInExecution(et);
                             // Invoking http request to resource before on resource object
                             et.executeTest();
+                            executed.add(method);
                         } catch (Exception ex) {
                             LOGGER.error("Failed to execute test " + invoking, ex);
                             config.getExceptions().add(ex.getCause());

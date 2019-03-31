@@ -1,14 +1,18 @@
 package info.stasha.testosterone;
 
 import info.stasha.testosterone.annotation.Configuration;
+import info.stasha.testosterone.annotation.DontIntercept;
 import info.stasha.testosterone.cdi.CdiConfig;
 import info.stasha.testosterone.db.H2Config;
 import info.stasha.testosterone.servers.JettyServerConfig;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.inject.Singleton;
 import javax.ws.rs.core.UriBuilder;
 import org.slf4j.Logger;
@@ -24,6 +28,8 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTestConfig.class);
+
+    public static int totalTestsExecuted;
 
     private final Set<Throwable> exceptions = new HashSet<>();
 
@@ -43,6 +49,8 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
     private Setup setup;
     private final String mainThreadName;
     private static boolean running;
+    private Set<Method> testMethods = new LinkedHashSet<>();
+    private final Set<Method> executedTests = new LinkedHashSet<>();
 
     public AbstractTestConfig() {
         this(null, null);
@@ -438,6 +446,16 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
         this.running = running;
     }
 
+    @Override
+    public Set<Method> getTestMethods() {
+        return this.testMethods;
+    }
+
+    @Override
+    public Set<Method> getExecutedTests() {
+        return this.executedTests;
+    }
+
     /**
      * {@inheritDoc }
      *
@@ -447,6 +465,12 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
     public void start() throws Exception {
 
         if (!isRunning()) {
+            this.testMethods = Utils.getAnnotatedMethods(getTest().getClass(), TestAnnotations.TEST)
+                    .stream().filter(p -> p.getDeclaringClass().getName().endsWith("_")
+                    && p.getAnnotation(DontIntercept.class) == null
+                    && !Utils.isIgnored(p))
+                    .collect(Collectors.toSet());
+
             setRunning(true);
             getSetup().beforeServerStart((SuperTestosterone) getTest());
             LOGGER.info("Starting server with {} configuration", getStartServer());
@@ -503,6 +527,28 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
 
                         setRunning(false);
                         System.out.println("");
+
+                        int executed = executedTests.size();
+                        totalTestsExecuted += executed;
+
+//                        System.out.println(
+//                                "\nTests executed: " + executed
+//                                + "\nTotal tests executed: " + totalTestsExecuted + "\n\n\n");
+
+                        if (this.getStartServer() == StartServer.PER_TEST_METHOD) {
+
+                            if (executed < 1) {
+                                throw new AssertionError("StartServer configuration is set PER_TEST_METHOD but no tests were executed");
+                            } else if (executed > 1) {
+                                throw new AssertionError("StartServer configuration is set PER_TEST_METHOD but more then 1 test was executed");
+                            }
+                        } else {
+                            if (this.testMethods.size() > 0) {
+                                throw new AssertionError("Failed to invoke tests: " + Arrays.toString(this.testMethods.stream()
+                                        .map(p -> "\n" + p.getDeclaringClass() + "#" + p.getName())
+                                        .collect(Collectors.toList()).stream().toArray(String[]::new)));
+                            }
+                        }
                     }
                 }
             } else if (isRunning() && !this.isStopServerAfterTestEnds()) {

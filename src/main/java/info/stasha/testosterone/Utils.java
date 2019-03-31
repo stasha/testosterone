@@ -3,7 +3,7 @@ package info.stasha.testosterone;
 import info.stasha.testosterone.annotation.Configuration;
 import info.stasha.testosterone.annotation.Request;
 import info.stasha.testosterone.annotation.Requests;
-import static info.stasha.testosterone.cdi.weld.WeldUtils.getBeanManager;
+import static info.stasha.testosterone.cdi.CdiUtils.getBeanManager;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -11,8 +11,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ServiceLoader;
+import java.util.Set;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.BeanManager;
@@ -178,14 +181,15 @@ public class Utils {
     }
 
     /**
-     * Returns all methods that are annotated with specified annotation.
+     * Returns all methods including methods from superclasses that are
+     * annotated with specified annotation.
      *
      * @param clazz
      * @param annotations
      * @return
      */
-    public static List<Method> getAnnotatedMethods(Class<?> clazz, List<Class<? extends Annotation>> annotations) {
-        List<Method> methods = new ArrayList<>();
+    public static Set<Method> getAnnotatedMethods(Class<?> clazz, List<Class<? extends Annotation>> annotations) {
+        Set<Method> methods = new LinkedHashSet<>();
         if (clazz == null || annotations == null || annotations.isEmpty()) {
             return methods;
         }
@@ -201,6 +205,18 @@ public class Utils {
             clazz = clazz.getSuperclass();
         }
         return methods;
+    }
+
+    /**
+     * Returns all methods including methods from superclasses that are
+     * annotated with specified annotation.
+     *
+     * @param clazz
+     * @param annotation
+     * @return
+     */
+    public static Set<Method> getAnnotatedMethods(Class<?> clazz, Class<? extends Annotation> annotation) {
+        return getAnnotatedMethods(clazz, Collections.singletonList(annotation));
     }
 
     /**
@@ -254,6 +270,21 @@ public class Utils {
      */
     public static boolean isAnnotationPresent(Object o, Class<? extends Annotation> annotation) {
         return getAnnotation(o, annotation) != null;
+    }
+
+    /**
+     * Returns true/false if method is ignored.
+     *
+     * @param method
+     * @return
+     */
+    public static boolean isIgnored(Method method) {
+        for (Class<? extends Annotation> annotation : TestAnnotations.IGNORE) {
+            if (method.getAnnotation(annotation) != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -389,7 +420,6 @@ public class Utils {
         }
     }
 
-    
     /**
      * Injects required objects into object.
      *

@@ -15,6 +15,7 @@ public class ExecutionListener extends RunListener {
 
     // HACK BECAUSE TESTRUNFINISHED DOES NOT WORK
     private static Class<? extends SuperTestosterone> clazz;
+    private static int totalExecuted;
 
     /**
      * {@inheritDoc }
@@ -54,6 +55,8 @@ public class ExecutionListener extends RunListener {
     @Override
     public void testFinished(Description description) throws Exception {
         TestInterceptors.after(clazz);
+//        totalExecuted++;
+//        System.out.println("\nTotal tests executed from listener: " + totalExecuted);
     }
 
 }

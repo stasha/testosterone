@@ -20,7 +20,6 @@ import info.stasha.testosterone.jersey.inject.SpyInjectionResolver;
 import info.stasha.testosterone.jersey.inject.ValueInjectionResolver;
 import info.stasha.testosterone.junit4.AfterClassAnnotation;
 import info.stasha.testosterone.junit4.BeforeClassAnnotation;
-import info.stasha.testosterone.servlet.Servlet;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -34,7 +33,6 @@ import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.servlet.ServletContainer;
 import static org.mockito.AdditionalAnswers.delegatesTo;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -275,10 +273,7 @@ public class JerseyTestConfig extends AbstractTestConfig<Testosterone, JerseyTes
             // registering setup so it can listen for application events
             root.getApplication().register(root.getSetup());
 
-            // registering jersey servlet
-            Servlet s = new Servlet(new ServletContainer(root.getApplication()),
-                    root.getServletContainerConfig().getJaxRsPath()).setInitOrder(0);
-            root.getServletContainerConfig().addServlet(s);
+            JerseyServletUtils.registerJerseyServlet(root);
 
             LOGGER.info("Configuration end:   {}", root.getTest().getClass().getName());
             root.getServerConfig().setConfigurationObject(root.getApplication());

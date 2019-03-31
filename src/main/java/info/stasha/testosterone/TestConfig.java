@@ -69,11 +69,11 @@ public interface TestConfig<T, C> extends StartStop {
      * @return
      */
     ServerConfig getServerConfig();
-    
+
     /**
      * Returns CDI config that will be used for running tests.
-     * 
-     * @return 
+     *
+     * @return
      */
     CdiConfig getCdiConfig();
 
@@ -178,5 +178,19 @@ public interface TestConfig<T, C> extends StartStop {
      * @param tests
      */
     void init(C root, C dep, List<T> tests);
+
+    /**
+     * Returns test methods that should be executed.
+     *
+     * @return
+     */
+    Set<Method> getTestMethods();
+
+    /**
+     * Returns set of executed test methods.
+     *
+     * @return
+     */
+    Set<Method> getExecutedTests();
 
 }

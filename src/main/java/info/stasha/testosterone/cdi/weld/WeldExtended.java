@@ -1,8 +1,9 @@
 package info.stasha.testosterone.cdi.weld;
 
+import info.stasha.testosterone.cdi.CdiUtils;
 import info.stasha.testosterone.TestConfig;
 import info.stasha.testosterone.cdi.BeanConfig;
-import static info.stasha.testosterone.cdi.weld.WeldUtils.getBeanManager;
+import static info.stasha.testosterone.cdi.CdiUtils.getBeanManager;
 import java.util.function.Consumer;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.InjectionTarget;
@@ -30,7 +31,7 @@ public class WeldExtended extends Weld {
                     InjectionTarget it = getBeanManager().createInjectionTarget(annotatedType);
 
                     WeldBeanConfigurator config = event.addBean()
-                            .read(WeldUtils.getBeanManager().createAnnotatedType(bean.getBean()))
+                            .read(CdiUtils.getBeanManager().createAnnotatedType(bean.getBean()))
                             .beanClass(bean.getBean())
                             .scope(bean.getScope())
                             .priority(bean.getPriority())
@@ -38,11 +39,11 @@ public class WeldExtended extends Weld {
                             .alternative(true);
                     if (bean.getType().equals(BeanConfig.BeanType.MOCK)) {
                         config.createWith((i) -> {
-                            return WeldUtils.inject(Mockito.mock(bean.getBean()));
+                            return CdiUtils.inject(Mockito.mock(bean.getBean()));
                         });
                     } else if (bean.getType().equals(BeanConfig.BeanType.SPY)) {
                         config.createWith((i) -> {
-                            return WeldUtils.inject(Mockito.spy(WeldUtils.create(bean.getBean())));
+                            return CdiUtils.inject(Mockito.spy(CdiUtils.create(bean.getBean())));
                         });
                     }
 
