@@ -9,6 +9,7 @@ Also, it simplifies writing "free-form" or "cowboy" tests. Beside testing it is 
 [![CircleCI](https://circleci.com/gh/stasha/testosterone/tree/master.svg?style=svg)](https://circleci.com/gh/stasha/testosterone/tree/master)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/info.stasha/testosterone/badge.svg)](https://maven-badges.herokuapp.com/maven-central/info.stasha/testosterone)
 [![Coverage Status](https://coveralls.io/repos/github/stasha/testosterone/badge.svg)](https://coveralls.io/github/stasha/testosterone)
+[![Maintainability](https://api.codeclimate.com/v1/badges/2aa577a0b1c433309bf0/maintainability)](https://codeclimate.com/github/stasha/testosterone/maintainability)
 
 
 
