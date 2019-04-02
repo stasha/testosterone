@@ -17,7 +17,7 @@ public class RuntimeBindingTest implements Testosterone {
 
     @Override
     public void configure(ResourceConfig config) {
-        config.packages("info");
+        config.packages("info.stasha.testosterone.jersey.junit4");
     }
 
     @Context

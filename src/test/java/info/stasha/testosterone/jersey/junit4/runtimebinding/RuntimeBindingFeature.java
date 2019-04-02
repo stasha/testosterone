@@ -1,30 +1,30 @@
 package info.stasha.testosterone.jersey.junit4.runtimebinding;
 
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Feature;
-import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.ext.Provider;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.utilities.ServiceLocatorUtilities;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.server.monitoring.ApplicationEvent;
+import org.glassfish.jersey.server.monitoring.ApplicationEventListener;
+import org.glassfish.jersey.server.monitoring.RequestEvent;
+import org.glassfish.jersey.server.monitoring.RequestEventListener;
 
 /**
  *
  * @author stasha
  */
 @Provider
-public class RuntimeBindingFeature implements Feature {
-    
+public class RuntimeBindingFeature implements ApplicationEventListener {
+
     public static final String STRING_FROM_RUNTIME_BINDED_FACTORY = "string from runtime binded feature";
 
     @Context
     private ServiceLocator locator;
 
     @Override
-    public boolean configure(FeatureContext context) {
-        
-
+    public void onEvent(ApplicationEvent event) {
         ServiceLocatorUtilities.bind(locator, new AbstractBinder() {
             @Override
             protected void configure() {
@@ -41,8 +41,11 @@ public class RuntimeBindingFeature implements Feature {
                 }).to(String.class);
             }
         });
+    }
 
-        return false;
+    @Override
+    public RequestEventListener onRequest(RequestEvent requestEvent) {
+        return null;
     }
 
 }
