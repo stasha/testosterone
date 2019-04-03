@@ -1,4 +1,4 @@
-package info.stasha.testosterone.jersey.junit4.runtimebinding;
+package info.stasha.testosterone.jersey.junit4.jersey.runtimebinding;
 
 import info.stasha.testosterone.jersey.junit4.Testosterone;
 import info.stasha.testosterone.junit4.TestosteroneRunner;
@@ -13,11 +13,11 @@ import org.junit.runner.RunWith;
  * @author stasha
  */
 @RunWith(TestosteroneRunner.class)
-public class RuntimeBindingWithPackageScenTest implements Testosterone {
+public class RuntimeBindingExistingAndNonExistinPackageScanTest implements Testosterone {
 
     @Override
     public void configure(ResourceConfig config) {
-        config.packages("info.stasha.testosterone.jersey.junit4");
+        config.packages("some.non.existing.package", "info.stasha.testosterone.jersey.junit4");
     }
 
     @Context

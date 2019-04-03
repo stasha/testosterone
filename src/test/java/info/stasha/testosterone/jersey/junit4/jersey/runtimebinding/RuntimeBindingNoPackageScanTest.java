@@ -1,4 +1,4 @@
-package info.stasha.testosterone.jersey.junit4.runtimebinding;
+package info.stasha.testosterone.jersey.junit4.jersey.runtimebinding;
 
 import info.stasha.testosterone.jersey.junit4.Testosterone;
 import info.stasha.testosterone.junit4.TestosteroneRunner;

@@ -1,4 +1,4 @@
-package info.stasha.testosterone.jersey.junit4.runtimebinding;
+package info.stasha.testosterone.jersey.junit4.jersey.runtimebinding;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
