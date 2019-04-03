@@ -168,8 +168,6 @@ public class JerseyTestConfig extends AbstractTestConfig<Testosterone, JerseyTes
                     this.bind(InputStreamInjectionResolver.class)
                             .to(new TypeLiteral<InjectionResolver<LoadFile>>() {
                             }).in(Singleton.class);
-
-                    root.getTest().configure(this);
                 }
             });
 

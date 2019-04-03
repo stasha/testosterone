@@ -14,8 +14,8 @@ import javax.ws.rs.container.PreMatching;
  * @author stasha
  */
 @PreMatching
-@Priority(1)
-public class RequestFilter implements ContainerRequestFilter, ContainerResponseFilter {
+@Priority(2)
+public class RequestFilter2 implements ContainerRequestFilter, ContainerResponseFilter {
 
 	@Override
 	public void filter(ContainerRequestContext crc) throws IOException {
