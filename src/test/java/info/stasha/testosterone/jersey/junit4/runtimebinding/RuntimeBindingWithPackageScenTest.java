@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
  * @author stasha
  */
 @RunWith(TestosteroneRunner.class)
-public class RuntimeBindingTest implements Testosterone {
+public class RuntimeBindingWithPackageScenTest implements Testosterone {
 
     @Override
     public void configure(ResourceConfig config) {
@@ -26,7 +26,7 @@ public class RuntimeBindingTest implements Testosterone {
     @Test
     public void runtimeBindedFactoryTest() {
         assertEquals("String from runtime binded factory should equal",
-                RuntimeBindingFeature.STRING_FROM_RUNTIME_BINDED_FACTORY, stringFromFactory);
+                RuntimeBindingListener.STRING_FROM_RUNTIME_BINDED_FACTORY, stringFromFactory);
     }
 
 }

@@ -16,7 +16,7 @@ import org.glassfish.jersey.server.monitoring.RequestEventListener;
  * @author stasha
  */
 @Provider
-public class RuntimeBindingFeature implements ApplicationEventListener {
+public class RuntimeBindingListener implements ApplicationEventListener {
 
     public static final String STRING_FROM_RUNTIME_BINDED_FACTORY = "string from runtime binded feature";
 
@@ -25,22 +25,24 @@ public class RuntimeBindingFeature implements ApplicationEventListener {
 
     @Override
     public void onEvent(ApplicationEvent event) {
-        ServiceLocatorUtilities.bind(locator, new AbstractBinder() {
-            @Override
-            protected void configure() {
-                this.bindFactory(new Factory<String>() {
-                    @Override
-                    public String provide() {
-                        return STRING_FROM_RUNTIME_BINDED_FACTORY;
-                    }
+        if (event.getType() == ApplicationEvent.Type.INITIALIZATION_FINISHED) {
+            ServiceLocatorUtilities.bind(locator, new AbstractBinder() {
+                @Override
+                protected void configure() {
+                    this.bindFactory(new Factory<String>() {
+                        @Override
+                        public String provide() {
+                            return STRING_FROM_RUNTIME_BINDED_FACTORY;
+                        }
 
-                    @Override
-                    public void dispose(String instance) {
-                        // do nothing
-                    }
-                }).to(String.class);
-            }
-        });
+                        @Override
+                        public void dispose(String instance) {
+                            // do nothing
+                        }
+                    }).to(String.class);
+                }
+            });
+        }
     }
 
     @Override
