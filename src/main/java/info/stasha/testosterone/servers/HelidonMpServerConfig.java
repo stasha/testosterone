@@ -9,6 +9,8 @@ import io.helidon.config.Config;
 import io.helidon.microprofile.config.MpConfig;
 import javax.ws.rs.core.Application;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.jboss.weld.environment.se.Weld;
+import org.jboss.weld.environment.se.WeldContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +27,8 @@ public class HelidonMpServerConfig implements ServerConfig<Application> {
     private Server server;
     private ResourceConfig resourceConfig;
     private ServletContainerConfig servletContainerConfig;
+    private Weld weld;
+    WeldContainer weldContainer;
 
     public HelidonMpServerConfig() {
     }
@@ -100,12 +104,16 @@ public class HelidonMpServerConfig implements ServerConfig<Application> {
      */
     @Override
     public void start() throws Exception {
+        
 
         if (!isRunning()) {
+            
+            weld = new WeldExtended(this.testConfig);
+            weldContainer = weld.initialize();
 
             server = Server.builder()
                     .addApplication(this.resourceConfig)
-                    .cdiContainer(new WeldExtended(this.testConfig).initialize())
+                    .cdiContainer(weldContainer)
                     .config(MpConfig.builder().config(Config.create()).build())
                     .host(testConfig.getBaseUri().getHost())
                     .port(testConfig.getHttpPort())
@@ -116,7 +124,7 @@ public class HelidonMpServerConfig implements ServerConfig<Application> {
     }
 
     /**
-     * {@inheritDoc }
+     * {@inhstop(Utils.getTestosterone(clazz));eritDoc }
      *
      * @throws Exception
      */
@@ -124,6 +132,7 @@ public class HelidonMpServerConfig implements ServerConfig<Application> {
     public void stop() throws Exception {
         if (isRunning() && (testConfig == null || testConfig.isStopServerAfterTestEnds())) {
             server.stop();
+            Thread.sleep(10);
         } else if (isRunning() && !testConfig.isStopServerAfterTestEnds()) {
             Thread.currentThread().join();
         }

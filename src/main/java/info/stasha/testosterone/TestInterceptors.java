@@ -49,7 +49,7 @@ public class TestInterceptors {
         try {
             t.getTestConfig().stop();
         } catch (Exception ex) {
-            throw new RuntimeException();
+            throw new RuntimeException(ex);
         }
     }
 
