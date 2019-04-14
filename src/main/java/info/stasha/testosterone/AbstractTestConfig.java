@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTestConfig.class);
+    public static final ThreadLocal<AbstractTestConfig> TEST_CONFIG = new ThreadLocal<>();
 
     public static int totalTestsExecuted;
 
@@ -534,7 +535,6 @@ public abstract class AbstractTestConfig<T, C> implements TestConfig<T, C> {
 //                        System.out.println(
 //                                "\nTests executed: " + executed
 //                                + "\nTotal tests executed: " + totalTestsExecuted + "\n\n\n");
-
                         if (this.getStartServer() == StartServer.PER_TEST_METHOD) {
 
                             if (executed < 1) {

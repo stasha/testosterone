@@ -86,6 +86,8 @@ public class JerseyTestConfig extends AbstractTestConfig<Testosterone, JerseyTes
     @Override
     public void init(JerseyTestConfig root, JerseyTestConfig dep, final List<Testosterone> tests) {
 
+        TEST_CONFIG.set(this);
+
         //The configuration order is:
         //
         // 1. For Jersey bindings, first registered is one that gets used.
@@ -186,7 +188,7 @@ public class JerseyTestConfig extends AbstractTestConfig<Testosterone, JerseyTes
                     }
 
                 } catch (Exception ex) {
-                     throw new RuntimeException(ex);
+                    throw new RuntimeException(ex);
                 }
             }
 
@@ -270,6 +272,7 @@ public class JerseyTestConfig extends AbstractTestConfig<Testosterone, JerseyTes
             });
             // registering setup so it can listen for application events
             root.getApplication().register(root.getSetup());
+            root.getApplication().register(JerseyInitializationMarker.class);
 
             JerseyServletUtils.registerJerseyServlet(root);
 
@@ -293,5 +296,5 @@ public class JerseyTestConfig extends AbstractTestConfig<Testosterone, JerseyTes
             super.start();
         }
     }
-
+    
 }

@@ -3,7 +3,6 @@ package info.stasha.testosterone.servers;
 import io.helidon.microprofile.server.Server;
 import info.stasha.testosterone.ServerConfig;
 import info.stasha.testosterone.TestConfig;
-import info.stasha.testosterone.cdi.weld.WeldExtended;
 import info.stasha.testosterone.servlet.ServletContainerConfig;
 import io.helidon.config.Config;
 import io.helidon.microprofile.config.MpConfig;
@@ -28,7 +27,7 @@ public class HelidonMpServerConfig implements ServerConfig<Application> {
     private ResourceConfig resourceConfig;
     private ServletContainerConfig servletContainerConfig;
     private Weld weld;
-    WeldContainer weldContainer;
+    private WeldContainer weldContainer;
 
     public HelidonMpServerConfig() {
     }
@@ -108,7 +107,7 @@ public class HelidonMpServerConfig implements ServerConfig<Application> {
 
         if (!isRunning()) {
             
-            weld = new WeldExtended(this.testConfig);
+            weld = new Weld();
             weldContainer = weld.initialize();
 
             server = Server.builder()
