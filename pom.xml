@@ -60,7 +60,8 @@
         <mockito.version>2.23.0</mockito.version>
         <javax-enterprise.version>2.0</javax-enterprise.version>
         <generex.version>1.0.2</generex.version>
-        <jetty.version>9.4.12.v20180830</jetty.version>
+        <jetty.version>9.4.18.v20190429</jetty.version>
+        <tomcat.version>8.5.40</tomcat.version>
         <commons-lang.version>3.8.1</commons-lang.version>
         <h2.version>1.4.197</h2.version>
         <helidon.version>1.0.3</helidon.version>
@@ -152,19 +153,19 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
-            <version>8.5.35</version>
+            <version>${tomcat.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
-            <version>8.5.35</version>
+            <version>${tomcat.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-jasper</artifactId>
-            <version>8.5.35</version>
+            <version>${tomcat.version}</version>
             <scope>provided</scope>
         </dependency>
         
