@@ -63,7 +63,7 @@
         <jetty.version>9.4.12.v20180830</jetty.version>
         <commons-lang.version>3.8.1</commons-lang.version>
         <h2.version>1.4.197</h2.version>
-        <helidon.version>1.0.2</helidon.version>
+        <helidon.version>1.0.3</helidon.version>
         <jandex.version>2.1.1.Final</jandex.version>
 	
         <surefire-plugin.version>2.22.1</surefire-plugin.version>
