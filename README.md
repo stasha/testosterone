@@ -24,8 +24,8 @@ Take a look at [example](https://github.com/stasha/testosterone/tree/master/src/
 
 
 ### Testosterone supports
-- **ALL Jersey versions from 2.1 to 2.29**
-- **ALL Helidon versions from 1.0.0 to 1.2.1**
+- **ALL Jersey versions from 2.1 to 2.29.1**
+- **ALL Helidon versions from 1.0.0 to 1.3.1**
     - [Includes CDI mocking and spying](https://github.com/stasha/testosterone/blob/master/src/test/java/info/stasha/testosterone/jersey/junit4/helidon/HelidonTest.java)
 ###
 - testing frameworks 
