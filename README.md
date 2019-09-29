@@ -134,7 +134,7 @@ this dependency should be removed because it makes conflicts -->
 <dependency>
     <groupId>info.stasha</groupId>
     <artifactId>testosterone</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
     <scope>test</scope>
 </dependency>
 
