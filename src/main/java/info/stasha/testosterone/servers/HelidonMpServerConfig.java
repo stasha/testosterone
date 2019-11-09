@@ -130,6 +130,7 @@ public class HelidonMpServerConfig implements ServerConfig<Application> {
     @Override
     public void stop() throws Exception {
         if (isRunning() && (testConfig == null || testConfig.isStopServerAfterTestEnds())) {
+            weld.shutdown();
             server.stop();
             Thread.sleep(10);
         } else if (isRunning() && !testConfig.isStopServerAfterTestEnds()) {

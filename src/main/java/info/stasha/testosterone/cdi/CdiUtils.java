@@ -29,7 +29,7 @@ public class CdiUtils {
     public static BeanManager getBeanManager() {
         try {
             return CDI.current().getBeanManager();
-        } catch (IllegalStateException ex) {
+        } catch (Exception ex) {
             LOGGER.info("There is no CDI (WELD) available. Injecting CDI beans will be skipped.");
             return null;
         }
@@ -37,6 +37,10 @@ public class CdiUtils {
 
     public static Object create(Class<?> clazz) {
         BeanManager beanManager = getBeanManager();
+
+        if (beanManager == null) {
+            return null;
+        }
 
         final AnnotatedType annotatedType = beanManager.createAnnotatedType(clazz);
         final InjectionTargetFactory injectionTargetFactory = beanManager.getInjectionTargetFactory(annotatedType);
@@ -52,6 +56,10 @@ public class CdiUtils {
 
     public static <T> T inject(T obj) {
         BeanManager beanManager = getBeanManager();
+
+        if (beanManager == null) {
+            return null;
+        }
 
         final AnnotatedType annotatedType = beanManager.createAnnotatedType(obj.getClass());
         final InjectionTargetFactory injectionTargetFactory = beanManager.getInjectionTargetFactory(annotatedType);

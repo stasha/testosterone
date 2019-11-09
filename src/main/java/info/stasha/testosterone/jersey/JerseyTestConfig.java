@@ -112,10 +112,14 @@ public class JerseyTestConfig extends AbstractTestConfig<Testosterone, JerseyTes
 
         if (root.equals(dep)) {
             root.getApplication().register(new AbstractBinder() {
+                private boolean initialized = false;
 
                 @Override
                 protected void configure() {
-
+                    if (initialized) {
+                        return;
+                    }
+                    initialized = true;
                     this.bindFactory(new Factory<Testosterone>() {
 
                         @Override
@@ -202,8 +206,15 @@ public class JerseyTestConfig extends AbstractTestConfig<Testosterone, JerseyTes
             dep.getTest().configureMocks(root.getCdiConfig());
 
             root.getApplication().register(new AbstractBinder() {
+                private boolean initialized = false;
+
                 @Override
                 protected void configure() {
+                    if (initialized) {
+                        return;
+                    }
+                    initialized = true;
+
                     dep.getTest().configureMocks(this);
                 }
             });
@@ -263,11 +274,18 @@ public class JerseyTestConfig extends AbstractTestConfig<Testosterone, JerseyTes
 
             root.getApplication().register(new AbstractBinder() {
 
+                private boolean initialized = false;
+
                 @Override
                 protected void configure() {
+                    if (initialized) {
+                        return;
+                    }
+                    initialized = true;
                     tests.forEach((test) -> {
                         test.configure(this);
                     });
+
                 }
             });
             // registering setup so it can listen for application events
@@ -296,5 +314,5 @@ public class JerseyTestConfig extends AbstractTestConfig<Testosterone, JerseyTes
             super.start();
         }
     }
-    
+
 }

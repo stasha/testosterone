@@ -11,19 +11,17 @@ import org.glassfish.hk2.api.InterceptionService;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 import static org.junit.Assert.assertEquals;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
- * 
+ *
  * @author stasha
  */
-@Ignore
 @RunWith(TestosteroneRunner.class)
 public class MethodInterceptorTest implements Testosterone {
 
-    @Path("/intercept")
+    @Path("intercept")
     public static class MyInterceptedResource {
 
         @GET
