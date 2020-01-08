@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Connection factory used for creating new connections when injecting ingo
+ * Connection factory used for creating new connections when injecting into
  * method or class.<br>
  *
  * @Context Connection

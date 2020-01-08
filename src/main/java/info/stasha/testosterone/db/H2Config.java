@@ -1,6 +1,8 @@
 package info.stasha.testosterone.db;
 
 import info.stasha.testosterone.TestConfig;
+import java.sql.Connection;
+import java.sql.DriverManager;
 
 /**
  * H2 DbConfig implementation.
@@ -8,6 +10,8 @@ import info.stasha.testosterone.TestConfig;
  * @author stasha
  */
 public class H2Config extends AbstractDbConfig {
+    
+    private final String conn = "jdbc:h2:mem:";
 
     public H2Config() {
         this(null);
@@ -17,7 +21,8 @@ public class H2Config extends AbstractDbConfig {
         super(testConfig);
         this.dbName = "H2 DB";
 
-        this.dataSource.setJdbcUrl("jdbc:h2:mem:" + testDb + ";create=true");
+        this.dbConnectionString = conn + testDb + ";create=true";
+        this.dataSource.setJdbcUrl(this.dbConnectionString);
         this.dataSource.setUsername(this.userName);
         this.dataSource.setPassword(this.password);
     }
@@ -30,7 +35,9 @@ public class H2Config extends AbstractDbConfig {
     @Override
     public void stop() throws Exception {
         if (isRunning()) {
-            getConnection().prepareStatement("shutdown").execute();
+            try (Connection c = DriverManager.getConnection(dbConnectionString, userName, password)) {
+                c.prepareStatement("shutdown").execute();
+            }
             super.stop();
         }
     }
