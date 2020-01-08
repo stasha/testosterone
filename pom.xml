@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>info.stasha</groupId>
     <artifactId>testosterone</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.3-SNAPSHOT</version>
 	
     <name>testosterone</name>
     <description>
@@ -33,7 +33,7 @@
     <scm>
         <connection>scm:git:https://github.com/stasha/testosterone.git</connection>
         <url>https://github.com/stasha/testosterone.git</url>
-        <tag>testosterone-3.0.2</tag>
+        <tag>testosterone-2.27</tag>
     </scm>
 	
     <distributionManagement>
