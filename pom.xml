@@ -68,7 +68,7 @@
         <jandex.version>2.1.1.Final</jandex.version>
 	
         <surefire-plugin.version>2.22.1</surefire-plugin.version>
-        <junit.version>4.12</junit.version><!-- supported versions of JUnit are 4.5 or higher -->
+        <junit.version>4.13.1</junit.version><!-- supported versions of JUnit are 4.5 or higher -->
         <junit-jupiter.version>5.3.1</junit-jupiter.version>
         <junit-platform.version>1.3.1</junit-platform.version>
         <testng.version>6.14.3</testng.version>
