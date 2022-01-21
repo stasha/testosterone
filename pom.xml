@@ -63,7 +63,7 @@
         <jetty.version>9.4.18.v20190429</jetty.version>
         <tomcat.version>8.5.50</tomcat.version>
         <commons-lang.version>3.8.1</commons-lang.version>
-        <h2.version>1.4.197</h2.version>
+        <h2.version>2.1.210</h2.version>
         <helidon.version>1.4.1</helidon.version>
         <jandex.version>2.1.1.Final</jandex.version>
 	
